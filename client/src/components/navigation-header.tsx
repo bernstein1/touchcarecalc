@@ -1,4 +1,4 @@
-import { Calculator, Printer, ArrowLeft, Home } from "lucide-react";
+import { Calculator, Printer, ArrowLeft, Home, GitCompare } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useLocation } from "wouter";
 
@@ -38,9 +38,11 @@ export default function NavigationHeader() {
             <Button
               variant="ghost"
               className="text-muted-foreground hover:text-primary transition-colors"
-              data-testid="button-history"
+              onClick={() => navigate("/comparison")}
+              data-testid="button-comparison"
             >
-              History
+              <GitCompare className="mr-2" size={16} />
+              Compare
             </Button>
             <Button
               className="glass-button hover:bg-primary/90 text-primary-foreground transition-all"
