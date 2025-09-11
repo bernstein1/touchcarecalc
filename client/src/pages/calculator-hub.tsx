@@ -1,4 +1,4 @@
-import { HeartPulse, Bus, Shield } from "lucide-react";
+import { HeartPulse, Bus, Shield, TrendingUp } from "lucide-react";
 import GlassCard from "@/components/glass-card";
 import { useLocation } from "wouter";
 
@@ -45,6 +45,19 @@ export default function CalculatorHub() {
         { label: "Method:", value: "DIME Analysis" },
       ],
     },
+    {
+      id: "retirement",
+      title: "401(k) Retirement",
+      description: "Plan your retirement with compound interest projections and employer matching calculations.",
+      icon: TrendingUp,
+      color: "text-chart-1",
+      bgColor: "bg-chart-1",
+      route: "/retirement",
+      stats: [
+        { label: "2025 Limit:", value: "$23,000" },
+        { label: "50+ Catch-up:", value: "$30,500" },
+      ],
+    },
   ];
 
   return (
@@ -58,7 +71,7 @@ export default function CalculatorHub() {
         </p>
       </div>
 
-      <div className="grid md:grid-cols-3 gap-8 mb-12">
+      <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
         {calculators.map((calculator) => {
           const Icon = calculator.icon;
           return (

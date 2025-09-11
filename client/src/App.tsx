@@ -8,6 +8,7 @@ import CalculatorHub from "@/pages/calculator-hub";
 import HSACalculator from "@/pages/hsa-calculator";
 import CommuterCalculator from "@/pages/commuter-calculator";
 import LifeInsuranceCalculator from "@/pages/life-insurance-calculator";
+import RetirementCalculator from "@/pages/retirement-calculator";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -17,6 +18,7 @@ function Router() {
       <Route path="/hsa" component={HSACalculator} />
       <Route path="/commuter" component={CommuterCalculator} />
       <Route path="/life-insurance" component={LifeInsuranceCalculator} />
+      <Route path="/retirement" component={RetirementCalculator} />
       <Route component={NotFound} />
     </Switch>
   );

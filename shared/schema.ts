@@ -5,7 +5,7 @@ import { z } from "zod";
 
 export const calculationSessions = pgTable("calculation_sessions", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  calculatorType: text("calculator_type").notNull(), // 'hsa', 'commuter', 'life'
+  calculatorType: text("calculator_type").notNull(), // 'hsa', 'commuter', 'life', '401k'
   inputData: text("input_data").notNull(), // JSON string of form inputs
   results: text("results").notNull(), // JSON string of calculation results
   createdAt: timestamp("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
@@ -64,4 +64,37 @@ export interface LifeInsuranceResults {
   dimeTotal: number;
   additionalNeeded: number;
   incomeReplacement: number;
+}
+
+export interface RetirementInputs {
+  currentAge: number;
+  retirementAge: number;
+  currentSalary: number;
+  currentSavings: number;
+  employeeContribution: number;
+  employerMatch: number;
+  employerMatchCap: number;
+  expectedReturn: number;
+  salaryGrowth: number;
+  contributionType: 'traditional' | 'roth' | 'both';
+  taxBracket: number;
+}
+
+export interface RetirementResults {
+  finalBalance: number;
+  totalContributions: number;
+  employerContributions: number;
+  investmentGrowth: number;
+  monthlyContribution: number;
+  yearlyProjections: Array<{
+    year: number;
+    age: number;
+    salary: number;
+    employeeContribution: number;
+    employerContribution: number;
+    totalContribution: number;
+    balance: number;
+    taxSavings: number;
+  }>;
+  taxSavings: number;
 }
