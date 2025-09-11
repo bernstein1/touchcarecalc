@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Slider } from "@/components/ui/slider";
 import GlassCard from "@/components/glass-card";
 import Tooltip from "@/components/tooltip";
 import { useLocation } from "wouter";
@@ -67,18 +68,21 @@ export default function CommuterCalculator() {
               {/* Transit Expenses */}
               <div>
                 <Label className="flex items-center text-sm font-medium text-foreground mb-4">
-                  Monthly Transit Costs
+                  Monthly Transit Costs: ${inputs.transitCost}
                   <Tooltip content="Includes bus, subway, train, ferry, and vanpool costs. 2025 limit: $315/month." />
                 </Label>
-                <div className="relative">
-                  <span className="absolute left-4 top-3 text-muted-foreground">$</span>
-                  <Input
-                    type="number"
-                    className="glass-input pl-8"
-                    value={inputs.transitCost}
-                    onChange={(e) => updateInput('transitCost', parseFloat(e.target.value) || 0)}
-                    data-testid="input-transit-cost"
-                  />
+                <Slider
+                  value={[inputs.transitCost]}
+                  onValueChange={(value) => updateInput('transitCost', value[0])}
+                  max={500}
+                  min={0}
+                  step={5}
+                  className="w-full"
+                  data-testid="slider-transit-cost"
+                />
+                <div className="flex justify-between text-xs text-muted-foreground mt-1">
+                  <span>$0</span>
+                  <span>$500</span>
                 </div>
                 <div className="mt-2 text-xs text-muted-foreground">
                   2025 Monthly Limit: $315
@@ -88,18 +92,21 @@ export default function CommuterCalculator() {
               {/* Parking Expenses */}
               <div>
                 <Label className="flex items-center text-sm font-medium text-foreground mb-4">
-                  Monthly Parking Costs
+                  Monthly Parking Costs: ${inputs.parkingCost}
                   <Tooltip content="Includes workplace parking fees and related expenses. 2025 limit: $315/month." />
                 </Label>
-                <div className="relative">
-                  <span className="absolute left-4 top-3 text-muted-foreground">$</span>
-                  <Input
-                    type="number"
-                    className="glass-input pl-8"
-                    value={inputs.parkingCost}
-                    onChange={(e) => updateInput('parkingCost', parseFloat(e.target.value) || 0)}
-                    data-testid="input-parking-cost"
-                  />
+                <Slider
+                  value={[inputs.parkingCost]}
+                  onValueChange={(value) => updateInput('parkingCost', value[0])}
+                  max={500}
+                  min={0}
+                  step={5}
+                  className="w-full"
+                  data-testid="slider-parking-cost"
+                />
+                <div className="flex justify-between text-xs text-muted-foreground mt-1">
+                  <span>$0</span>
+                  <span>$500</span>
                 </div>
                 <div className="mt-2 text-xs text-muted-foreground">
                   2025 Monthly Limit: $315

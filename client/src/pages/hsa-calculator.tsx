@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Slider } from "@/components/ui/slider";
 import GlassCard from "@/components/glass-card";
 import Tooltip from "@/components/tooltip";
 import { useLocation } from "wouter";
@@ -86,7 +87,11 @@ export default function HSACalculator() {
                 onValueChange={(value) => updateInput('accountType', value as 'hsa' | 'fsa')}
                 className="grid grid-cols-2 gap-4"
               >
-                <div className="glass-input rounded-xl p-4 cursor-pointer hover:bg-primary/10 transition-colors">
+                <div className={`glass-input rounded-xl p-4 cursor-pointer transition-colors ${
+                  inputs.accountType === 'hsa' 
+                    ? 'bg-primary/20 border-primary ring-2 ring-primary/50' 
+                    : 'hover:bg-primary/10'
+                }`}>
                   <RadioGroupItem value="hsa" id="hsa" className="sr-only" />
                   <Label htmlFor="hsa" className="cursor-pointer">
                     <div className="text-center">
@@ -96,7 +101,11 @@ export default function HSACalculator() {
                     </div>
                   </Label>
                 </div>
-                <div className="glass-input rounded-xl p-4 cursor-pointer hover:bg-primary/10 transition-colors">
+                <div className={`glass-input rounded-xl p-4 cursor-pointer transition-colors ${
+                  inputs.accountType === 'fsa' 
+                    ? 'bg-secondary/20 border-secondary ring-2 ring-secondary/50' 
+                    : 'hover:bg-primary/10'
+                }`}>
                   <RadioGroupItem value="fsa" id="fsa" className="sr-only" />
                   <Label htmlFor="fsa" className="cursor-pointer">
                     <div className="text-center">
@@ -120,7 +129,11 @@ export default function HSACalculator() {
                 onValueChange={(value) => updateInput('coverage', value as 'individual' | 'family')}
                 className="grid grid-cols-2 gap-4"
               >
-                <div className="glass-input rounded-xl p-4 cursor-pointer hover:bg-primary/10 transition-colors">
+                <div className={`glass-input rounded-xl p-4 cursor-pointer transition-colors ${
+                  inputs.coverage === 'individual' 
+                    ? 'bg-primary/20 border-primary ring-2 ring-primary/50' 
+                    : 'hover:bg-primary/10'
+                }`}>
                   <RadioGroupItem value="individual" id="individual" className="sr-only" />
                   <Label htmlFor="individual" className="cursor-pointer">
                     <div className="text-center">
@@ -130,7 +143,11 @@ export default function HSACalculator() {
                     </div>
                   </Label>
                 </div>
-                <div className="glass-input rounded-xl p-4 cursor-pointer hover:bg-primary/10 transition-colors">
+                <div className={`glass-input rounded-xl p-4 cursor-pointer transition-colors ${
+                  inputs.coverage === 'family' 
+                    ? 'bg-primary/20 border-primary ring-2 ring-primary/50' 
+                    : 'hover:bg-primary/10'
+                }`}>
                   <RadioGroupItem value="family" id="family" className="sr-only" />
                   <Label htmlFor="family" className="cursor-pointer">
                     <div className="text-center">
@@ -164,18 +181,21 @@ export default function HSACalculator() {
 
               <div>
                 <Label className="flex items-center text-sm font-medium text-foreground mb-2">
-                  Planned Annual Contribution
+                  Planned Annual Contribution: ${inputs.contribution.toLocaleString()}
                   <Tooltip content="Amount you plan to contribute annually. Cannot exceed IRS limits." />
                 </Label>
-                <div className="relative">
-                  <span className="absolute left-4 top-3 text-muted-foreground">$</span>
-                  <Input
-                    type="number"
-                    className="glass-input pl-8"
-                    value={inputs.contribution}
-                    onChange={(e) => updateInput('contribution', parseFloat(e.target.value) || 0)}
-                    data-testid="input-contribution"
-                  />
+                <Slider
+                  value={[inputs.contribution]}
+                  onValueChange={(value) => updateInput('contribution', value[0])}
+                  max={results.contributionLimit}
+                  min={0}
+                  step={50}
+                  className="w-full"
+                  data-testid="slider-contribution"
+                />
+                <div className="flex justify-between text-xs text-muted-foreground mt-1">
+                  <span>$0</span>
+                  <span>${results.contributionLimit.toLocaleString()}</span>
                 </div>
                 <div className="mt-2 text-xs text-muted-foreground" data-testid="text-contribution-limit">
                   {getLimitText()}

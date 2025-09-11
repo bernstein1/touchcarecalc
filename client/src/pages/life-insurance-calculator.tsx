@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Slider } from "@/components/ui/slider";
 import GlassCard from "@/components/glass-card";
 import Tooltip from "@/components/tooltip";
 import { useLocation } from "wouter";
@@ -69,18 +70,21 @@ export default function LifeInsuranceCalculator() {
                 {/* Debt */}
                 <div>
                   <Label className="flex items-center text-sm font-medium text-foreground mb-4">
-                    Total Debt
+                    Total Debt: ${inputs.totalDebt.toLocaleString()}
                     <Tooltip content="Include mortgage, credit cards, loans, and other debts your family would need to pay." />
                   </Label>
-                  <div className="relative">
-                    <span className="absolute left-4 top-3 text-muted-foreground">$</span>
-                    <Input
-                      type="number"
-                      className="glass-input pl-8"
-                      value={inputs.totalDebt}
-                      onChange={(e) => updateInput('totalDebt', parseFloat(e.target.value) || 0)}
-                      data-testid="input-total-debt"
-                    />
+                  <Slider
+                    value={[inputs.totalDebt]}
+                    onValueChange={(value) => updateInput('totalDebt', value[0])}
+                    max={1000000}
+                    min={0}
+                    step={5000}
+                    className="w-full"
+                    data-testid="slider-total-debt"
+                  />
+                  <div className="flex justify-between text-xs text-muted-foreground mt-1">
+                    <span>$0</span>
+                    <span>$1,000,000</span>
                   </div>
                 </div>
 
@@ -105,36 +109,42 @@ export default function LifeInsuranceCalculator() {
                 {/* Mortgage */}
                 <div>
                   <Label className="flex items-center text-sm font-medium text-foreground mb-4">
-                    Mortgage Balance
+                    Mortgage Balance: ${inputs.mortgageBalance.toLocaleString()}
                     <Tooltip content="Outstanding mortgage balance that could be paid off to reduce family expenses." />
                   </Label>
-                  <div className="relative">
-                    <span className="absolute left-4 top-3 text-muted-foreground">$</span>
-                    <Input
-                      type="number"
-                      className="glass-input pl-8"
-                      value={inputs.mortgageBalance}
-                      onChange={(e) => updateInput('mortgageBalance', parseFloat(e.target.value) || 0)}
-                      data-testid="input-mortgage-balance"
-                    />
+                  <Slider
+                    value={[inputs.mortgageBalance]}
+                    onValueChange={(value) => updateInput('mortgageBalance', value[0])}
+                    max={1000000}
+                    min={0}
+                    step={5000}
+                    className="w-full"
+                    data-testid="slider-mortgage-balance"
+                  />
+                  <div className="flex justify-between text-xs text-muted-foreground mt-1">
+                    <span>$0</span>
+                    <span>$1,000,000</span>
                   </div>
                 </div>
 
                 {/* Education */}
                 <div>
                   <Label className="flex items-center text-sm font-medium text-foreground mb-4">
-                    Future Education Costs
+                    Future Education Costs: ${inputs.educationCosts.toLocaleString()}
                     <Tooltip content="Estimated costs for children's education, including college expenses." />
                   </Label>
-                  <div className="relative">
-                    <span className="absolute left-4 top-3 text-muted-foreground">$</span>
-                    <Input
-                      type="number"
-                      className="glass-input pl-8"
-                      value={inputs.educationCosts}
-                      onChange={(e) => updateInput('educationCosts', parseFloat(e.target.value) || 0)}
-                      data-testid="input-education-costs"
-                    />
+                  <Slider
+                    value={[inputs.educationCosts]}
+                    onValueChange={(value) => updateInput('educationCosts', value[0])}
+                    max={500000}
+                    min={0}
+                    step={5000}
+                    className="w-full"
+                    data-testid="slider-education-costs"
+                  />
+                  <div className="flex justify-between text-xs text-muted-foreground mt-1">
+                    <span>$0</span>
+                    <span>$500,000</span>
                   </div>
                 </div>
               </div>
@@ -157,16 +167,21 @@ export default function LifeInsuranceCalculator() {
                 </div>
 
                 <div>
-                  <Label className="text-sm font-medium text-foreground mb-2">Current Life Insurance</Label>
-                  <div className="relative">
-                    <span className="absolute left-4 top-3 text-muted-foreground">$</span>
-                    <Input
-                      type="number"
-                      className="glass-input pl-8"
-                      value={inputs.currentInsurance}
-                      onChange={(e) => updateInput('currentInsurance', parseFloat(e.target.value) || 0)}
-                      data-testid="input-current-insurance"
-                    />
+                  <Label className="text-sm font-medium text-foreground mb-2">
+                    Current Life Insurance: ${inputs.currentInsurance.toLocaleString()}
+                  </Label>
+                  <Slider
+                    value={[inputs.currentInsurance]}
+                    onValueChange={(value) => updateInput('currentInsurance', value[0])}
+                    max={2000000}
+                    min={0}
+                    step={10000}
+                    className="w-full"
+                    data-testid="slider-current-insurance"
+                  />
+                  <div className="flex justify-between text-xs text-muted-foreground mt-1">
+                    <span>$0</span>
+                    <span>$2,000,000</span>
                   </div>
                 </div>
               </div>

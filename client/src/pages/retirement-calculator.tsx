@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Slider } from "@/components/ui/slider";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import GlassCard from "@/components/glass-card";
 import Tooltip from "@/components/tooltip";
@@ -94,16 +95,22 @@ export default function RetirementCalculator() {
             <div className="grid md:grid-cols-2 gap-6 mb-8">
               <div>
                 <Label className="flex items-center text-sm font-medium text-foreground mb-2">
-                  Current Age
+                  Current Age: {inputs.currentAge}
                   <Tooltip content="Your current age affects contribution limits and time to retirement." />
                 </Label>
-                <Input
-                  type="number"
-                  className="glass-input"
-                  value={inputs.currentAge}
-                  onChange={(e) => updateInput('currentAge', parseFloat(e.target.value) || 0)}
-                  data-testid="input-current-age"
+                <Slider
+                  value={[inputs.currentAge]}
+                  onValueChange={(value) => updateInput('currentAge', value[0])}
+                  max={70}
+                  min={18}
+                  step={1}
+                  className="w-full"
+                  data-testid="slider-current-age"
                 />
+                <div className="flex justify-between text-xs text-muted-foreground mt-1">
+                  <span>18</span>
+                  <span>70</span>
+                </div>
               </div>
 
               <div>
@@ -145,18 +152,21 @@ export default function RetirementCalculator() {
 
               <div>
                 <Label className="flex items-center text-sm font-medium text-foreground mb-2">
-                  Current 401(k) Balance
+                  Current 401(k) Balance: ${inputs.currentSavings.toLocaleString()}
                   <Tooltip content="The current value of your 401(k) or retirement savings accounts." />
                 </Label>
-                <div className="relative">
-                  <span className="absolute left-4 top-3 text-muted-foreground">$</span>
-                  <Input
-                    type="number"
-                    className="glass-input pl-8"
-                    value={inputs.currentSavings}
-                    onChange={(e) => updateInput('currentSavings', parseFloat(e.target.value) || 0)}
-                    data-testid="input-current-savings"
-                  />
+                <Slider
+                  value={[inputs.currentSavings]}
+                  onValueChange={(value) => updateInput('currentSavings', value[0])}
+                  max={500000}
+                  min={0}
+                  step={1000}
+                  className="w-full"
+                  data-testid="slider-current-savings"
+                />
+                <div className="flex justify-between text-xs text-muted-foreground mt-1">
+                  <span>$0</span>
+                  <span>$500,000</span>
                 </div>
               </div>
             </div>
@@ -178,7 +188,11 @@ export default function RetirementCalculator() {
                   onValueChange={(value) => updateInput('contributionType', value as 'traditional' | 'roth' | 'both')}
                   className="grid grid-cols-3 gap-4"
                 >
-                  <div className="glass-input rounded-xl p-4 cursor-pointer hover:bg-primary/10 transition-colors">
+                  <div className={`glass-input rounded-xl p-4 cursor-pointer transition-colors ${
+                    inputs.contributionType === 'traditional' 
+                      ? 'bg-primary/20 border-primary ring-2 ring-primary/50' 
+                      : 'hover:bg-primary/10'
+                  }`}>
                     <RadioGroupItem value="traditional" id="traditional" className="sr-only" />
                     <Label htmlFor="traditional" className="cursor-pointer">
                       <div className="text-center">
@@ -188,7 +202,11 @@ export default function RetirementCalculator() {
                       </div>
                     </Label>
                   </div>
-                  <div className="glass-input rounded-xl p-4 cursor-pointer hover:bg-primary/10 transition-colors">
+                  <div className={`glass-input rounded-xl p-4 cursor-pointer transition-colors ${
+                    inputs.contributionType === 'roth' 
+                      ? 'bg-secondary/20 border-secondary ring-2 ring-secondary/50' 
+                      : 'hover:bg-primary/10'
+                  }`}>
                     <RadioGroupItem value="roth" id="roth" className="sr-only" />
                     <Label htmlFor="roth" className="cursor-pointer">
                       <div className="text-center">
@@ -198,7 +216,11 @@ export default function RetirementCalculator() {
                       </div>
                     </Label>
                   </div>
-                  <div className="glass-input rounded-xl p-4 cursor-pointer hover:bg-primary/10 transition-colors">
+                  <div className={`glass-input rounded-xl p-4 cursor-pointer transition-colors ${
+                    inputs.contributionType === 'both' 
+                      ? 'bg-accent/20 border-accent ring-2 ring-accent/50' 
+                      : 'hover:bg-primary/10'
+                  }`}>
                     <RadioGroupItem value="both" id="both" className="sr-only" />
                     <Label htmlFor="both" className="cursor-pointer">
                       <div className="text-center">
@@ -215,18 +237,21 @@ export default function RetirementCalculator() {
               <div className="grid md:grid-cols-2 gap-6">
                 <div>
                   <Label className="flex items-center text-sm font-medium text-foreground mb-2">
-                    Employee Contribution (%)
+                    Employee Contribution: {inputs.employeeContribution}%
                     <Tooltip content="Percentage of salary you contribute to your 401(k). Most experts recommend at least 10-15%." />
                   </Label>
-                  <div className="relative">
-                    <Input
-                      type="number"
-                      className="glass-input pr-8"
-                      value={inputs.employeeContribution}
-                      onChange={(e) => updateInput('employeeContribution', parseFloat(e.target.value) || 0)}
-                      data-testid="input-employee-contribution"
-                    />
-                    <span className="absolute right-4 top-3 text-muted-foreground">%</span>
+                  <Slider
+                    value={[inputs.employeeContribution]}
+                    onValueChange={(value) => updateInput('employeeContribution', value[0])}
+                    max={50}
+                    min={0}
+                    step={0.5}
+                    className="w-full"
+                    data-testid="slider-employee-contribution"
+                  />
+                  <div className="flex justify-between text-xs text-muted-foreground mt-1">
+                    <span>0%</span>
+                    <span>50%</span>
                   </div>
                   <div className="mt-2 text-xs text-muted-foreground" data-testid="text-contribution-limit">
                     2025 Annual Limit: ${contributionLimit.toLocaleString()}
@@ -258,35 +283,41 @@ export default function RetirementCalculator() {
               <div className="grid md:grid-cols-2 gap-6">
                 <div>
                   <Label className="flex items-center text-sm font-medium text-foreground mb-2">
-                    Employer Match (%)
+                    Employer Match: {inputs.employerMatch}%
                     <Tooltip content="How much your employer matches for each 1% you contribute. Common matches are 50% or 100%." />
                   </Label>
-                  <div className="relative">
-                    <Input
-                      type="number"
-                      className="glass-input pr-8"
-                      value={inputs.employerMatch}
-                      onChange={(e) => updateInput('employerMatch', parseFloat(e.target.value) || 0)}
-                      data-testid="input-employer-match"
-                    />
-                    <span className="absolute right-4 top-3 text-muted-foreground">%</span>
+                  <Slider
+                    value={[inputs.employerMatch]}
+                    onValueChange={(value) => updateInput('employerMatch', value[0])}
+                    max={200}
+                    min={0}
+                    step={5}
+                    className="w-full"
+                    data-testid="slider-employer-match"
+                  />
+                  <div className="flex justify-between text-xs text-muted-foreground mt-1">
+                    <span>0%</span>
+                    <span>200%</span>
                   </div>
                 </div>
 
                 <div>
                   <Label className="flex items-center text-sm font-medium text-foreground mb-2">
-                    Match Cap (%)
+                    Match Cap: {inputs.employerMatchCap}%
                     <Tooltip content="Maximum contribution percentage that qualifies for employer match. Often 3-6% of salary." />
                   </Label>
-                  <div className="relative">
-                    <Input
-                      type="number"
-                      className="glass-input pr-8"
-                      value={inputs.employerMatchCap}
-                      onChange={(e) => updateInput('employerMatchCap', parseFloat(e.target.value) || 0)}
-                      data-testid="input-employer-match-cap"
-                    />
-                    <span className="absolute right-4 top-3 text-muted-foreground">%</span>
+                  <Slider
+                    value={[inputs.employerMatchCap]}
+                    onValueChange={(value) => updateInput('employerMatchCap', value[0])}
+                    max={20}
+                    min={0}
+                    step={0.5}
+                    className="w-full"
+                    data-testid="slider-employer-match-cap"
+                  />
+                  <div className="flex justify-between text-xs text-muted-foreground mt-1">
+                    <span>0%</span>
+                    <span>20%</span>
                   </div>
                 </div>
               </div>
@@ -295,37 +326,41 @@ export default function RetirementCalculator() {
               <div className="grid md:grid-cols-2 gap-6">
                 <div>
                   <Label className="flex items-center text-sm font-medium text-foreground mb-2">
-                    Expected Annual Return (%)
+                    Expected Annual Return: {inputs.expectedReturn}%
                     <Tooltip content="Historical stock market average is around 7-10%. Conservative estimates use 6-7%." />
                   </Label>
-                  <div className="relative">
-                    <Input
-                      type="number"
-                      step="0.1"
-                      className="glass-input pr-8"
-                      value={inputs.expectedReturn}
-                      onChange={(e) => updateInput('expectedReturn', parseFloat(e.target.value) || 0)}
-                      data-testid="input-expected-return"
-                    />
-                    <span className="absolute right-4 top-3 text-muted-foreground">%</span>
+                  <Slider
+                    value={[inputs.expectedReturn]}
+                    onValueChange={(value) => updateInput('expectedReturn', value[0])}
+                    max={15}
+                    min={1}
+                    step={0.1}
+                    className="w-full"
+                    data-testid="slider-expected-return"
+                  />
+                  <div className="flex justify-between text-xs text-muted-foreground mt-1">
+                    <span>1%</span>
+                    <span>15%</span>
                   </div>
                 </div>
 
                 <div>
                   <Label className="flex items-center text-sm font-medium text-foreground mb-2">
-                    Annual Salary Growth (%)
+                    Annual Salary Growth: {inputs.salaryGrowth}%
                     <Tooltip content="Expected annual salary increases. Historical average is 2-4% including inflation." />
                   </Label>
-                  <div className="relative">
-                    <Input
-                      type="number"
-                      step="0.1"
-                      className="glass-input pr-8"
-                      value={inputs.salaryGrowth}
-                      onChange={(e) => updateInput('salaryGrowth', parseFloat(e.target.value) || 0)}
-                      data-testid="input-salary-growth"
-                    />
-                    <span className="absolute right-4 top-3 text-muted-foreground">%</span>
+                  <Slider
+                    value={[inputs.salaryGrowth]}
+                    onValueChange={(value) => updateInput('salaryGrowth', value[0])}
+                    max={10}
+                    min={0}
+                    step={0.1}
+                    className="w-full"
+                    data-testid="slider-salary-growth"
+                  />
+                  <div className="flex justify-between text-xs text-muted-foreground mt-1">
+                    <span>0%</span>
+                    <span>10%</span>
                   </div>
                 </div>
               </div>
