@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ArrowLeft, Plus, GitCompare, HeartPulse, Bus, Shield, TrendingUp } from "lucide-react";
+import { ArrowLeft, Plus, GitCompare, HeartPulse, Bus, Shield, TrendingUp, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
@@ -10,6 +10,7 @@ import CommuterComparison from "@/components/comparisons/commuter-comparison";
 import LifeInsuranceComparison from "@/components/comparisons/life-insurance-comparison";
 import RetirementComparison from "@/components/comparisons/retirement-comparison";
 import { useLocation } from "wouter";
+import { usePDFExport } from "@/lib/pdf/use-pdf-export";
 
 type CalculatorType = 'hsa' | 'commuter' | 'life-insurance' | 'retirement';
 type Scenario = {
@@ -56,6 +57,7 @@ const calculatorTypes = [
 
 export default function ComparisonTool() {
   const [, navigate] = useLocation();
+  const { exportComparisonReport, isGenerating, error } = usePDFExport();
   const [selectedCalculator, setSelectedCalculator] = useState<CalculatorType | null>(null);
   const [scenarios, setScenarios] = useState<Scenario[]>([]);
   const [newScenarioName, setNewScenarioName] = useState("");
@@ -278,6 +280,22 @@ export default function ComparisonTool() {
                 <h3 className="text-xl font-semibold text-foreground">
                   Scenario Comparison ({scenarios.length})
                 </h3>
+                {scenarios.length > 0 && selectedCalculator && (
+                  <Button
+                    onClick={() => exportComparisonReport({
+                      type: 'comparison',
+                      title: `${selectedCalculatorInfo?.name} Comparison Report`,
+                      calculatorType: selectedCalculator,
+                      scenarios: scenarios.map(s => ({ name: s.name, inputs: s.data, results: {} }))
+                    })}
+                    disabled={isGenerating}
+                    className="flex items-center space-x-2"
+                    data-testid="button-export-comparison-pdf"
+                  >
+                    <Download size={16} />
+                    <span>{isGenerating ? 'Generating...' : 'Export PDF'}</span>
+                  </Button>
+                )}
               </div>
               
               {/* Scenario Comparison Components */}

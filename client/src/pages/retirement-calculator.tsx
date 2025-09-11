@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { ArrowLeft, Calculator, TrendingUp, DollarSign, PiggyBank } from "lucide-react";
+import { ArrowLeft, Calculator, TrendingUp, DollarSign, PiggyBank, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -13,9 +13,11 @@ import { useLocation } from "wouter";
 import { calculateRetirement, CONTRIBUTION_LIMITS } from "@/lib/calculations";
 import { RetirementInputs, RetirementResults } from "@shared/schema";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, ResponsiveContainer } from "recharts";
+import { usePDFExport } from "@/lib/pdf/use-pdf-export";
 
 export default function RetirementCalculator() {
   const [, navigate] = useLocation();
+  const { exportRetirementReport, isGenerating, error } = usePDFExport();
   
   const [inputs, setInputs] = useState<RetirementInputs>({
     currentAge: 30,
@@ -372,7 +374,18 @@ export default function RetirementCalculator() {
         <div className="space-y-6">
           {/* Quick Results */}
           <GlassCard>
-            <h3 className="text-lg font-semibold text-foreground mb-4">Retirement Projection</h3>
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-semibold text-foreground">Retirement Projection</h3>
+              <Button
+                onClick={() => exportRetirementReport(inputs, results)}
+                disabled={isGenerating}
+                className="flex items-center space-x-2"
+                data-testid="button-export-pdf"
+              >
+                <Download size={16} />
+                <span>{isGenerating ? 'Generating...' : 'Export PDF'}</span>
+              </Button>
+            </div>
             <div className="space-y-4">
               <div className="flex justify-between items-center">
                 <span className="text-muted-foreground">Final Balance</span>

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { ArrowLeft, Calculator, Lightbulb, TrendingUp, Users } from "lucide-react";
+import { ArrowLeft, Calculator, Lightbulb, TrendingUp, Users, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -10,9 +10,11 @@ import Tooltip from "@/components/tooltip";
 import { useLocation } from "wouter";
 import { calculateLifeInsurance } from "@/lib/calculations";
 import { LifeInsuranceInputs, LifeInsuranceResults } from "@shared/schema";
+import { usePDFExport } from "@/lib/pdf/use-pdf-export";
 
 export default function LifeInsuranceCalculator() {
   const [, navigate] = useLocation();
+  const { exportLifeInsuranceReport, isGenerating, error } = usePDFExport();
   
   const [inputs, setInputs] = useState<LifeInsuranceInputs>({
     totalDebt: 250000,
@@ -192,7 +194,18 @@ export default function LifeInsuranceCalculator() {
         {/* Results */}
         <div className="space-y-6">
           <GlassCard>
-            <h3 className="text-lg font-semibold text-foreground mb-4">Coverage Needed</h3>
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-semibold text-foreground">Coverage Needed</h3>
+              <Button
+                onClick={() => exportLifeInsuranceReport(inputs, results)}
+                disabled={isGenerating}
+                className="flex items-center space-x-2"
+                data-testid="button-export-pdf"
+              >
+                <Download size={16} />
+                <span>{isGenerating ? 'Generating...' : 'Export PDF'}</span>
+              </Button>
+            </div>
             <div className="space-y-4">
               <div className="flex justify-between items-center">
                 <span className="text-muted-foreground">DIME Total</span>

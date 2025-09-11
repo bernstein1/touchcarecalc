@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { ArrowLeft, Calculator } from "lucide-react";
+import { ArrowLeft, Calculator, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -10,9 +10,11 @@ import Tooltip from "@/components/tooltip";
 import { useLocation } from "wouter";
 import { calculateCommuter } from "@/lib/calculations";
 import { CommuterInputs, CommuterResults } from "@shared/schema";
+import { usePDFExport } from "@/lib/pdf/use-pdf-export";
 
 export default function CommuterCalculator() {
   const [, navigate] = useLocation();
+  const { exportCommuterReport, isGenerating, error } = usePDFExport();
   
   const [inputs, setInputs] = useState<CommuterInputs>({
     transitCost: 200,
@@ -134,7 +136,18 @@ export default function CommuterCalculator() {
         {/* Results */}
         <div className="space-y-6">
           <GlassCard>
-            <h3 className="text-lg font-semibold text-foreground mb-4">Annual Savings</h3>
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-semibold text-foreground">Annual Savings</h3>
+              <Button
+                onClick={() => exportCommuterReport(inputs, results)}
+                disabled={isGenerating}
+                className="flex items-center space-x-2"
+                data-testid="button-export-pdf"
+              >
+                <Download size={16} />
+                <span>{isGenerating ? 'Generating...' : 'Export PDF'}</span>
+              </Button>
+            </div>
             <div className="space-y-4">
               <div className="flex justify-between items-center">
                 <span className="text-muted-foreground">Transit Savings</span>

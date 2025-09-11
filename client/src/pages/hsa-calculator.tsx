@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { ArrowLeft, Calculator, Check } from "lucide-react";
+import { ArrowLeft, Calculator, Check, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -11,9 +11,11 @@ import Tooltip from "@/components/tooltip";
 import { useLocation } from "wouter";
 import { calculateHSA, CONTRIBUTION_LIMITS } from "@/lib/calculations";
 import { HSAInputs, HSAResults } from "@shared/schema";
+import { usePDFExport } from "@/lib/pdf/use-pdf-export";
 
 export default function HSACalculator() {
   const [, navigate] = useLocation();
+  const { exportHSAReport, isGenerating, error } = usePDFExport();
   
   const [inputs, setInputs] = useState<HSAInputs>({
     accountType: 'hsa',
@@ -230,7 +232,18 @@ export default function HSACalculator() {
         <div className="space-y-6">
           {/* Quick Results */}
           <GlassCard>
-            <h3 className="text-lg font-semibold text-foreground mb-4">Tax Savings Summary</h3>
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-semibold text-foreground">Tax Savings Summary</h3>
+              <Button
+                onClick={() => exportHSAReport(inputs, results)}
+                disabled={isGenerating}
+                className="flex items-center space-x-2"
+                data-testid="button-export-pdf"
+              >
+                <Download size={16} />
+                <span>{isGenerating ? 'Generating...' : 'Export PDF'}</span>
+              </Button>
+            </div>
             <div className="space-y-4">
               <div className="flex justify-between items-center">
                 <span className="text-muted-foreground">Annual Contribution</span>
