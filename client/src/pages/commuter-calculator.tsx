@@ -71,7 +71,7 @@ export default function CommuterCalculator() {
               <div>
                 <Label className="flex items-center text-sm font-medium text-foreground mb-4">
                   Monthly Transit Costs: ${inputs.transitCost}
-                  <Tooltip content="Includes bus, subway, train, ferry, and vanpool costs. 2025 limit: $315/month." />
+                  <Tooltip content="Include what you spend each month on eligible public transportation—subways, buses, commuter rail, ferries, and qualified employer-sponsored vanpools. Federal rules cap the tax-free benefit at $315 per month in 2025, so amounts above that limit must be paid with after-tax dollars." />
                 </Label>
                 <Slider
                   value={[inputs.transitCost]}
@@ -95,7 +95,7 @@ export default function CommuterCalculator() {
               <div>
                 <Label className="flex items-center text-sm font-medium text-foreground mb-4">
                   Monthly Parking Costs: ${inputs.parkingCost}
-                  <Tooltip content="Includes workplace parking fees and related expenses. 2025 limit: $315/month." />
+                  <Tooltip content="Add the average you pay to park at or near your workplace or a transit station. The IRS allows up to $315 per month in 2025 to be excluded from taxes when the parking space is tied to your commute; general street parking or mileage reimbursement is not covered." />
                 </Label>
                 <Slider
                   value={[inputs.parkingCost]}
@@ -151,13 +151,13 @@ export default function CommuterCalculator() {
             <div className="space-y-4">
               <div className="flex justify-between items-center">
                 <span className="text-muted-foreground">Transit Savings</span>
-                <span className="text-lg font-semibold text-secondary" data-testid="result-transit-savings">
+                <span className="text-lg font-semibold text-foreground" data-testid="result-transit-savings">
                   ${Math.round(results.transitSavings).toLocaleString()}
                 </span>
               </div>
               <div className="flex justify-between items-center">
                 <span className="text-muted-foreground">Parking Savings</span>
-                <span className="text-lg font-semibold text-secondary" data-testid="result-parking-savings">
+                <span className="text-lg font-semibold text-foreground" data-testid="result-parking-savings">
                   ${Math.round(results.parkingSavings).toLocaleString()}
                 </span>
               </div>
@@ -205,11 +205,26 @@ export default function CommuterCalculator() {
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Tax Savings:</span>
-                  <span className="text-secondary font-mono" data-testid="math-savings">
+                  <span className="text-foreground font-mono" data-testid="math-savings">
                     ${Math.round(results.totalSavings).toLocaleString()}
                   </span>
                 </div>
               </div>
+            </div>
+          </GlassCard>
+
+          <GlassCard>
+            <h3 className="text-lg font-semibold text-foreground mb-4">TouchCare Transit Guidance</h3>
+            <div className="space-y-3 text-sm text-muted-foreground">
+              <p>
+                Pre-tax commuter benefits are capped at $315 per month for transit and $315 for parking in 2025 (IRS Rev. Proc. 2024-45). Savings shown assume payroll deductions and no local taxes.
+              </p>
+              <p>
+                Submit eligible receipts promptly—many plans require substantiation within 180 days. Parking reimbursements often cover rideshare to transit hubs but not mileage to your office.
+              </p>
+              <p className="text-xs text-foreground">
+                Use this illustration for planning only. Final eligibility, ordering windows, and rollover rules are determined by your employer’s plan document and local ordinances.
+              </p>
             </div>
           </GlassCard>
         </div>

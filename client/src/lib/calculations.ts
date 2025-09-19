@@ -91,12 +91,31 @@ export function calculateRetirement(inputs: RetirementInputs): RetirementResults
 
   const yearsToRetirement = retirementAge - currentAge;
   const monthlyReturn = expectedReturn / 100 / 12;
-  const monthlySalaryGrowth = salaryGrowth / 100 / 12;
-  
   // Check contribution limits
   const contributionLimit = currentAge >= 50 ? 
     CONTRIBUTION_LIMITS.RETIREMENT_TOTAL_WITH_CATCHUP : 
     CONTRIBUTION_LIMITS.RETIREMENT_401K;
+
+  const baseContributionLimit = CONTRIBUTION_LIMITS.RETIREMENT_401K;
+  const catchUpAllowance = Math.max(0, contributionLimit - baseContributionLimit);
+
+  const getTraditionalContribution = (amount: number) => {
+    switch (contributionType) {
+      case 'traditional':
+        return amount;
+      case 'roth':
+        return 0;
+      case 'both': {
+        const basePortion = Math.min(amount, baseContributionLimit);
+        const catchUpPortion = Math.min(Math.max(amount - baseContributionLimit, 0), catchUpAllowance);
+        const blendedTraditional = basePortion * 0.5;
+        // Treat catch-up contributions as traditional for tax-savings purposes
+        return blendedTraditional + catchUpPortion;
+      }
+      default:
+        return amount;
+    }
+  };
   
   let balance = currentSavings;
   let totalEmployeeContributions = 0;
@@ -115,7 +134,9 @@ export function calculateRetirement(inputs: RetirementInputs): RetirementResults
       (employeeContribution / 100) * currentSalaryWorking,
       contributionLimit
     );
-    
+
+    const traditionalContribution = getTraditionalContribution(employeeContribAnnual);
+
     // Calculate employer match
     const matchPercentage = Math.min(employeeContribution, employerMatchCap);
     const employerContribAnnual = (matchPercentage / 100) * currentSalaryWorking * (employerMatch / 100);
@@ -124,10 +145,10 @@ export function calculateRetirement(inputs: RetirementInputs): RetirementResults
     
     // Calculate tax savings for traditional contributions
     let annualTaxSavings = 0;
-    if (contributionType === 'traditional' || contributionType === 'both') {
-      annualTaxSavings = employeeContribAnnual * (taxBracket / 100);
+    if (traditionalContribution > 0) {
+      annualTaxSavings = traditionalContribution * (taxBracket / 100);
     }
-    
+
     // Calculate balance growth with monthly compounding
     let yearEndBalance = balance;
     const monthlyContrib = totalAnnualContrib / 12;

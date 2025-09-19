@@ -12,7 +12,7 @@ import Tooltip from "@/components/tooltip";
 import { useLocation } from "wouter";
 import { calculateRetirement, CONTRIBUTION_LIMITS } from "@/lib/calculations";
 import { RetirementInputs, RetirementResults } from "@shared/schema";
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, ResponsiveContainer } from "recharts";
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Tooltip as RechartsTooltip } from "recharts";
 import { usePDFExport } from "@/lib/pdf/use-pdf-export";
 
 export default function RetirementCalculator() {
@@ -56,12 +56,30 @@ export default function RetirementCalculator() {
     CONTRIBUTION_LIMITS.RETIREMENT_TOTAL_WITH_CATCHUP : 
     CONTRIBUTION_LIMITS.RETIREMENT_401K;
 
-  const chartData = results.yearlyProjections.slice(0, Math.min(20, results.yearlyProjections.length)).map(projection => ({
-    year: projection.year,
-    age: projection.age,
-    balance: projection.balance,
-    contributions: projection.totalContribution
-  }));
+  const totalYears = results.yearlyProjections.length;
+  const samplingStep = totalYears > 60 ? Math.ceil(totalYears / 60) : 1;
+  const sampledProjections = results.yearlyProjections.filter((_, index) => index % samplingStep === 0 || index === totalYears - 1);
+
+  const chartData = [
+    {
+      year: 0,
+      age: inputs.currentAge,
+      balance: inputs.currentSavings,
+      contributions: 0,
+    },
+    ...sampledProjections.map((projection) => ({
+      year: projection.year,
+      age: projection.age,
+      balance: projection.balance,
+      contributions: projection.totalContribution,
+    })),
+  ];
+
+  const maxBalance = chartData.length > 0 ? Math.max(...chartData.map((point) => point.balance)) : 0;
+  const minAge = chartData.length > 0 ? Math.min(...chartData.map((point) => point.age)) : inputs.currentAge;
+  const maxAge = chartData.length > 0 ? Math.max(...chartData.map((point) => point.age)) : inputs.retirementAge;
+  const xDomain = minAge === maxAge ? [minAge, minAge + 1] : [minAge, maxAge];
+  const yDomain = maxBalance > 0 ? [0, Math.ceil((maxBalance * 1.1) / 5000) * 5000] : [0, 5000];
 
   return (
     <div className="space-y-8">
@@ -98,7 +116,7 @@ export default function RetirementCalculator() {
               <div>
                 <Label className="flex items-center text-sm font-medium text-foreground mb-2">
                   Current Age: {inputs.currentAge}
-                  <Tooltip content="Your current age affects contribution limits and time to retirement." />
+                <Tooltip content="Enter how old you are today. Your age tells the calculator how many years you have until retirement, when catch-up contribution limits start (age 50+), and how long your money has to grow before you begin withdrawals." />
                 </Label>
                 <Slider
                   value={[inputs.currentAge]}
@@ -118,7 +136,7 @@ export default function RetirementCalculator() {
               <div>
                 <Label className="flex items-center text-sm font-medium text-foreground mb-2">
                   Retirement Age
-                  <Tooltip content="The age at which you plan to retire. Full Social Security benefits start at 67." />
+                <Tooltip content="Choose the age when you expect to stop full-time work. This target controls how many years you have to save and when you may start drawing Social Security or tapping retirement accounts; retiring earlier means fewer saving years and more time spent living off your nest egg." />
                 </Label>
                 <Select value={inputs.retirementAge.toString()} onValueChange={(value) => updateInput('retirementAge', parseFloat(value))}>
                   <SelectTrigger className="glass-input" data-testid="select-retirement-age">
@@ -138,7 +156,7 @@ export default function RetirementCalculator() {
               <div>
                 <Label className="flex items-center text-sm font-medium text-foreground mb-2">
                   Current Annual Salary
-                  <Tooltip content="Your current gross annual income before taxes and deductions." />
+                  <Tooltip content="Enter the amount you earn in salary each year before taxes and payroll deductions. The calculator multiplies this by your contribution percentage to estimate how much you are putting into the plan each paycheck." />
                 </Label>
                 <div className="relative">
                   <span className="absolute left-4 top-3 text-muted-foreground">$</span>
@@ -155,7 +173,7 @@ export default function RetirementCalculator() {
               <div>
                 <Label className="flex items-center text-sm font-medium text-foreground mb-2">
                   Current 401(k) Balance: ${inputs.currentSavings.toLocaleString()}
-                  <Tooltip content="The current value of your 401(k) or retirement savings accounts." />
+                  <Tooltip content="Type in the total balance you already have saved in this retirement account (and similar workplace plans). This serves as your starting point so the projection grows both what you have today and what you will contribute going forward." />
                 </Label>
                 <Slider
                   value={[inputs.currentSavings]}
@@ -183,7 +201,7 @@ export default function RetirementCalculator() {
               <div>
                 <Label className="flex items-center text-sm font-medium text-foreground mb-4">
                   Contribution Type
-                  <Tooltip content="Traditional contributions are pre-tax, Roth are after-tax but grow tax-free." />
+                  <Tooltip content="Traditional 401(k) contributions come out of your paycheck before taxes, lowering today’s taxable income but creating taxable withdrawals later. Roth contributions are taxed now but can be withdrawn tax-free in retirement. Selecting 'Both' splits your ongoing contributions between the two approaches." />
                 </Label>
                 <RadioGroup
                   value={inputs.contributionType}
@@ -240,7 +258,7 @@ export default function RetirementCalculator() {
                 <div>
                   <Label className="flex items-center text-sm font-medium text-foreground mb-2">
                     Employee Contribution: {inputs.employeeContribution}%
-                    <Tooltip content="Percentage of salary you contribute to your 401(k). Most experts recommend at least 10-15%." />
+                    <Tooltip content="Set the share of each paycheck you want the plan to contribute automatically. Many advisors suggest saving 10–15% of gross pay, but any percentage helps; the calculator multiplies this rate by your salary each year to project the dollars invested." />
                   </Label>
                   <Slider
                     value={[inputs.employeeContribution]}
@@ -263,7 +281,7 @@ export default function RetirementCalculator() {
                 <div>
                   <Label className="flex items-center text-sm font-medium text-foreground mb-2">
                     Tax Bracket
-                    <Tooltip content="Your marginal federal tax rate. Used to calculate tax savings for traditional contributions." />
+                    <Tooltip content="Select the tax bracket that applies to the top portion of your income. When you choose traditional contributions, the calculator uses this marginal rate to estimate how much federal tax you defer by saving pre-tax dollars." />
                   </Label>
                   <Select value={inputs.taxBracket.toString()} onValueChange={(value) => updateInput('taxBracket', parseFloat(value))}>
                     <SelectTrigger className="glass-input" data-testid="select-tax-bracket">
@@ -286,12 +304,12 @@ export default function RetirementCalculator() {
                 <div>
                   <Label className="flex items-center text-sm font-medium text-foreground mb-2">
                     Employer Match: {inputs.employerMatch}%
-                    <Tooltip content="How much your employer matches for each 1% you contribute. Common matches are 50% or 100%." />
+                    <Tooltip content="Many employers add money to your account when you contribute. Enter the percentage your employer matches for each percentage point you save—for example, a 50% match means they contribute 0.5% for every 1% you put in." />
                   </Label>
                   <Slider
                     value={[inputs.employerMatch]}
                     onValueChange={(value) => updateInput('employerMatch', value[0])}
-                    max={200}
+                    max={100}
                     min={0}
                     step={5}
                     className="w-full"
@@ -299,19 +317,19 @@ export default function RetirementCalculator() {
                   />
                   <div className="flex justify-between text-xs text-muted-foreground mt-1">
                     <span>0%</span>
-                    <span>200%</span>
+                    <span>100%</span>
                   </div>
                 </div>
 
                 <div>
                   <Label className="flex items-center text-sm font-medium text-foreground mb-2">
                     Match Cap: {inputs.employerMatchCap}%
-                    <Tooltip content="Maximum contribution percentage that qualifies for employer match. Often 3-6% of salary." />
+                    <Tooltip content="Employers usually limit the match to a certain portion of your salary. If the cap is 6%, any contributions you make above 6% do not receive additional matching dollars. Enter that cap so the calculator stops the match once you hit the threshold." />
                   </Label>
                   <Slider
                     value={[inputs.employerMatchCap]}
                     onValueChange={(value) => updateInput('employerMatchCap', value[0])}
-                    max={20}
+                    max={15}
                     min={0}
                     step={0.5}
                     className="w-full"
@@ -319,7 +337,7 @@ export default function RetirementCalculator() {
                   />
                   <div className="flex justify-between text-xs text-muted-foreground mt-1">
                     <span>0%</span>
-                    <span>20%</span>
+                    <span>15%</span>
                   </div>
                 </div>
               </div>
@@ -329,7 +347,7 @@ export default function RetirementCalculator() {
                 <div>
                   <Label className="flex items-center text-sm font-medium text-foreground mb-2">
                     Expected Annual Return: {inputs.expectedReturn}%
-                    <Tooltip content="Historical stock market average is around 7-10%. Conservative estimates use 6-7%." />
+                    <Tooltip content="Choose the average annual investment return you want to model. Long-term stock-heavy portfolios have historically earned about 7–10% before fees, but actual results vary year to year. Use a conservative number if you prefer a cautious projection." />
                   </Label>
                   <Slider
                     value={[inputs.expectedReturn]}
@@ -349,7 +367,7 @@ export default function RetirementCalculator() {
                 <div>
                   <Label className="flex items-center text-sm font-medium text-foreground mb-2">
                     Annual Salary Growth: {inputs.salaryGrowth}%
-                    <Tooltip content="Expected annual salary increases. Historical average is 2-4% including inflation." />
+                    <Tooltip content="Estimate how much your pay may rise each year from raises, promotions, and inflation. Higher salary growth means larger contributions over time because the same percentage of a bigger paycheck equals more dollars invested." />
                   </Label>
                   <Slider
                     value={[inputs.salaryGrowth]}
@@ -401,7 +419,7 @@ export default function RetirementCalculator() {
               </div>
               <div className="flex justify-between items-center">
                 <span className="text-muted-foreground">Employer Match</span>
-                <span className="text-lg font-semibold text-secondary" data-testid="result-employer-contributions">
+                <span className="text-lg font-semibold text-foreground" data-testid="result-employer-contributions">
                   ${results.employerContributions.toLocaleString()}
                 </span>
               </div>
@@ -445,7 +463,7 @@ export default function RetirementCalculator() {
                 <div className="border-t border-border pt-2">
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Annual Tax Savings:</span>
-                    <span className="text-secondary font-mono" data-testid="math-tax-savings">
+                    <span className="text-foreground font-mono" data-testid="math-tax-savings">
                       ${Math.round(results.taxSavings / (inputs.retirementAge - inputs.currentAge)).toLocaleString()}
                     </span>
                   </div>
@@ -455,35 +473,57 @@ export default function RetirementCalculator() {
           </GlassCard>
 
           {/* Growth Chart */}
-          {chartData.length > 0 && (
+          {chartData.length > 1 && (
             <GlassCard>
               <h3 className="text-lg font-semibold text-foreground mb-4">
                 <TrendingUp className="inline mr-2" size={20} />
                 Growth Projection
               </h3>
-              <div className="h-48">
+              <div className="h-56">
                 <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={chartData}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                    <XAxis 
-                      dataKey="age" 
-                      stroke="hsl(var(--muted-foreground))"
+                  <LineChart data={chartData} margin={{ top: 12, right: 16, bottom: 8, left: 0 }}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
+                    <XAxis
+                      type="number"
+                      dataKey="age"
+                      domain={xDomain}
+                      allowDecimals={false}
+                      stroke="var(--muted-foreground)"
                       fontSize={12}
+                      tickFormatter={(value) => `Age ${value}`}
+                      minTickGap={16}
                     />
-                    <YAxis 
-                      stroke="hsl(var(--muted-foreground))"
+                    <YAxis
+                      domain={yDomain}
+                      stroke="var(--muted-foreground)"
                       fontSize={12}
                       tickFormatter={(value) => `$${(value / 1000).toFixed(0)}k`}
                     />
-                    <Line 
-                      type="monotone" 
-                      dataKey="balance" 
-                      stroke="hsl(var(--primary))" 
-                      strokeWidth={2}
+                    <RechartsTooltip
+                      cursor={{ stroke: "var(--accent)", strokeDasharray: "3 3" }}
+                      formatter={(value: number) => [`$${value.toLocaleString()}`, "Balance"]}
+                      labelFormatter={(label) => `Age ${label}`}
+                    />
+                    <Line
+                      type="monotone"
+                      dataKey="balance"
+                      stroke="var(--primary)"
+                      strokeWidth={3}
                       dot={false}
                     />
                   </LineChart>
                 </ResponsiveContainer>
+              </div>
+            </GlassCard>
+          )}
+          {chartData.length <= 1 && (
+            <GlassCard>
+              <h3 className="text-lg font-semibold text-foreground mb-4">
+                <TrendingUp className="inline mr-2" size={20} />
+                Growth Projection
+              </h3>
+              <div className="text-sm text-muted-foreground">
+                Adjust the current and retirement ages to generate a projection timeline.
               </div>
             </GlassCard>
           )}
@@ -519,6 +559,20 @@ export default function RetirementCalculator() {
                   </div>
                 </div>
               </div>
+            </div>
+          </GlassCard>
+          <GlassCard>
+            <h3 className="text-lg font-semibold text-foreground mb-4">TouchCare Retirement Guidance</h3>
+            <div className="space-y-3 text-sm text-muted-foreground">
+              <p>
+                Projections assume even returns, no hardship withdrawals, and constant salary growth. Actual balances can change with market volatility, plan fees, loan activity, and contribution pauses.
+              </p>
+              <p>
+                Confirm employer match percentages, vesting schedules, and contribution timing—many plans match per paycheck rather than annually. Catch-up contributions for individuals age 50+ add $7,500 to the 2025 limit and must be elected separately.
+              </p>
+              <p className="text-xs text-foreground">
+                Educational tool only—TouchCare is not providing individualized investment, legal, or tax advice. Consult a fiduciary advisor before adjusting allocations or contribution elections.
+              </p>
             </div>
           </GlassCard>
         </div>

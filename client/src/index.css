@@ -1,102 +1,110 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+@font-face {
+  font-family: "Canela";
+  src: url("./components/fonts/Canela-Thin-Web.woff2") format("woff2"),
+       url("./components/fonts/Canela-Thin-Web.woff") format("woff");
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Canela";
+  src: url("./components/fonts/Canela-Thin-Web.woff2") format("woff2"),
+       url("./components/fonts/Canela-Thin-Web.woff") format("woff");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Avenir";
+  src: url("./components/fonts/AvenirLTStd-Book.woff2") format("woff2"),
+       url("./components/fonts/AvenirLTStd-Book.woff") format("woff");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Avenir";
+  src: url("./components/fonts/AvenirLTStd-Book.woff2") format("woff2"),
+       url("./components/fonts/AvenirLTStd-Book.woff") format("woff");
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
 :root {
-  --background: hsl(210, 20%, 98%);
-  --foreground: hsl(215, 25%, 27%);
-  --card: hsl(0, 0%, 100%, 0.7);
-  --card-foreground: hsl(215, 25%, 27%);
-  --popover: hsl(0, 0%, 100%);
-  --popover-foreground: hsl(215, 25%, 27%);
-  --primary: hsl(188, 95%, 37%);
-  --primary-foreground: hsl(0, 0%, 100%);
-  --secondary: hsl(159, 84%, 39%);
-  --secondary-foreground: hsl(0, 0%, 100%);
-  --muted: hsl(215, 16%, 47%, 0.1);
-  --muted-foreground: hsl(215, 16%, 47%);
-  --accent: hsl(42, 96%, 52%);
-  --accent-foreground: hsl(0, 0%, 100%);
-  --destructive: hsl(356.3033, 90.5579%, 54.3137%);
-  --destructive-foreground: hsl(0, 0%, 100%);
-  --border: hsl(215, 20%, 85%);
-  --input: hsl(0, 0%, 100%, 0.5);
-  --ring: hsl(188, 95%, 37%);
-  --chart-1: hsl(203.8863, 88.2845%, 53.1373%);
-  --chart-2: hsl(159.7826, 100%, 36.0784%);
-  --chart-3: hsl(42.0290, 92.8251%, 56.2745%);
-  --chart-4: hsl(147.1429, 78.5047%, 41.9608%);
-  --chart-5: hsl(341.4894, 75.2000%, 50.9804%);
-  --sidebar: hsl(180, 6.6667%, 97.0588%);
-  --sidebar-foreground: hsl(210, 25%, 7.8431%);
-  --sidebar-primary: hsl(203.8863, 88.2845%, 53.1373%);
-  --sidebar-primary-foreground: hsl(0, 0%, 100%);
-  --sidebar-accent: hsl(211.5789, 51.3514%, 92.7451%);
-  --sidebar-accent-foreground: hsl(203.8863, 88.2845%, 53.1373%);
-  --sidebar-border: hsl(205.0000, 25.0000%, 90.5882%);
-  --sidebar-ring: hsl(202.8169, 89.1213%, 53.1373%);
-  --font-sans: 'Inter', Open Sans, sans-serif;
-  --font-serif: Georgia, serif;
-  --font-mono: Menlo, monospace;
+  --background: #FFFFFF;
+  --foreground: #202030;
+  --surface-subtle: #E6E7F0;
+  --card: rgba(255, 255, 255, 0.95);
+  --card-foreground: #202030;
+  --popover: #FFFFFF;
+  --popover-foreground: #202030;
+  --primary: #2B3785;
+  --primary-foreground: #FFFFFF;
+  --secondary: #E6E7F0;
+  --secondary-foreground: #202030;
+  --muted: #E4E4E6;
+  --muted-foreground: #41414E;
+  --accent: #00768B;
+  --accent-foreground: #FFFFFF;
+  --destructive: #F3716C;
+  --destructive-foreground: #FFFFFF;
+  --border: #E4E4E6;
+  --input: #FFFFFF;
+  --ring: #2B3785;
+  --chart-1: #2B3785;
+  --chart-2: #6B73AA;
+  --chart-3: #00768B;
+  --chart-4: #F3716C;
+  --chart-5: #F6DFCB;
+  --sidebar-background: #FFFFFF;
+  --sidebar-foreground: #202030;
+  --sidebar-primary: #2B3785;
+  --sidebar-primary-foreground: #FFFFFF;
+  --sidebar-accent: #E6E7F0;
+  --sidebar-accent-foreground: #2B3785;
+  --sidebar-border: #E4E4E6;
+  --sidebar-ring: #2B3785;
+  --font-headline: "Canela";
+  --font-body: "Avenir";
+  --font-mono: var(--font-body);
+  --font-sans: var(--font-body);
+  --font-serif: var(--font-headline);
   --radius: 12px;
-  --shadow-2xs: 0px 2px 0px 0px hsl(202.8169, 89.1213%, 53.1373%, 0.00);
-  --shadow-xs: 0px 2px 0px 0px hsl(202.8169, 89.1213%, 53.1373%, 0.00);
-  --shadow-sm: 0px 2px 0px 0px hsl(202.8169, 89.1213%, 53.1373%, 0.00), 0px 1px 2px -1px hsl(202.8169, 89.1213%, 53.1373%, 0.00);
-  --shadow: 0px 2px 0px 0px hsl(202.8169, 89.1213%, 53.1373%, 0.00), 0px 1px 2px -1px hsl(202.8169, 89.1213%, 53.1373%, 0.00);
-  --shadow-md: 0px 2px 0px 0px hsl(202.8169, 89.1213%, 53.1373%, 0.00), 0px 2px 4px -1px hsl(202.8169, 89.1213%, 53.1373%, 0.00);
-  --shadow-lg: 0px 2px 0px 0px hsl(202.8169, 89.1213%, 53.1373%, 0.00), 0px 4px 6px -1px hsl(202.8169, 89.1213%, 53.1373%, 0.00);
-  --shadow-xl: 0px 2px 0px 0px hsl(202.8169, 89.1213%, 53.1373%, 0.00), 0px 8px 10px -1px hsl(202.8169, 89.1213%, 53.1373%, 0.00);
-  --shadow-2xl: 0px 2px 0px 0px hsl(202.8169, 89.1213%, 53.1373%, 0.00);
-  --tracking-normal: 0em;
-  --spacing: 0.25rem;
 }
 
 .dark {
-  --background: hsl(0, 0%, 0%);
-  --foreground: hsl(200, 6.6667%, 91.1765%);
-  --card: hsl(228, 9.8039%, 10%);
-  --card-foreground: hsl(0, 0%, 85.0980%);
-  --popover: hsl(0, 0%, 0%);
-  --popover-foreground: hsl(200, 6.6667%, 91.1765%);
-  --primary: hsl(203.7736, 87.6033%, 52.5490%);
-  --primary-foreground: hsl(0, 0%, 100%);
-  --secondary: hsl(195.0000, 15.3846%, 94.9020%);
-  --secondary-foreground: hsl(210, 25%, 7.8431%);
-  --muted: hsl(0, 0%, 9.4118%);
-  --muted-foreground: hsl(210, 3.3898%, 46.2745%);
-  --accent: hsl(205.7143, 70%, 7.8431%);
-  --accent-foreground: hsl(203.7736, 87.6033%, 52.5490%);
-  --destructive: hsl(356.3033, 90.5579%, 54.3137%);
-  --destructive-foreground: hsl(0, 0%, 100%);
-  --border: hsl(210, 5.2632%, 14.9020%);
-  --input: hsl(207.6923, 27.6596%, 18.4314%);
-  --ring: hsl(202.8169, 89.1213%, 53.1373%);
-  --chart-1: hsl(203.8863, 88.2845%, 53.1373%);
-  --chart-2: hsl(159.7826, 100%, 36.0784%);
-  --chart-3: hsl(42.0290, 92.8251%, 56.2745%);
-  --chart-4: hsl(147.1429, 78.5047%, 41.9608%);
-  --chart-5: hsl(341.4894, 75.2000%, 50.9804%);
-  --sidebar: hsl(228, 9.8039%, 10%);
-  --sidebar-foreground: hsl(0, 0%, 85.0980%);
-  --sidebar-primary: hsl(202.8169, 89.1213%, 53.1373%);
-  --sidebar-primary-foreground: hsl(0, 0%, 100%);
-  --sidebar-accent: hsl(205.7143, 70%, 7.8431%);
-  --sidebar-accent-foreground: hsl(203.7736, 87.6033%, 52.5490%);
-  --sidebar-border: hsl(205.7143, 15.7895%, 26.0784%);
-  --sidebar-ring: hsl(202.8169, 89.1213%, 53.1373%);
-  --font-sans: 'Inter', Open Sans, sans-serif;
-  --font-serif: Georgia, serif;
-  --font-mono: Menlo, monospace;
-  --radius: 12px;
-  --shadow-2xs: 0px 2px 0px 0px hsl(202.8169, 89.1213%, 53.1373%, 0.00);
-  --shadow-xs: 0px 2px 0px 0px hsl(202.8169, 89.1213%, 53.1373%, 0.00);
-  --shadow-sm: 0px 2px 0px 0px hsl(202.8169, 89.1213%, 53.1373%, 0.00), 0px 1px 2px -1px hsl(202.8169, 89.1213%, 53.1373%, 0.00);
-  --shadow: 0px 2px 0px 0px hsl(202.8169, 89.1213%, 53.1373%, 0.00), 0px 1px 2px -1px hsl(202.8169, 89.1213%, 53.1373%, 0.00);
-  --shadow-md: 0px 2px 0px 0px hsl(202.8169, 89.1213%, 53.1373%, 0.00), 0px 2px 4px -1px hsl(202.8169, 89.1213%, 53.1373%, 0.00);
-  --shadow-lg: 0px 2px 0px 0px hsl(202.8169, 89.1213%, 53.1373%, 0.00), 0px 4px 6px -1px hsl(202.8169, 89.1213%, 53.1373%, 0.00);
-  --shadow-xl: 0px 2px 0px 0px hsl(202.8169, 89.1213%, 53.1373%, 0.00), 0px 8px 10px -1px hsl(202.8169, 89.1213%, 53.1373%, 0.00);
-  --shadow-2xl: 0px 2px 0px 0px hsl(202.8169, 89.1213%, 53.1373%, 0.00);
+  --background: #101655;
+  --foreground: #FFFFFF;
+  --card: rgba(26, 35, 104, 0.92);
+  --card-foreground: #FFFFFF;
+  --popover: #1A2368;
+  --popover-foreground: #FFFFFF;
+  --primary: #FFFFFF;
+  --primary-foreground: #1A2368;
+  --secondary: #202A72;
+  --secondary-foreground: #FFFFFF;
+  --muted: #26317D;
+  --muted-foreground: #BFC3DA;
+  --accent: #00768B;
+  --accent-foreground: #FFFFFF;
+  --destructive: #F3716C;
+  --destructive-foreground: #1A2368;
+  --border: #1A2368;
+  --input: #202A72;
+  --ring: #FFFFFF;
+  --font-headline: "Canela";
+  --font-body: "Avenir";
+  --font-mono: var(--font-body);
+  --font-sans: var(--font-body);
+  --font-serif: var(--font-headline);
 }
 
 @layer base {
@@ -105,30 +113,32 @@
   }
 
   body {
-    @apply font-sans antialiased bg-background text-foreground;
+    font-family: var(--font-body);
+    @apply antialiased bg-background text-foreground;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: var(--font-headline);
+    font-weight: 300;
+    color: var(--foreground);
   }
 }
 
 @layer components {
   .glass-effect {
-    background: rgba(255, 255, 255, 0.7);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.3);
-  }
-  
-  .glass-input {
-    background: rgba(255, 255, 255, 0.5);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.3);
-  }
-  
-  .glass-button {
-    background: rgba(8, 145, 178, 0.8);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(8, 145, 178, 0.3);
+    background: rgba(255, 255, 255, 0.96);
+    backdrop-filter: blur(18px);
+    border: 1px solid var(--border);
   }
 
-  .glass-button:hover {
-    background: rgba(8, 145, 178, 0.9);
+  .glass-input {
+    background: rgba(255, 255, 255, 0.88);
+    backdrop-filter: blur(14px);
+    border: 1px solid var(--border);
   }
 }

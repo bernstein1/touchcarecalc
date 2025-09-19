@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { TrendingUp, TrendingDown, Calculator } from "lucide-react";
+import { TrendingUp, TrendingDown, Calculator, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -18,9 +18,10 @@ interface RetirementComparisonProps {
     data: RetirementInputs;
   }>;
   onUpdateScenario: (scenarioId: string, data: RetirementInputs) => void;
+  onRemoveScenario: (scenarioId: string) => void;
 }
 
-export default function RetirementComparison({ scenarios, onUpdateScenario }: RetirementComparisonProps) {
+export default function RetirementComparison({ scenarios, onUpdateScenario, onRemoveScenario }: RetirementComparisonProps) {
   const [scenarioResults, setScenarioResults] = useState<Record<string, RetirementResults>>({});
 
   // Calculate results for all scenarios
@@ -178,9 +179,21 @@ export default function RetirementComparison({ scenarios, onUpdateScenario }: Re
           
           return (
             <GlassCard key={scenario.id} className="space-y-6">
-              <h4 className="text-lg font-semibold text-foreground border-b border-border pb-2" data-testid={`scenario-title-${scenario.id}`}>
-                {scenario.name}
-              </h4>
+              <div className="flex items-start justify-between border-b border-border pb-2">
+                <h4 className="text-lg font-semibold text-foreground" data-testid={`scenario-title-${scenario.id}`}>
+                  {scenario.name}
+                </h4>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="text-muted-foreground hover:text-destructive"
+                  onClick={() => onRemoveScenario(scenario.id)}
+                  aria-label={`Remove scenario ${scenario.name}`}
+                  data-testid={`button-remove-scenario-${scenario.id}`}
+                >
+                  <Trash2 size={16} />
+                </Button>
+              </div>
 
               {/* Age Information */}
               <div className="grid grid-cols-2 gap-4">

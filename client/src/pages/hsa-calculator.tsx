@@ -13,25 +13,33 @@ import { calculateHSA, CONTRIBUTION_LIMITS } from "@/lib/calculations";
 import { HSAInputs, HSAResults } from "@shared/schema";
 import { usePDFExport } from "@/lib/pdf/use-pdf-export";
 
+const getContributionLimit = (inputValues: HSAInputs) => {
+  if (inputValues.accountType === 'hsa' && inputValues.coverage === 'family') {
+    return CONTRIBUTION_LIMITS.HSA_FAMILY;
+  }
+
+  if (inputValues.accountType === 'fsa') {
+    return CONTRIBUTION_LIMITS.FSA;
+  }
+
+  return CONTRIBUTION_LIMITS.HSA_INDIVIDUAL;
+};
+
+const DEFAULT_INPUTS: HSAInputs = {
+  accountType: 'hsa',
+  coverage: 'individual',
+  income: 75000,
+  contribution: 3000,
+  taxBracket: 22,
+};
+
 export default function HSACalculator() {
   const [, navigate] = useLocation();
   const { exportHSAReport, isGenerating, error } = usePDFExport();
-  
-  const [inputs, setInputs] = useState<HSAInputs>({
-    accountType: 'hsa',
-    coverage: 'individual',
-    income: 75000,
-    contribution: 3000,
-    taxBracket: 22,
-  });
 
-  const [results, setResults] = useState<HSAResults>({
-    actualContribution: 0,
-    taxSavings: 0,
-    effectiveCost: 0,
-    taxableIncome: 0,
-    contributionLimit: 0,
-  });
+  const [inputs, setInputs] = useState<HSAInputs>(DEFAULT_INPUTS);
+
+  const [results, setResults] = useState<HSAResults>(() => calculateHSA(DEFAULT_INPUTS));
 
   useEffect(() => {
     const calculatedResults = calculateHSA(inputs);
@@ -42,10 +50,12 @@ export default function HSACalculator() {
     setInputs(prev => ({ ...prev, [key]: value }));
   };
 
+  const currentLimit = results.contributionLimit || getContributionLimit(inputs);
+
   const getLimitText = () => {
     const accountTypeText = inputs.accountType.toUpperCase();
     const coverageText = inputs.coverage === 'family' ? 'Family' : 'Individual';
-    return `2025 ${coverageText} ${accountTypeText} Limit: $${results.contributionLimit.toLocaleString()}`;
+    return `2025 ${coverageText} ${accountTypeText} Limit: $${currentLimit.toLocaleString()}`;
   };
 
   return (
@@ -82,7 +92,7 @@ export default function HSACalculator() {
             <div className="mb-8">
               <Label className="flex items-center text-sm font-medium text-foreground mb-4">
                 Account Type
-                <Tooltip content="HSA requires high-deductible health plan. FSA has 'use it or lose it' rules." />
+                <Tooltip content="An HSA is only available when you are enrolled in a qualified high-deductible health plan (HDHP); the money you contribute rolls over year to year and can even be invested for future medical costs. An FSA is set up by your employer, gives you access to the full yearly election on day one, but generally follows a 'use it or lose it' rule at the end of the plan year unless your employer allows a limited carryover or grace period." />
               </Label>
               <RadioGroup
                 value={inputs.accountType}
@@ -124,7 +134,7 @@ export default function HSACalculator() {
             <div className="mb-8">
               <Label className="flex items-center text-sm font-medium text-foreground mb-4">
                 Coverage Level
-                <Tooltip content="Family coverage includes spouse and dependents. Individual is self-only." />
+                <Tooltip content="Choose 'Individual' if your HDHP covers only you. Choose 'Family' when the plan also covers a spouse or any dependents; the IRS allows a higher contribution limit for family coverage because the money is meant to stretch across multiple people’s medical expenses." />
               </Label>
               <RadioGroup
                 value={inputs.coverage}
@@ -167,7 +177,7 @@ export default function HSACalculator() {
               <div>
                 <Label className="flex items-center text-sm font-medium text-foreground mb-2">
                   Annual Income
-                  <Tooltip content="Your gross annual salary before taxes and deductions." />
+                  <Tooltip content="Enter the total amount you earn in a year before any taxes, insurance premiums, or other payroll deductions are taken out. Using gross income helps the calculator show how pre-tax HSA or FSA contributions lower the income you are taxed on." />
                 </Label>
                 <div className="relative">
                   <span className="absolute left-4 top-3 text-muted-foreground">$</span>
@@ -184,12 +194,12 @@ export default function HSACalculator() {
               <div>
                 <Label className="flex items-center text-sm font-medium text-foreground mb-2">
                   Planned Annual Contribution: ${inputs.contribution.toLocaleString()}
-                  <Tooltip content="Amount you plan to contribute annually. Cannot exceed IRS limits." />
+                  <Tooltip content="This is the total dollars you plan to set aside for eligible medical expenses during the year. The slider caps your entry at the IRS maximum for your account type and coverage, because you cannot legally contribute more than that amount through payroll." />
                 </Label>
                 <Slider
                   value={[inputs.contribution]}
                   onValueChange={(value) => updateInput('contribution', value[0])}
-                  max={results.contributionLimit}
+                  max={currentLimit}
                   min={0}
                   step={50}
                   className="w-full"
@@ -197,7 +207,7 @@ export default function HSACalculator() {
                 />
                 <div className="flex justify-between text-xs text-muted-foreground mt-1">
                   <span>$0</span>
-                  <span>${results.contributionLimit.toLocaleString()}</span>
+                  <span>${currentLimit.toLocaleString()}</span>
                 </div>
                 <div className="mt-2 text-xs text-muted-foreground" data-testid="text-contribution-limit">
                   {getLimitText()}
@@ -207,7 +217,7 @@ export default function HSACalculator() {
               <div>
                 <Label className="flex items-center text-sm font-medium text-foreground mb-2">
                   Tax Bracket
-                  <Tooltip content="Your marginal federal tax rate. State taxes may provide additional savings." />
+                  <Tooltip content="Select the federal tax bracket that applies to the top portion of your income. The calculator uses this marginal rate to estimate how every pre-tax dollar contributed reduces what you owe in federal taxes; additional state or local tax savings would be on top of this estimate." />
                 </Label>
                 <Select value={inputs.taxBracket.toString()} onValueChange={(value) => updateInput('taxBracket', parseFloat(value))}>
                   <SelectTrigger className="glass-input" data-testid="select-tax-bracket">
@@ -253,7 +263,7 @@ export default function HSACalculator() {
               </div>
               <div className="flex justify-between items-center">
                 <span className="text-muted-foreground">Federal Tax Savings</span>
-                <span className="text-lg font-semibold text-secondary" data-testid="result-savings">
+                <span className="text-lg font-semibold text-foreground" data-testid="result-savings">
                   ${Math.round(results.taxSavings).toLocaleString()}
                 </span>
               </div>
@@ -302,7 +312,7 @@ export default function HSACalculator() {
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Tax Savings:</span>
-                  <span className="text-secondary font-mono" data-testid="math-savings">
+                  <span className="text-foreground font-mono" data-testid="math-savings">
                     ${Math.round(results.taxSavings).toLocaleString()}
                   </span>
                 </div>
@@ -315,26 +325,41 @@ export default function HSACalculator() {
             <h3 className="text-lg font-semibold text-foreground mb-4">Additional Benefits</h3>
             <div className="space-y-3">
               <div className="flex items-start space-x-3">
-                <Check className="text-secondary mt-1" size={16} />
+                <Check className="text-accent mt-1" size={16} />
                 <div>
                   <div className="font-medium text-foreground">Tax-Free Growth</div>
                   <div className="text-xs text-muted-foreground">Earnings grow without taxes</div>
                 </div>
               </div>
               <div className="flex items-start space-x-3">
-                <Check className="text-secondary mt-1" size={16} />
+                <Check className="text-accent mt-1" size={16} />
                 <div>
                   <div className="font-medium text-foreground">Triple Tax Advantage</div>
                   <div className="text-xs text-muted-foreground">Deductible, growth, and withdrawals</div>
                 </div>
               </div>
               <div className="flex items-start space-x-3">
-                <Check className="text-secondary mt-1" size={16} />
+                <Check className="text-accent mt-1" size={16} />
                 <div>
                   <div className="font-medium text-foreground">No Required Minimum</div>
                   <div className="text-xs text-muted-foreground">Unlike traditional retirement accounts</div>
                 </div>
               </div>
+            </div>
+          </GlassCard>
+
+          <GlassCard>
+            <h3 className="text-lg font-semibold text-foreground mb-4">TouchCare Guidance &amp; Compliance</h3>
+            <div className="space-y-3 text-sm text-muted-foreground">
+              <p>
+                The figures shown use 2025 IRS limits (Publication 969) and assume contributions are made through payroll on a pre-tax basis. Actual savings vary by state taxes, employer rules, and mid-year eligibility changes.
+              </p>
+              <p>
+                Remember that FSA balances are generally forfeited if not spent by the plan deadline, while HSA dollars stay with you and can be invested. Catch-up contributions for those age 55+ and employer seeding should be layered in manually.
+              </p>
+              <p className="text-xs text-foreground">
+                This calculator is for educational purposes only and does not replace individualized guidance from TouchCare, your benefits administrator, or a licensed tax professional.
+              </p>
             </div>
           </GlassCard>
         </div>

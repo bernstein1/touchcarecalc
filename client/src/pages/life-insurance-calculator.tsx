@@ -73,12 +73,12 @@ export default function LifeInsuranceCalculator() {
                 <div>
                   <Label className="flex items-center text-sm font-medium text-foreground mb-4">
                     Total Debt: ${inputs.totalDebt.toLocaleString()}
-                    <Tooltip content="Include mortgage, credit cards, loans, and other debts your family would need to pay." />
+                    <Tooltip content="Add up every debt your household would still owe if you passed away today—credit cards, auto loans, student loans, personal loans, and any other balances that do not disappear at death. Life insurance proceeds can pay these off so your family isn’t forced to sell assets or dip into savings." />
                   </Label>
                   <Slider
                     value={[inputs.totalDebt]}
                     onValueChange={(value) => updateInput('totalDebt', value[0])}
-                    max={1000000}
+                    max={2000000}
                     min={0}
                     step={5000}
                     className="w-full"
@@ -86,7 +86,7 @@ export default function LifeInsuranceCalculator() {
                   />
                   <div className="flex justify-between text-xs text-muted-foreground mt-1">
                     <span>$0</span>
-                    <span>$1,000,000</span>
+                    <span>$5,000,000</span>
                   </div>
                 </div>
 
@@ -94,7 +94,7 @@ export default function LifeInsuranceCalculator() {
                 <div>
                   <Label className="flex items-center text-sm font-medium text-foreground mb-4">
                     Annual Income
-                    <Tooltip content="Your gross annual income that would need to be replaced for your family." />
+                    <Tooltip content="Enter the total amount you earn before taxes and deductions. This figure helps estimate how much income your family would need replaced to cover everyday bills, savings goals, and future plans if you were no longer there to provide a paycheck." />
                   </Label>
                   <div className="relative">
                     <span className="absolute left-4 top-3 text-muted-foreground">$</span>
@@ -112,12 +112,12 @@ export default function LifeInsuranceCalculator() {
                 <div>
                   <Label className="flex items-center text-sm font-medium text-foreground mb-4">
                     Mortgage Balance: ${inputs.mortgageBalance.toLocaleString()}
-                    <Tooltip content="Outstanding mortgage balance that could be paid off to reduce family expenses." />
+                    <Tooltip content="Include the remaining balance on your primary home’s mortgage—or any other housing loan your family would still be responsible for. Paying this off with insurance proceeds can keep your loved ones in the home without a large monthly payment." />
                   </Label>
                   <Slider
                     value={[inputs.mortgageBalance]}
                     onValueChange={(value) => updateInput('mortgageBalance', value[0])}
-                    max={1000000}
+                    max={2000000}
                     min={0}
                     step={5000}
                     className="w-full"
@@ -125,7 +125,7 @@ export default function LifeInsuranceCalculator() {
                   />
                   <div className="flex justify-between text-xs text-muted-foreground mt-1">
                     <span>$0</span>
-                    <span>$1,000,000</span>
+                    <span>$5,000,000</span>
                   </div>
                 </div>
 
@@ -133,12 +133,12 @@ export default function LifeInsuranceCalculator() {
                 <div>
                   <Label className="flex items-center text-sm font-medium text-foreground mb-4">
                     Future Education Costs: ${inputs.educationCosts.toLocaleString()}
-                    <Tooltip content="Estimated costs for children's education, including college expenses." />
+                    <Tooltip content="Estimate the future education expenses you want to cover, such as college tuition, trade school, or private K-12 tuition. Even if you are unsure of the exact amount, entering a rough goal helps size coverage so dependents can pursue their plans without taking on heavy debt." />
                   </Label>
                   <Slider
                     value={[inputs.educationCosts]}
                     onValueChange={(value) => updateInput('educationCosts', value[0])}
-                    max={500000}
+                    max={1000000}
                     min={0}
                     step={5000}
                     className="w-full"
@@ -146,7 +146,7 @@ export default function LifeInsuranceCalculator() {
                   />
                   <div className="flex justify-between text-xs text-muted-foreground mt-1">
                     <span>$0</span>
-                    <span>$500,000</span>
+                    <span>$1,000,000</span>
                   </div>
                 </div>
               </div>
@@ -175,7 +175,7 @@ export default function LifeInsuranceCalculator() {
                   <Slider
                     value={[inputs.currentInsurance]}
                     onValueChange={(value) => updateInput('currentInsurance', value[0])}
-                    max={2000000}
+                    max={5000000}
                     min={0}
                     step={10000}
                     className="w-full"
@@ -295,6 +295,21 @@ export default function LifeInsuranceCalculator() {
                   <div className="text-xs text-muted-foreground">Consult with insurance professional</div>
                 </div>
               </div>
+            </div>
+          </GlassCard>
+
+          <GlassCard>
+            <h3 className="text-lg font-semibold text-foreground mb-4">TouchCare Coverage Guidance</h3>
+            <div className="space-y-3 text-sm text-muted-foreground">
+              <p>
+                The DIME framework adds together outstanding debts, income replacement, mortgage payoff, and education goals to estimate coverage. It does not consider Social Security survivor benefits, employer-provided life insurance, or unique estate planning needs.
+              </p>
+              <p>
+                Review beneficiaries annually and after major life events. Most households revisit coverage every 24 months or when income changes by more than 10%.
+              </p>
+              <p className="text-xs text-foreground">
+                TouchCare provides educational guidance only. For policy selection or underwriting, consult a licensed insurance professional or financial advisor.
+              </p>
             </div>
           </GlassCard>
         </div>

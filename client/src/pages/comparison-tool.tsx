@@ -11,6 +11,7 @@ import LifeInsuranceComparison from "@/components/comparisons/life-insurance-com
 import RetirementComparison from "@/components/comparisons/retirement-comparison";
 import { useLocation } from "wouter";
 import { usePDFExport } from "@/lib/pdf/use-pdf-export";
+import { CALCULATOR_THEME, type CalculatorId } from "@/lib/calculatorTheme";
 
 type CalculatorType = 'hsa' | 'commuter' | 'life-insurance' | 'retirement';
 type Scenario = {
@@ -20,37 +21,42 @@ type Scenario = {
   data: any;
 };
 
+const normaliseCalculatorId = (id: CalculatorType): CalculatorId => {
+  switch (id) {
+    case "life-insurance":
+      return "life";
+    case "hsa":
+      return "hsa";
+    case "commuter":
+      return "commuter";
+    case "retirement":
+      return "retirement";
+  }
+};
+
 const calculatorTypes = [
   {
     id: 'hsa' as const,
     name: 'HSA/FSA Benefits',
     icon: HeartPulse,
-    color: 'text-primary',
-    bgColor: 'bg-primary',
     description: 'Compare health savings and flexible spending account scenarios'
   },
   {
     id: 'commuter' as const,
     name: 'Commuter Benefits',
     icon: Bus,
-    color: 'text-secondary',
-    bgColor: 'bg-secondary',
     description: 'Compare pre-tax transit and parking benefit scenarios'
   },
   {
     id: 'life-insurance' as const,
     name: 'Life Insurance',
     icon: Shield,
-    color: 'text-accent',
-    bgColor: 'bg-accent',
     description: 'Compare life insurance coverage need scenarios'
   },
   {
     id: 'retirement' as const,
     name: '401(k) Retirement',
     icon: TrendingUp,
-    color: 'text-chart-1',
-    bgColor: 'bg-chart-1',
     description: 'Compare retirement planning scenarios'
   }
 ];
@@ -175,6 +181,7 @@ export default function ComparisonTool() {
           <div className="grid md:grid-cols-2 gap-6">
             {calculatorTypes.map((calculator) => {
               const Icon = calculator.icon;
+              const theme = CALCULATOR_THEME[normaliseCalculatorId(calculator.id)];
               return (
                 <GlassCard
                   key={calculator.id}
@@ -182,7 +189,7 @@ export default function ComparisonTool() {
                   className="text-center hover:scale-105"
                   data-testid={`card-calculator-${calculator.id}`}
                 >
-                  <div className={`w-16 h-16 ${calculator.bgColor} rounded-2xl flex items-center justify-center mx-auto mb-4`}>
+                  <div className={`w-16 h-16 ${theme.bgClass} rounded-2xl flex items-center justify-center mx-auto mb-4`}>
                     <Icon className="text-white" size={32} />
                   </div>
                   <h4 className="text-xl font-semibold text-foreground mb-2" data-testid={`text-calculator-name-${calculator.id}`}>
@@ -203,7 +210,7 @@ export default function ComparisonTool() {
           <GlassCard>
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-4">
-                <div className={`w-12 h-12 ${selectedCalculatorInfo?.bgColor} rounded-xl flex items-center justify-center`}>
+                <div className={`w-12 h-12 ${selectedCalculatorInfo ? CALCULATOR_THEME[normaliseCalculatorId(selectedCalculatorInfo.id)].bgClass : "bg-muted"} rounded-xl flex items-center justify-center`}>
                   {selectedCalculatorInfo?.icon && (
                     <selectedCalculatorInfo.icon className="text-white" size={24} />
                   )}
@@ -251,7 +258,7 @@ export default function ComparisonTool() {
                 <Button
                   onClick={handleAddScenario}
                   disabled={!newScenarioName.trim()}
-                  className="glass-button"
+                  className="shadow-sm"
                   data-testid="button-add-scenario"
                 >
                   <Plus size={16} className="mr-2" />
@@ -303,6 +310,7 @@ export default function ComparisonTool() {
                 <HSAComparison 
                   scenarios={scenarios} 
                   onUpdateScenario={handleUpdateScenario}
+                  onRemoveScenario={handleRemoveScenario}
                 />
               )}
               
@@ -310,6 +318,7 @@ export default function ComparisonTool() {
                 <CommuterComparison 
                   scenarios={scenarios} 
                   onUpdateScenario={handleUpdateScenario}
+                  onRemoveScenario={handleRemoveScenario}
                 />
               )}
               
@@ -317,6 +326,7 @@ export default function ComparisonTool() {
                 <LifeInsuranceComparison 
                   scenarios={scenarios} 
                   onUpdateScenario={handleUpdateScenario}
+                  onRemoveScenario={handleRemoveScenario}
                 />
               )}
               
@@ -324,6 +334,7 @@ export default function ComparisonTool() {
                 <RetirementComparison 
                   scenarios={scenarios} 
                   onUpdateScenario={handleUpdateScenario}
+                  onRemoveScenario={handleRemoveScenario}
                 />
               )}
             </div>

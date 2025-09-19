@@ -1,3 +1,4 @@
+import type { KeyboardEvent } from "react";
 import { cn } from "@/lib/utils";
 
 interface GlassCardProps {
@@ -7,13 +8,31 @@ interface GlassCardProps {
 }
 
 export default function GlassCard({ children, className, onClick }: GlassCardProps) {
+  const isInteractive = typeof onClick === "function";
+
+  const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
+    if (!isInteractive) {
+      return;
+    }
+
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      onClick?.();
+    }
+  };
+
   return (
     <div
       className={cn(
-        "glass-effect rounded-2xl p-8 hover:shadow-xl transition-all cursor-pointer group",
+        "glass-effect rounded-2xl p-8 transition-all",
+        isInteractive &&
+          "hover:shadow-xl cursor-pointer group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary",
         className
       )}
       onClick={onClick}
+      onKeyDown={handleKeyDown}
+      role={isInteractive ? "button" : undefined}
+      tabIndex={isInteractive ? 0 : undefined}
     >
       {children}
     </div>

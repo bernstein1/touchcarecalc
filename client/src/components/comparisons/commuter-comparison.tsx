@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { TrendingUp, TrendingDown, Calculator } from "lucide-react";
+import { TrendingUp, TrendingDown, Calculator, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -24,9 +24,10 @@ interface CommuterComparisonProps {
     data: CommuterInputs;
   }>;
   onUpdateScenario: (scenarioId: string, data: CommuterInputs) => void;
+  onRemoveScenario: (scenarioId: string) => void;
 }
 
-export default function CommuterComparison({ scenarios, onUpdateScenario }: CommuterComparisonProps) {
+export default function CommuterComparison({ scenarios, onUpdateScenario, onRemoveScenario }: CommuterComparisonProps) {
   const [scenarioResults, setScenarioResults] = useState<Record<string, CommuterResults>>({});
 
   // Calculate results for all scenarios
@@ -209,15 +210,27 @@ export default function CommuterComparison({ scenarios, onUpdateScenario }: Comm
         {scenarios.map(scenario => {
           return (
             <GlassCard key={scenario.id} className="space-y-6">
-              <h4 className="text-lg font-semibold text-foreground border-b border-border pb-2" data-testid={`scenario-title-${scenario.id}`}>
-                {scenario.name}
-              </h4>
+              <div className="flex items-start justify-between border-b border-border pb-2">
+                <h4 className="text-lg font-semibold text-foreground" data-testid={`scenario-title-${scenario.id}`}>
+                  {scenario.name}
+                </h4>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="text-muted-foreground hover:text-destructive"
+                  onClick={() => onRemoveScenario(scenario.id)}
+                  aria-label={`Remove scenario ${scenario.name}`}
+                  data-testid={`button-remove-scenario-${scenario.id}`}
+                >
+                  <Trash2 size={16} />
+                </Button>
+              </div>
 
               {/* Monthly Transit Cost */}
               <div>
                 <Label className="flex items-center text-sm font-medium text-foreground mb-3">
                   Monthly Transit Cost
-                  <Tooltip content="Pre-tax transit benefits for buses, trains, subways, and qualified vanpools." />
+                  <Tooltip content="Include the monthly cost of eligible public transit for your commute—subways, buses, commuter rail, ferries, and employer-sponsored vanpools. The IRS allows up to $315 per month in 2025 to be set aside pre-tax; anything above that is paid with after-tax dollars." />
                 </Label>
                 <div className="space-y-3">
                   <div className="relative">
@@ -253,7 +266,7 @@ export default function CommuterComparison({ scenarios, onUpdateScenario }: Comm
               <div>
                 <Label className="flex items-center text-sm font-medium text-foreground mb-3">
                   Monthly Parking Cost
-                  <Tooltip content="Pre-tax parking benefits for work-related parking at or near your workplace or transit station." />
+                  <Tooltip content="Add what you spend to park at or near your workplace or a transit station. Only parking tied directly to your commute qualifies for the $315 per month pre-tax limit in 2025; general street parking or mileage reimbursement does not count." />
                 </Label>
                 <div className="space-y-3">
                   <div className="relative">

@@ -1,59 +1,58 @@
-import { Calculator, Printer, ArrowLeft, Home, GitCompare } from "lucide-react";
+import { Printer, Home, GitCompare } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useLocation } from "wouter";
+import TouchCareLogo from "@/components/touchcare-logo";
 
 export default function NavigationHeader() {
   const [location, navigate] = useLocation();
   const isHub = location === "/";
+  const isComparison = location === "/comparison";
 
   const handlePrint = () => {
     window.print();
   };
 
   return (
-    <header className="glass-effect border-b border-border/50 sticky top-0 z-50">
-      <div className="max-w-7xl mx-auto px-6 py-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center">
-              <Calculator className="text-primary-foreground text-lg" size={20} />
-            </div>
-            <div>
-              <h1 className="text-xl font-semibold text-foreground">FinanceCalc Pro</h1>
-              <p className="text-sm text-muted-foreground">2025 Tax Rules & Benefits</p>
-            </div>
-          </div>
-          <nav className="hidden md:flex items-center space-x-6">
-            {!isHub && (
-              <Button
-                variant="ghost"
-                className="text-foreground hover:text-primary transition-colors"
-                onClick={() => navigate("/")}
-                data-testid="button-home"
-              >
-                <Home className="mr-2" size={16} />
-                Dashboard
-              </Button>
-            )}
+    <header className="bg-background/95 backdrop-blur border-b border-border/80 sticky top-0 z-50">
+      <div className="max-w-7xl mx-auto px-6 py-4 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-6">
+          <TouchCareLogo className="w-40" />
+          <p className="text-sm text-muted-foreground font-normal leading-snug">
+            A healthier understanding of healthcare.
+          </p>
+        </div>
+        <nav className="flex items-center gap-2 sm:gap-3">
+          {!isHub && (
             <Button
               variant="ghost"
-              className="text-muted-foreground hover:text-primary transition-colors"
-              onClick={() => navigate("/comparison")}
-              data-testid="button-comparison"
+              className="px-3 text-primary"
+              onClick={() => navigate("/")}
+              data-testid="button-home"
             >
-              <GitCompare className="mr-2" size={16} />
-              Compare
+              <Home className="mr-2" size={16} />
+              Dashboard
             </Button>
-            <Button
-              className="glass-button hover:bg-primary/90 text-primary-foreground transition-all"
-              onClick={handlePrint}
-              data-testid="button-print"
-            >
-              <Printer className="mr-2" size={16} />
-              Print Results
-            </Button>
-          </nav>
-        </div>
+          )}
+          <Button
+            variant="ghost"
+            className={`px-3 ${isComparison ? "bg-[var(--surface-subtle)] text-primary" : "text-primary"}`}
+            onClick={() => navigate("/comparison")}
+            data-testid="button-comparison"
+            aria-current={isComparison ? "page" : undefined}
+          >
+            <GitCompare className="mr-2" size={16} />
+            Compare
+          </Button>
+          <Button
+            variant="outline"
+            className="px-3"
+            onClick={handlePrint}
+            data-testid="button-print"
+          >
+            <Printer className="mr-2" size={16} />
+            Print Results
+          </Button>
+        </nav>
       </div>
     </header>
   );

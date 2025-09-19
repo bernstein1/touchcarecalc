@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { TrendingUp, TrendingDown, Minus, Calculator } from "lucide-react";
+import { TrendingUp, TrendingDown, Minus, Calculator, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -25,9 +25,10 @@ interface HSAComparisonProps {
     data: HSAInputs;
   }>;
   onUpdateScenario: (scenarioId: string, data: HSAInputs) => void;
+  onRemoveScenario: (scenarioId: string) => void;
 }
 
-export default function HSAComparison({ scenarios, onUpdateScenario }: HSAComparisonProps) {
+export default function HSAComparison({ scenarios, onUpdateScenario, onRemoveScenario }: HSAComparisonProps) {
   const [scenarioResults, setScenarioResults] = useState<Record<string, HSAResults>>({});
 
   // Calculate results for all scenarios
@@ -176,15 +177,27 @@ export default function HSAComparison({ scenarios, onUpdateScenario }: HSACompar
           
           return (
             <GlassCard key={scenario.id} className="space-y-6">
-              <h4 className="text-lg font-semibold text-foreground border-b border-border pb-2" data-testid={`scenario-title-${scenario.id}`}>
-                {scenario.name}
-              </h4>
+              <div className="flex items-start justify-between border-b border-border pb-2">
+                <h4 className="text-lg font-semibold text-foreground" data-testid={`scenario-title-${scenario.id}`}>
+                  {scenario.name}
+                </h4>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="text-muted-foreground hover:text-destructive"
+                  onClick={() => onRemoveScenario(scenario.id)}
+                  aria-label={`Remove scenario ${scenario.name}`}
+                  data-testid={`button-remove-scenario-${scenario.id}`}
+                >
+                  <Trash2 size={16} />
+                </Button>
+              </div>
 
               {/* Account Type */}
               <div>
                 <Label className="flex items-center text-sm font-medium text-foreground mb-3">
                   Account Type
-                  <Tooltip content="HSA requires high-deductible health plan. FSA has 'use it or lose it' rules." />
+                  <Tooltip content="An HSA can only be used when you are enrolled in a qualified high-deductible health plan (HDHP); your contributions roll over year to year and can be invested. An FSA is sponsored by your employer, gives access to the full annual election immediately, but typically follows a 'use it or lose it' rule unless your employer permits a small carryover or grace period." />
                 </Label>
                 <RadioGroup
                   value={scenario.data.accountType}
@@ -224,7 +237,7 @@ export default function HSAComparison({ scenarios, onUpdateScenario }: HSACompar
               <div>
                 <Label className="flex items-center text-sm font-medium text-foreground mb-3">
                   Coverage
-                  <Tooltip content="Family coverage includes spouse and dependents." />
+                  <Tooltip content="Select 'Individual' when your HDHP covers only you. Choose 'Family' if the plan also covers a spouse or dependents; family coverage qualifies for a higher IRS contribution limit because the dollars support multiple people." />
                 </Label>
                 <RadioGroup
                   value={scenario.data.coverage}

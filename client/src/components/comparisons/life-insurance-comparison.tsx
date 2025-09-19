@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { TrendingUp, TrendingDown, Calculator } from "lucide-react";
+import { TrendingUp, TrendingDown, Calculator, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -16,9 +16,10 @@ interface LifeInsuranceComparisonProps {
     data: LifeInsuranceInputs;
   }>;
   onUpdateScenario: (scenarioId: string, data: LifeInsuranceInputs) => void;
+  onRemoveScenario: (scenarioId: string) => void;
 }
 
-export default function LifeInsuranceComparison({ scenarios, onUpdateScenario }: LifeInsuranceComparisonProps) {
+export default function LifeInsuranceComparison({ scenarios, onUpdateScenario, onRemoveScenario }: LifeInsuranceComparisonProps) {
   const [scenarioResults, setScenarioResults] = useState<Record<string, LifeInsuranceResults>>({});
 
   // Calculate results for all scenarios
@@ -150,15 +151,27 @@ export default function LifeInsuranceComparison({ scenarios, onUpdateScenario }:
         {scenarios.map(scenario => {
           return (
             <GlassCard key={scenario.id} className="space-y-6">
-              <h4 className="text-lg font-semibold text-foreground border-b border-border pb-2" data-testid={`scenario-title-${scenario.id}`}>
-                {scenario.name}
-              </h4>
+              <div className="flex items-start justify-between border-b border-border pb-2">
+                <h4 className="text-lg font-semibold text-foreground" data-testid={`scenario-title-${scenario.id}`}>
+                  {scenario.name}
+                </h4>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="text-muted-foreground hover:text-destructive"
+                  onClick={() => onRemoveScenario(scenario.id)}
+                  aria-label={`Remove scenario ${scenario.name}`}
+                  data-testid={`button-remove-scenario-${scenario.id}`}
+                >
+                  <Trash2 size={16} />
+                </Button>
+              </div>
 
               {/* Annual Income */}
               <div>
                 <Label className="flex items-center text-sm font-medium text-foreground mb-2">
                   Annual Income
-                  <Tooltip content="Your current gross annual income before taxes." />
+                  <Tooltip content="Enter the amount you earn each year before taxes and payroll deductions. Replacing this income helps your family continue covering monthly bills, savings goals, and future plans if you could no longer provide a paycheck." />
                 </Label>
                 <div className="relative">
                   <span className="absolute left-3 top-3 text-muted-foreground text-sm">$</span>
@@ -196,7 +209,7 @@ export default function LifeInsuranceComparison({ scenarios, onUpdateScenario }:
               <div>
                 <Label className="flex items-center text-sm font-medium text-foreground mb-2">
                   Total Debt (excluding mortgage)
-                  <Tooltip content="Credit cards, car loans, student loans, and other debts excluding mortgage." />
+                  <Tooltip content="Include credit cards, auto loans, student loans, personal loans, or any other balances that would remain after your passing. Covering these debts with insurance proceeds keeps loved ones from draining savings or selling assets." />
                 </Label>
                 <div className="relative">
                   <span className="absolute left-3 top-3 text-muted-foreground text-sm">$</span>
@@ -214,7 +227,7 @@ export default function LifeInsuranceComparison({ scenarios, onUpdateScenario }:
               <div>
                 <Label className="flex items-center text-sm font-medium text-foreground mb-2">
                   Mortgage Balance
-                  <Tooltip content="Remaining balance on your primary mortgage." />
+                  <Tooltip content="Enter how much you still owe on your home or other housing loans. Using life insurance to pay off the mortgage helps your family stay in the home without taking on a large monthly payment." />
                 </Label>
                 <div className="relative">
                   <span className="absolute left-3 top-3 text-muted-foreground text-sm">$</span>
@@ -232,7 +245,7 @@ export default function LifeInsuranceComparison({ scenarios, onUpdateScenario }:
               <div>
                 <Label className="flex items-center text-sm font-medium text-foreground mb-2">
                   Future Education Costs
-                  <Tooltip content="Estimated costs for children's college education or other educational expenses." />
+                  <Tooltip content="Estimate what you want to set aside for children’s college, trade school, or other education goals. Planning for this amount ensures dependents can pursue their dreams without taking on heavy student debt." />
                 </Label>
                 <div className="relative">
                   <span className="absolute left-3 top-3 text-muted-foreground text-sm">$</span>
@@ -250,7 +263,7 @@ export default function LifeInsuranceComparison({ scenarios, onUpdateScenario }:
               <div>
                 <Label className="flex items-center text-sm font-medium text-foreground mb-2">
                   Current Life Insurance Coverage
-                  <Tooltip content="Your existing life insurance coverage amount." />
+                  <Tooltip content="Add up any life insurance you already have through your employer or individual policies. The calculator subtracts this existing protection so you only see the additional amount of coverage you may still need." />
                 </Label>
                 <div className="relative">
                   <span className="absolute left-3 top-3 text-muted-foreground text-sm">$</span>
