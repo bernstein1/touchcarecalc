@@ -3,7 +3,8 @@
     "client/src/**/*",
     "client/tests/**/*",
     "shared/**/*",
-    "server/**/*"
+    "server/**/*",
+    "api/**/*"
   ],
   "exclude": [
     "node_modules",
@@ -25,7 +26,7 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "allowImportingTsExtensions": true,
-    "moduleResolution": "bundler",
+    "moduleResolution": "node",
     "baseUrl": ".",
     "types": [
       "node",

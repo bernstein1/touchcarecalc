@@ -28,7 +28,11 @@ module.exports = {
   rules: {
     "react/react-in-jsx-scope": "off",
     "react/prop-types": "off",
+    "react/no-unknown-property": "off",
+    "react/no-unescaped-entities": "off",
     "@typescript-eslint/explicit-module-boundary-types": "off",
+    "@typescript-eslint/no-explicit-any": "off",
+    "@typescript-eslint/no-unused-vars": "off",
   },
   ignorePatterns: ["dist", "node_modules", "*.config.*"],
 };

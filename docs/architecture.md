@@ -7,11 +7,11 @@
 - **State/Data**: React Query for async data fetching, React Hook Form for forms.
 - **PDF Export**: `@react-pdf/renderer` templates in `client/src/lib/pdf`.
 
-## Back-end
+## API Layer
 
-- **Runtime**: Express server (`server/index.ts`) with modular routes (`server/routes.ts`).
-- **Storage**: Drizzle ORM abstractions ready for Postgres/Neon; currently stores sessions in memory.
-- **Server-Side Rendering**: Vite middleware in development; static assets served in production build.
+- **Serverless**: Vercel functions under `api/` expose `/api/calculations` endpoints backed by the shared Drizzle schema.
+- **Legacy Local Server**: `server/index.ts` runs the same routes via Express for local development or self-hosted deployments.
+- **Storage**: `MemStorage` keeps sessions in memory; swap for Postgres/Neon via Drizzle when persistence is required.
 
 ## Shared Modules
 

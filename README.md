@@ -1,14 +1,14 @@
 # TouchCare Benefits Calculator
 
-A marketing-ready web experience for TouchCare clients and prospects to explore HSA/FSA, commuter, life insurance, and retirement benefits. The project pairs a React + Vite front-end with an Express/Drizzle API so sales, member support, and end users can model savings dynamically and export polished PDF summaries.
+A marketing-ready web experience for TouchCare clients and prospects to explore HSA/FSA, commuter, life insurance, and retirement benefits. The project runs as a Vite-powered React SPA with optional serverless endpoints for persisting calculator sessions.
 
 ## Features
 
 - 2025 IRS limits baked into every calculator with centralized constants.
 - Guided UX with TouchCare branding, education tooltips, and PDF exports per scenario.
 - Comparison tool to evaluate multiple benefit strategies side-by-side.
-- Server-side session endpoints (Express + Drizzle ORM) ready for persistence or analytics.
-- Fully typed TypeScript codebase shared between client and server.
+- Serverless API routes (`/api/calculations`) powered by the same Drizzle schemas, deployable on Vercel.
+- Fully typed TypeScript codebase shared between client, shared logic, and API handlers.
 
 ## Getting Started
 
@@ -16,8 +16,11 @@ A marketing-ready web experience for TouchCare clients and prospects to explore 
 # install dependencies
 npm install
 
-# run the development server (client + api)
+# run the Vite dev server
 npm run dev
+
+# (optional) run the legacy Express server locally
+npm run server:dev
 
 # type-check the project
 npm run check
@@ -36,7 +39,8 @@ The app expects a `.env` file derived from `.env.example` for any secrets (datab
 
 ```
 client/             # React front-end (Vite, Tailwind, shadcn)
-server/             # Express API + session storage
+api/                # Vercel serverless functions for calculations API
+server/             # (Optional) Express server for local/legacy use
 shared/             # Types and schemas reused on both sides
 client/src/lib/     # Calculator logic, PDF utilities, brand tokens
 client/tests/       # Vitest unit tests
