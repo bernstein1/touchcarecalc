@@ -129,7 +129,8 @@ export default function ComparisonTool() {
           expectedReturn: 7,
           salaryGrowth: 3,
           contributionType: 'traditional',
-          taxBracket: 22
+          taxBracket: 22,
+          bothSplitTraditional: 50
         };
       default:
         return {};
