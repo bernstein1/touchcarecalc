@@ -14,11 +14,30 @@ interface RetirementReportProps {
 
 export const RetirementReport: React.FC<RetirementReportProps> = ({ data }) => {
   const { inputs, results, generatedAt } = data;
-  
+
   const yearsToRetirement = inputs.retirementAge - inputs.currentAge;
   const catchupEligible = inputs.currentAge >= 50;
   const currentLimit = catchupEligible ? 30500 : 23000;
-  
+  const sliderTraditionalShare = inputs.bothSplitTraditional ?? 50;
+  const effectiveTraditionalShare = results.totalContributions > 0
+    ? Math.round((results.totalTraditionalContributions / results.totalContributions) * 100)
+    : sliderTraditionalShare;
+  const effectiveRothShare = Math.max(0, 100 - effectiveTraditionalShare);
+  const contributionTypeLabel = inputs.contributionType === 'both'
+    ? 'Traditional + Roth'
+    : inputs.contributionType === 'traditional'
+      ? 'Traditional (Pre-tax)'
+      : 'Roth (After-tax)';
+  const contributionMixDescription = inputs.contributionType === 'both'
+    ? `Traditional ${effectiveTraditionalShare}% / Roth ${effectiveRothShare}% mix`
+    : contributionTypeLabel;
+  const sliderMixDescription = `Traditional ${sliderTraditionalShare}% / Roth ${100 - sliderTraditionalShare}%`;
+  const taxSavingsDescription = results.taxSavings > 0
+    ? contributionMixDescription
+    : inputs.contributionType === 'roth'
+      ? 'Roth contributions are taxed now, so no current tax savings'
+      : contributionMixDescription;
+
   return (
     <BaseDocument
       title="401(k) Retirement Planning Report"
@@ -50,7 +69,7 @@ export const RetirementReport: React.FC<RetirementReportProps> = ({ data }) => {
             title="Annual Tax Savings"
             value={results.taxSavings}
             currency
-            description={`${inputs.contributionType} contribution benefit`}
+            description={taxSavingsDescription}
           />
         </MetricGrid>
       </Section>
@@ -78,7 +97,13 @@ export const RetirementReport: React.FC<RetirementReportProps> = ({ data }) => {
           </Text>
           <ValueRow label="Contribution Percentage" value={`${inputs.employeeContribution}%`} />
           <ValueRow label="Current Monthly Contribution" value={results.monthlyContribution} currency />
-          <ValueRow label="Contribution Type" value={inputs.contributionType === 'traditional' ? 'Traditional (Pre-tax)' : 'Roth (After-tax)'} />
+          <ValueRow label="Contribution Type" value={contributionTypeLabel} />
+          {inputs.contributionType === 'both' && (
+            <>
+              <ValueRow label="Selected Split" value={sliderMixDescription} />
+              <ValueRow label="Effective Allocation" value={`Traditional ${effectiveTraditionalShare}% / Roth ${effectiveRothShare}%`} />
+            </>
+          )}
           <ValueRow label="2025 Annual Limit" value={currentLimit} currency />
           {catchupEligible && (
             <Text style={{ fontSize: 9, color: '#059669', marginTop: 5 }}>
@@ -96,7 +121,7 @@ export const RetirementReport: React.FC<RetirementReportProps> = ({ data }) => {
           <ValueRow label="Annual Employer Contribution" value={results.employerContributions / yearsToRetirement} currency />
         </View>
 
-        {inputs.contributionType === 'traditional' && (
+        {results.taxSavings > 0 && (
           <View style={{ padding: 10, backgroundColor: '#f3f4f6', marginVertical: 10 }}>
             <Text style={{ fontSize: 10, fontWeight: 'bold', marginBottom: 5, color: '#1f2937' }}>
               Tax Benefits (Traditional 401k)
@@ -120,6 +145,12 @@ export const RetirementReport: React.FC<RetirementReportProps> = ({ data }) => {
         
         <ValueRow label="Starting Balance" value={inputs.currentSavings} currency />
         <ValueRow label="Total Employee Contributions" value={results.totalContributions} currency />
+        {inputs.contributionType === 'both' && (
+          <>
+            <ValueRow label="Traditional Portion" value={results.totalTraditionalContributions} currency />
+            <ValueRow label="Roth Portion" value={results.totalRothContributions} currency />
+          </>
+        )}
         <ValueRow label="Total Employer Contributions" value={results.employerContributions} currency />
         <ValueRow label="Investment Growth" value={results.investmentGrowth} currency primary />
         <ValueRow 

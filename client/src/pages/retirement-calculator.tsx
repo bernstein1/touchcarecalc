@@ -31,12 +31,15 @@ export default function RetirementCalculator() {
     salaryGrowth: 3,
     contributionType: 'traditional',
     taxBracket: 22,
+    bothSplitTraditional: 50,
   });
 
   const [results, setResults] = useState<RetirementResults>({
     finalBalance: 0,
     totalContributions: 0,
     employerContributions: 0,
+    totalTraditionalContributions: 0,
+    totalRothContributions: 0,
     investmentGrowth: 0,
     monthlyContribution: 0,
     yearlyProjections: [],
@@ -80,6 +83,28 @@ export default function RetirementCalculator() {
   const maxAge = chartData.length > 0 ? Math.max(...chartData.map((point) => point.age)) : inputs.retirementAge;
   const xDomain = minAge === maxAge ? [minAge, minAge + 1] : [minAge, maxAge];
   const yDomain = maxBalance > 0 ? [0, Math.ceil((maxBalance * 1.1) / 5000) * 5000] : [0, 5000];
+
+  const totalEmployeeContribution = results.totalContributions;
+  const effectiveTraditionalShare = totalEmployeeContribution > 0
+    ? Math.round((results.totalTraditionalContributions / totalEmployeeContribution) * 100)
+    : inputs.contributionType === 'traditional'
+      ? 100
+      : inputs.contributionType === 'both'
+        ? inputs.bothSplitTraditional ?? 50
+        : 0;
+  const effectiveRothShare = totalEmployeeContribution > 0
+    ? Math.max(0, 100 - effectiveTraditionalShare)
+    : inputs.contributionType === 'roth'
+      ? 100
+      : inputs.contributionType === 'both'
+        ? 100 - (inputs.bothSplitTraditional ?? 50)
+        : 0;
+  const sliderTraditionalShare = inputs.bothSplitTraditional ?? 50;
+  const sliderRothShare = 100 - sliderTraditionalShare;
+  const projectionYears = Math.max(results.yearlyProjections.length, 1);
+  const annualTraditionalContribution = results.totalTraditionalContributions / projectionYears;
+  const annualRothContribution = results.totalRothContributions / projectionYears;
+  const yearsToRetirementValue = Math.max(inputs.retirementAge - inputs.currentAge, 1);
 
   return (
     <div className="space-y-8">
@@ -251,6 +276,42 @@ export default function RetirementCalculator() {
                     </Label>
                   </div>
                 </RadioGroup>
+                {inputs.contributionType === 'both' && (
+                  <div className="mt-6">
+                    <Label className="flex items-center text-sm font-medium text-foreground mb-2">
+                      Traditional vs. Roth Split
+                    </Label>
+                    <div className="flex items-center justify-between text-xs text-muted-foreground mb-2">
+                      <span>Traditional 0%</span>
+                      <span>Roth 100%</span>
+                    </div>
+                    <Slider
+                      value={[inputs.bothSplitTraditional ?? 50]}
+                      onValueChange={(value) => updateInput('bothSplitTraditional', value[0])}
+                      max={100}
+                      min={0}
+                      step={5}
+                      disabled={inputs.employeeContribution === 0}
+                      aria-label="Traditional contribution percentage"
+                      className="w-full"
+                      data-testid="slider-both-split"
+                    />
+                    <div className="flex justify-between text-xs text-muted-foreground mt-2">
+                      <span>Traditional {sliderTraditionalShare}%</span>
+                      <span>Roth {sliderRothShare}%</span>
+                    </div>
+                    {inputs.employeeContribution === 0 && (
+                      <p className="text-xs text-muted-foreground mt-2">
+                        Increase your employee contribution to unlock the split slider.
+                      </p>
+                    )}
+                    {inputs.employeeContribution > 0 && inputs.currentAge >= 50 && (
+                      <p className="text-xs text-muted-foreground mt-2">
+                        Catch-up contributions are treated as Traditional for tax savings.
+                      </p>
+                    )}
+                  </div>
+                )}
               </div>
 
               {/* Contribution Percentages */}
@@ -417,6 +478,16 @@ export default function RetirementCalculator() {
                   ${results.totalContributions.toLocaleString()}
                 </span>
               </div>
+              <div className="text-xs text-muted-foreground">
+                {inputs.contributionType === 'traditional' && '100% Traditional contributions'}
+                {inputs.contributionType === 'roth' && '100% Roth contributions'}
+                {inputs.contributionType === 'both' && (
+                  <span>
+                    Traditional ${results.totalTraditionalContributions.toLocaleString()} ({effectiveTraditionalShare}%){' | '}
+                    Roth ${results.totalRothContributions.toLocaleString()} ({effectiveRothShare}%)
+                  </span>
+                )}
+              </div>
               <div className="flex justify-between items-center">
                 <span className="text-muted-foreground">Employer Match</span>
                 <span className="text-lg font-semibold text-foreground" data-testid="result-employer-contributions">
@@ -459,12 +530,28 @@ export default function RetirementCalculator() {
                   {inputs.expectedReturn}%
                 </span>
               </div>
-              {inputs.contributionType === 'traditional' && (
+              {inputs.contributionType === 'both' && (
+                <>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Annual Traditional Portion:</span>
+                    <span className="text-foreground font-mono">
+                      ${Math.round(annualTraditionalContribution).toLocaleString()}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Annual Roth Portion:</span>
+                    <span className="text-foreground font-mono">
+                      ${Math.round(annualRothContribution).toLocaleString()}
+                    </span>
+                  </div>
+                </>
+              )}
+              {(inputs.contributionType === 'traditional' || results.taxSavings > 0) && (
                 <div className="border-t border-border pt-2">
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Annual Tax Savings:</span>
                     <span className="text-foreground font-mono" data-testid="math-tax-savings">
-                      ${Math.round(results.taxSavings / (inputs.retirementAge - inputs.currentAge)).toLocaleString()}
+                      ${Math.round(results.taxSavings / yearsToRetirementValue).toLocaleString()}
                     </span>
                   </div>
                 </div>

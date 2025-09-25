@@ -86,7 +86,8 @@ export function calculateRetirement(inputs: RetirementInputs): RetirementResults
     expectedReturn,
     salaryGrowth,
     contributionType,
-    taxBracket
+    taxBracket,
+    bothSplitTraditional = 50
   } = inputs;
 
   const yearsToRetirement = retirementAge - currentAge;
@@ -99,31 +100,17 @@ export function calculateRetirement(inputs: RetirementInputs): RetirementResults
   const baseContributionLimit = CONTRIBUTION_LIMITS.RETIREMENT_401K;
   const catchUpAllowance = Math.max(0, contributionLimit - baseContributionLimit);
 
-  const getTraditionalContribution = (amount: number) => {
-    switch (contributionType) {
-      case 'traditional':
-        return amount;
-      case 'roth':
-        return 0;
-      case 'both': {
-        const basePortion = Math.min(amount, baseContributionLimit);
-        const catchUpPortion = Math.min(Math.max(amount - baseContributionLimit, 0), catchUpAllowance);
-        const blendedTraditional = basePortion * 0.5;
-        // Treat catch-up contributions as traditional for tax-savings purposes
-        return blendedTraditional + catchUpPortion;
-      }
-      default:
-        return amount;
-    }
-  };
-  
+  const clampedTraditionalSplit = Math.min(Math.max(bothSplitTraditional, 0), 100) / 100;
+
   let balance = currentSavings;
   let totalEmployeeContributions = 0;
   let totalEmployerContributions = 0;
+  let totalTraditionalContributions = 0;
+  let totalRothContributions = 0;
   const yearlyProjections = [];
-  
+
   let currentSalaryWorking = currentSalary;
-  
+
   for (let year = 1; year <= yearsToRetirement; year++) {
     // Calculate annual salary for this year
     const yearlyGrowthRate = salaryGrowth / 100;
@@ -135,24 +122,36 @@ export function calculateRetirement(inputs: RetirementInputs): RetirementResults
       contributionLimit
     );
 
-    const traditionalContribution = getTraditionalContribution(employeeContribAnnual);
+    let traditionalContribution = 0;
+    let rothContribution = 0;
+
+    if (contributionType === 'traditional') {
+      traditionalContribution = employeeContribAnnual;
+    } else if (contributionType === 'roth') {
+      rothContribution = employeeContribAnnual;
+    } else {
+      const basePortion = Math.min(employeeContribAnnual, baseContributionLimit);
+      const catchUpPortion = Math.min(Math.max(employeeContribAnnual - baseContributionLimit, 0), catchUpAllowance);
+      const baseTraditional = basePortion * clampedTraditionalSplit;
+      traditionalContribution = baseTraditional + catchUpPortion;
+      rothContribution = Math.max(employeeContribAnnual - traditionalContribution, 0);
+    }
 
     // Calculate employer match
     const matchPercentage = Math.min(employeeContribution, employerMatchCap);
     const employerContribAnnual = (matchPercentage / 100) * currentSalaryWorking * (employerMatch / 100);
-    
+
     const totalAnnualContrib = employeeContribAnnual + employerContribAnnual;
     
     // Calculate tax savings for traditional contributions
-    let annualTaxSavings = 0;
-    if (traditionalContribution > 0) {
-      annualTaxSavings = traditionalContribution * (taxBracket / 100);
-    }
+    const annualTaxSavings = traditionalContribution > 0
+      ? traditionalContribution * (taxBracket / 100)
+      : 0;
 
     // Calculate balance growth with monthly compounding
     let yearEndBalance = balance;
     const monthlyContrib = totalAnnualContrib / 12;
-    
+
     for (let month = 1; month <= 12; month++) {
       yearEndBalance = yearEndBalance * (1 + monthlyReturn) + monthlyContrib;
     }
@@ -160,7 +159,9 @@ export function calculateRetirement(inputs: RetirementInputs): RetirementResults
     balance = yearEndBalance;
     totalEmployeeContributions += employeeContribAnnual;
     totalEmployerContributions += employerContribAnnual;
-    
+    totalTraditionalContributions += traditionalContribution;
+    totalRothContributions += rothContribution;
+
     yearlyProjections.push({
       year,
       age: currentAge + year,
@@ -169,18 +170,24 @@ export function calculateRetirement(inputs: RetirementInputs): RetirementResults
       employerContribution: Math.round(employerContribAnnual),
       totalContribution: Math.round(totalAnnualContrib),
       balance: Math.round(balance),
-      taxSavings: Math.round(annualTaxSavings)
+      taxSavings: Math.round(annualTaxSavings),
+      traditionalContribution: Math.round(traditionalContribution),
+      rothContribution: Math.round(rothContribution)
     });
   }
-  
+
   const totalTaxSavings = yearlyProjections.reduce((sum, projection) => sum + projection.taxSavings, 0);
   const investmentGrowth = balance - currentSavings - totalEmployeeContributions - totalEmployerContributions;
-  const monthlyContribution = totalEmployeeContributions / 12 / yearsToRetirement;
+  const monthlyContribution = yearsToRetirement > 0
+    ? totalEmployeeContributions / 12 / yearsToRetirement
+    : 0;
   
   return {
     finalBalance: Math.round(balance),
     totalContributions: Math.round(totalEmployeeContributions),
     employerContributions: Math.round(totalEmployerContributions),
+    totalTraditionalContributions: Math.round(totalTraditionalContributions),
+    totalRothContributions: Math.round(totalRothContributions),
     investmentGrowth: Math.round(investmentGrowth),
     monthlyContribution: Math.round(monthlyContribution),
     yearlyProjections,

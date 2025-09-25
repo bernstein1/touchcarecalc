@@ -78,12 +78,15 @@ export interface RetirementInputs {
   salaryGrowth: number;
   contributionType: 'traditional' | 'roth' | 'both';
   taxBracket: number;
+  bothSplitTraditional?: number;
 }
 
 export interface RetirementResults {
   finalBalance: number;
   totalContributions: number;
   employerContributions: number;
+  totalTraditionalContributions: number;
+  totalRothContributions: number;
   investmentGrowth: number;
   monthlyContribution: number;
   yearlyProjections: Array<{
@@ -95,6 +98,8 @@ export interface RetirementResults {
     totalContribution: number;
     balance: number;
     taxSavings: number;
+    traditionalContribution: number;
+    rothContribution: number;
   }>;
   taxSavings: number;
 }

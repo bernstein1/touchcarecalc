@@ -4,7 +4,7 @@ import { BaseDocument } from '../components/base-document';
 import { Section, ValueRow, MetricCard, MetricGrid, Divider, Note } from '../components/pdf-sections';
 import { formatCurrency, formatPercentage, ComparisonReportData } from '../pdf-utils';
 import { calculateHSA, calculateCommuter, calculateLifeInsurance, calculateRetirement } from '@/lib/calculations';
-import { HSAResults, CommuterResults, LifeInsuranceResults, RetirementResults } from '@shared/schema';
+import { HSAResults, CommuterResults, LifeInsuranceResults, RetirementResults, RetirementInputs } from '@shared/schema';
 
 interface ComparisonReportProps {
   data: ComparisonReportData;
@@ -153,20 +153,40 @@ export const ComparisonReport: React.FC<ComparisonReportProps> = ({ data }) => {
           </Text>
           {scenariosWithResults.map((scenario, index) => {
             const retirementResults = scenario.results as RetirementResults;
+            const inputs = scenario.inputs as RetirementInputs;
+            const sliderTraditional = inputs.bothSplitTraditional ?? 50;
+            const contributionTypeLabel = inputs.contributionType === 'both'
+              ? 'Traditional + Roth'
+              : inputs.contributionType === 'traditional'
+                ? 'Traditional (Pre-tax)'
+                : 'Roth (After-tax)';
+            const effectiveTraditionalShare = retirementResults.totalContributions > 0
+              ? Math.round((retirementResults.totalTraditionalContributions / retirementResults.totalContributions) * 100)
+              : sliderTraditional;
+            const effectiveRothShare = Math.max(0, 100 - effectiveTraditionalShare);
             return (
               <View key={index} style={{ marginBottom: 15, padding: 8, backgroundColor: index % 2 === 0 ? '#f9fafb' : '#ffffff' }}>
                 <Text style={{ fontSize: 11, fontWeight: 'bold', marginBottom: 5, color: '#1f2937' }}>
                   {scenario.name}
                 </Text>
-                <ValueRow label="Current Age / Retirement Age" value={`${scenario.inputs.currentAge} / ${scenario.inputs.retirementAge}`} />
-                <ValueRow label="Current Salary" value={scenario.inputs.currentSalary} currency />
-                <ValueRow label="Employee Contribution" value={`${scenario.inputs.employeeContribution}%`} />
-                <ValueRow label="Expected Return" value={`${scenario.inputs.expectedReturn}%`} />
+                <ValueRow label="Current Age / Retirement Age" value={`${inputs.currentAge} / ${inputs.retirementAge}`} />
+                <ValueRow label="Current Salary" value={inputs.currentSalary} currency />
+                <ValueRow label="Employee Contribution" value={`${inputs.employeeContribution}%`} />
+                <ValueRow label="Expected Return" value={`${inputs.expectedReturn}%`} />
+                <ValueRow label="Contribution Type" value={contributionTypeLabel} />
+                {inputs.contributionType === 'both' && (
+                  <>
+                    <ValueRow label="Selected Split" value={`Traditional ${sliderTraditional}% / Roth ${100 - sliderTraditional}%`} />
+                    <ValueRow label="Effective Allocation" value={`Traditional ${effectiveTraditionalShare}% / Roth ${effectiveRothShare}%`} />
+                    <ValueRow label="Traditional Contributions" value={retirementResults.totalTraditionalContributions} currency />
+                    <ValueRow label="Roth Contributions" value={retirementResults.totalRothContributions} currency />
+                  </>
+                )}
                 <ValueRow label="Monthly Contribution" value={retirementResults.monthlyContribution} currency />
                 <ValueRow label="Projected Final Balance" value={retirementResults.finalBalance} currency primary />
                 <ValueRow label="Total Contributions" value={retirementResults.totalContributions + retirementResults.employerContributions} currency />
                 <ValueRow label="Investment Growth" value={retirementResults.investmentGrowth} currency success />
-                {scenario.inputs.contributionType === 'traditional' && (
+                {retirementResults.taxSavings > 0 && (
                   <ValueRow label="Annual Tax Savings" value={retirementResults.taxSavings} currency />
                 )}
               </View>

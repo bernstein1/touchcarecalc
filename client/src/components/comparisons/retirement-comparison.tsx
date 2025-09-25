@@ -50,9 +50,31 @@ export default function RetirementComparison({ scenarios, onUpdateScenario, onRe
     if (value === bestValue) {
       return <TrendingUp className="text-green-500 ml-2" size={16} />;
     }
-    return value > (bestValue * 0.9) ? 
-      <TrendingUp className="text-green-500 ml-2" size={16} /> : 
+    return value > (bestValue * 0.9) ?
+      <TrendingUp className="text-green-500 ml-2" size={16} /> :
       <TrendingDown className="text-red-500 ml-2" size={16} />;
+  };
+
+  const formatContributionMix = (scenarioData: RetirementInputs, result?: RetirementResults) => {
+    if (scenarioData.contributionType === 'both' && result && result.totalContributions > 0) {
+      const traditionalShare = Math.round((result.totalTraditionalContributions / result.totalContributions) * 100);
+      const rothShare = Math.max(0, 100 - traditionalShare);
+      return (
+        <div className="space-y-1">
+          <div>Traditional ${result.totalTraditionalContributions.toLocaleString()} ({traditionalShare}%)</div>
+          <div>Roth ${result.totalRothContributions.toLocaleString()} ({rothShare}%)</div>
+        </div>
+      );
+    }
+
+    if (scenarioData.contributionType === 'both') {
+      const sliderTraditional = scenarioData.bothSplitTraditional ?? 50;
+      return `Traditional ${sliderTraditional}% / Roth ${100 - sliderTraditional}%`;
+    }
+
+    return scenarioData.contributionType === 'traditional'
+      ? 'Traditional (Pre-tax)'
+      : 'Roth (After-tax)';
   };
 
   if (scenarios.length === 0) {
@@ -131,6 +153,19 @@ export default function RetirementComparison({ scenarios, onUpdateScenario, onRe
               </tr>
               <tr className="border-b border-border">
                 <td className="p-3 font-medium text-foreground">
+                  Traditional vs Roth Mix
+                </td>
+                {scenarios.map(scenario => {
+                  const result = scenarioResults[scenario.id];
+                  return (
+                    <td key={scenario.id} className="p-3 text-center text-sm text-muted-foreground" data-testid={`contribution-mix-${scenario.id}`}>
+                      {formatContributionMix(scenario.data, result)}
+                    </td>
+                  );
+                })}
+              </tr>
+              <tr className="border-b border-border">
+                <td className="p-3 font-medium text-foreground">
                   Investment Growth
                   <div className="text-xs text-muted-foreground font-normal">Compound interest earnings</div>
                 </td>
@@ -150,17 +185,21 @@ export default function RetirementComparison({ scenarios, onUpdateScenario, onRe
               <tr>
                 <td className="p-3 font-medium text-foreground">
                   Lifetime Tax Savings
-                  <div className="text-xs text-muted-foreground font-normal">Traditional contributions only</div>
+                  <div className="text-xs text-muted-foreground font-normal">Traditional portions only</div>
                 </td>
                 {scenarios.map(scenario => {
                   const result = scenarioResults[scenario.id];
                   const value = result?.taxSavings || 0;
                   return (
                     <td key={scenario.id} className="p-3 text-center" data-testid={`tax-savings-${scenario.id}`}>
-                      <div className="flex items-center justify-center">
-                        <span className="text-lg font-semibold text-accent">${value.toLocaleString()}</span>
-                        {getValueIndicator(value, bestTaxSavings, 'taxSavings')}
-                      </div>
+                      {value > 0 ? (
+                        <div className="flex items-center justify-center">
+                          <span className="text-lg font-semibold text-accent">${value.toLocaleString()}</span>
+                          {getValueIndicator(value, bestTaxSavings, 'taxSavings')}
+                        </div>
+                      ) : (
+                        <span className="text-muted-foreground">N/A</span>
+                      )}
                     </td>
                   );
                 })}
@@ -356,8 +395,8 @@ export default function RetirementComparison({ scenarios, onUpdateScenario, onRe
                   className="grid grid-cols-1 gap-2"
                 >
                   <div className={`glass-input rounded-lg p-3 cursor-pointer transition-colors ${
-                    scenario.data.contributionType === 'traditional' 
-                      ? 'bg-primary/20 border-primary ring-1 ring-primary/50' 
+                    scenario.data.contributionType === 'traditional'
+                      ? 'bg-primary/20 border-primary ring-1 ring-primary/50'
                       : 'hover:bg-primary/10'
                   }`}>
                     <RadioGroupItem value="traditional" id={`traditional-${scenario.id}`} className="sr-only" />
@@ -369,8 +408,8 @@ export default function RetirementComparison({ scenarios, onUpdateScenario, onRe
                     </Label>
                   </div>
                   <div className={`glass-input rounded-lg p-3 cursor-pointer transition-colors ${
-                    scenario.data.contributionType === 'roth' 
-                      ? 'bg-secondary/20 border-secondary ring-1 ring-secondary/50' 
+                    scenario.data.contributionType === 'roth'
+                      ? 'bg-secondary/20 border-secondary ring-1 ring-secondary/50'
                       : 'hover:bg-primary/10'
                   }`}>
                     <RadioGroupItem value="roth" id={`roth-${scenario.id}`} className="sr-only" />
@@ -381,7 +420,50 @@ export default function RetirementComparison({ scenarios, onUpdateScenario, onRe
                       </div>
                     </Label>
                   </div>
+                  <div className={`glass-input rounded-lg p-3 cursor-pointer transition-colors ${
+                    scenario.data.contributionType === 'both'
+                      ? 'bg-accent/20 border-accent ring-1 ring-accent/50'
+                      : 'hover:bg-primary/10'
+                  }`}>
+                    <RadioGroupItem value="both" id={`both-${scenario.id}`} className="sr-only" />
+                    <Label htmlFor={`both-${scenario.id}`} className="cursor-pointer">
+                      <div className="text-center">
+                        <div className="font-medium text-foreground text-sm">Both (Traditional + Roth)</div>
+                        <div className="text-xs text-muted-foreground">Blend contributions between accounts</div>
+                      </div>
+                    </Label>
+                  </div>
                 </RadioGroup>
+                {scenario.data.contributionType === 'both' && (
+                  <div className="mt-3">
+                    <Label className="text-xs font-medium text-foreground mb-2 block">
+                      Traditional vs. Roth Split
+                    </Label>
+                    <Slider
+                      value={[scenario.data.bothSplitTraditional ?? 50]}
+                      onValueChange={(value) => updateScenarioInput(scenario.id, 'bothSplitTraditional', value[0])}
+                      max={100}
+                      min={0}
+                      step={5}
+                      disabled={scenario.data.employeeContribution === 0}
+                      data-testid={`slider-both-split-${scenario.id}`}
+                    />
+                    <div className="flex justify-between text-[10px] text-muted-foreground mt-1">
+                      <span>Traditional {scenario.data.bothSplitTraditional ?? 50}%</span>
+                      <span>Roth {100 - (scenario.data.bothSplitTraditional ?? 50)}%</span>
+                    </div>
+                    {scenario.data.employeeContribution === 0 && (
+                      <p className="text-[10px] text-muted-foreground mt-1">
+                        Set an employee contribution to adjust the split.
+                      </p>
+                    )}
+                    {scenario.data.currentAge >= 50 && scenario.data.employeeContribution > 0 && (
+                      <p className="text-[10px] text-muted-foreground mt-1">
+                        Catch-up contributions stay on the Traditional side for tax benefits.
+                      </p>
+                    )}
+                  </div>
+                )}
               </div>
 
               {/* Tax Bracket */}
@@ -421,6 +503,23 @@ export default function RetirementComparison({ scenarios, onUpdateScenario, onRe
                     <span>Employer Contribution:</span>
                     <span className="font-medium">${(scenarioResults[scenario.id]?.employerContributions || 0).toLocaleString()}</span>
                   </div>
+                  {scenario.data.contributionType === 'both' && (
+                    <div className="flex justify-between">
+                      <span>Contribution Mix:</span>
+                      <span className="font-medium text-right">
+                        {(() => {
+                          const result = scenarioResults[scenario.id];
+                          if (!result || result.totalContributions === 0) {
+                            const sliderTraditional = scenario.data.bothSplitTraditional ?? 50;
+                            return `Traditional ${sliderTraditional}% | Roth ${100 - sliderTraditional}%`;
+                          }
+                          const traditionalShare = Math.round((result.totalTraditionalContributions / result.totalContributions) * 100);
+                          const rothShare = Math.max(0, 100 - traditionalShare);
+                          return `Traditional ${traditionalShare}% | Roth ${rothShare}%`;
+                        })()}
+                      </span>
+                    </div>
+                  )}
                   <div className="flex justify-between border-t border-border pt-1 font-semibold">
                     <span>Projected Balance:</span>
                     <span className="text-primary">${(scenarioResults[scenario.id]?.finalBalance || 0).toLocaleString()}</span>
