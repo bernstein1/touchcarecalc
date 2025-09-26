@@ -1,14 +1,26 @@
 import { useState } from 'react';
 import { generateAndDownloadPDF, getFilenameSuffix, PDFReportData, ComparisonReportData } from './pdf-utils';
 import { HSAReport } from './templates/hsa-report';
+import { FSAReport } from './templates/fsa-report';
 import { CommuterReport } from './templates/commuter-report';
 import { LifeInsuranceReport } from './templates/life-insurance-report';
 import { RetirementReport } from './templates/retirement-report';
 import { ComparisonReport } from './templates/comparison-report';
-import { HSAInputs, HSAResults, CommuterInputs, CommuterResults, LifeInsuranceInputs, LifeInsuranceResults, RetirementInputs, RetirementResults } from '@shared/schema';
+import {
+  HSAInputs,
+  HSAResults,
+  FSAInputs,
+  FSAResults,
+  CommuterInputs,
+  CommuterResults,
+  LifeInsuranceInputs,
+  LifeInsuranceResults,
+  RetirementInputs,
+  RetirementResults
+} from '@shared/schema';
 
-type CalculatorInputs = HSAInputs | CommuterInputs | LifeInsuranceInputs | RetirementInputs;
-type CalculatorResults = HSAResults | CommuterResults | LifeInsuranceResults | RetirementResults;
+type CalculatorInputs = HSAInputs | FSAInputs | CommuterInputs | LifeInsuranceInputs | RetirementInputs;
+type CalculatorResults = HSAResults | FSAResults | CommuterResults | LifeInsuranceResults | RetirementResults;
 
 export const usePDFExport = () => {
   const [isGenerating, setIsGenerating] = useState(false);
@@ -21,7 +33,7 @@ export const usePDFExport = () => {
     try {
       const data: PDFReportData = {
         type: 'hsa',
-        title: `${inputs.accountType.toUpperCase()} Benefits Analysis`,
+        title: 'HSA Strategy Analysis',
         generatedAt: new Date(),
         inputs,
         results
@@ -33,6 +45,30 @@ export const usePDFExport = () => {
     } catch (err) {
       setError('Failed to generate HSA report. Please try again.');
       console.error('HSA PDF export error:', err);
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  const exportFSAReport = async (inputs: FSAInputs, results: FSAResults) => {
+    setIsGenerating(true);
+    setError(null);
+
+    try {
+      const data: PDFReportData = {
+        type: 'fsa',
+        title: 'FSA Election Analysis',
+        generatedAt: new Date(),
+        inputs,
+        results
+      };
+
+      const filename = `FSA_Report_${getFilenameSuffix()}.pdf`;
+      const reportElement = FSAReport({ data }) as React.ReactElement;
+      await generateAndDownloadPDF(reportElement, filename);
+    } catch (err) {
+      setError('Failed to generate FSA report. Please try again.');
+      console.error('FSA PDF export error:', err);
     } finally {
       setIsGenerating(false);
     }
@@ -132,13 +168,16 @@ export const usePDFExport = () => {
   };
 
   const exportReport = async (
-    type: 'hsa' | 'commuter' | 'life-insurance' | 'retirement',
+    type: 'hsa' | 'fsa' | 'commuter' | 'life-insurance' | 'retirement',
     inputs: CalculatorInputs,
     results: CalculatorResults
   ) => {
     switch (type) {
       case 'hsa':
         await exportHSAReport(inputs as HSAInputs, results as HSAResults);
+        break;
+      case 'fsa':
+        await exportFSAReport(inputs as FSAInputs, results as FSAResults);
         break;
       case 'commuter':
         await exportCommuterReport(inputs as CommuterInputs, results as CommuterResults);
@@ -158,6 +197,7 @@ export const usePDFExport = () => {
     isGenerating,
     error,
     exportHSAReport,
+    exportFSAReport,
     exportCommuterReport,
     exportLifeInsuranceReport,
     exportRetirementReport,

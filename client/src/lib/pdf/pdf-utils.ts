@@ -1,8 +1,19 @@
 import { pdf } from '@react-pdf/renderer';
 import { saveAs } from 'file-saver';
-import { HSAInputs, HSAResults, CommuterInputs, CommuterResults, LifeInsuranceInputs, LifeInsuranceResults, RetirementInputs, RetirementResults } from '@shared/schema';
+import {
+  HSAInputs,
+  HSAResults,
+  FSAInputs,
+  FSAResults,
+  CommuterInputs,
+  CommuterResults,
+  LifeInsuranceInputs,
+  LifeInsuranceResults,
+  RetirementInputs,
+  RetirementResults
+} from '@shared/schema';
 
-export type ReportType = 'hsa' | 'commuter' | 'life-insurance' | 'retirement' | 'comparison';
+export type ReportType = 'hsa' | 'fsa' | 'commuter' | 'life-insurance' | 'retirement' | 'comparison';
 
 export interface PDFReportData {
   type: ReportType;

@@ -71,13 +71,14 @@ export default function HSAComparison({ scenarios, onUpdateScenario, onRemoveSce
   };
 
   const getLimitText = (inputs: HSAInputs) => {
-    const limit = inputs.accountType === 'hsa' && inputs.coverage === 'family' 
-      ? CONTRIBUTION_LIMITS.HSA_FAMILY 
-      : inputs.accountType === 'fsa' 
-        ? CONTRIBUTION_LIMITS.FSA 
+    const accountType = inputs.accountType ?? 'hsa';
+    const limit = accountType === 'hsa' && inputs.coverage === 'family'
+      ? CONTRIBUTION_LIMITS.HSA_FAMILY
+      : accountType === 'fsa'
+        ? CONTRIBUTION_LIMITS.FSA
         : CONTRIBUTION_LIMITS.HSA_INDIVIDUAL;
-    
-    const accountTypeText = inputs.accountType.toUpperCase();
+
+    const accountTypeText = accountType.toUpperCase();
     const coverageText = inputs.coverage === 'family' ? 'Family' : 'Individual';
     return `2025 ${coverageText} ${accountTypeText} Limit: $${limit.toLocaleString()}`;
   };
@@ -293,11 +294,16 @@ export default function HSAComparison({ scenarios, onUpdateScenario, onRemoveSce
               {/* Contribution */}
               <div>
                 <Label className="text-sm font-medium text-foreground mb-2 block">
-                  Annual Contribution: ${scenario.data.contribution.toLocaleString()}
+                  Annual Contribution: ${(
+                    scenario.data.employeeContribution ?? scenario.data.contribution ?? 0
+                  ).toLocaleString()}
                 </Label>
                 <Slider
-                  value={[scenario.data.contribution]}
-                  onValueChange={(value) => updateScenarioInput(scenario.id, 'contribution', value[0])}
+                  value={[scenario.data.employeeContribution ?? scenario.data.contribution ?? 0]}
+                  onValueChange={(value) => {
+                    updateScenarioInput(scenario.id, 'employeeContribution', value[0]);
+                    updateScenarioInput(scenario.id, 'contribution', value[0]);
+                  }}
                   max={contributionLimit}
                   min={0}
                   step={50}
