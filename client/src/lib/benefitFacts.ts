@@ -12,9 +12,11 @@ export const BENEFIT_FACTS: Record<CalculatorId, BenefitFact[]> = {
   hsa: [
     { label: "HSA Individual Limit:", value: formatCurrency(CONTRIBUTION_LIMITS.HSA_INDIVIDUAL) },
     { label: "HSA Family Limit:", value: formatCurrency(CONTRIBUTION_LIMITS.HSA_FAMILY) },
+    { label: "Employer seed allowed:", value: "Yes — contributions stack with payroll" },
   ],
   fsa: [
     { label: "Health FSA Limit:", value: formatCurrency(CONTRIBUTION_LIMITS.FSA) },
+    { label: "Use-it-or-lose-it:", value: "Forfeit amounts beyond carryover/grace" },
     { label: "Dependent Care Max:", value: formatCurrency(FSA_LIMITS.dependentCare) },
   ],
   commuter: [

@@ -14,6 +14,14 @@ interface HSAReportProps {
 
 export const HSAReport: React.FC<HSAReportProps> = ({ data }) => {
   const { inputs, results, generatedAt } = data;
+  const talkingPoints = data.additionalData?.narrative as
+    | {
+        compatibility?: string;
+        employerSupport?: string;
+        premiumOffsets?: string;
+        cashflow?: string;
+      }
+    | undefined;
   const coverageText = inputs.coverage === 'family' ? 'Family' : 'Individual';
 
   return (
@@ -73,6 +81,27 @@ export const HSAReport: React.FC<HSAReportProps> = ({ data }) => {
         <ValueRow label="Employer Seed" value={results.employerContribution} currency />
         <ValueRow label="Net Cashflow Advantage" value={results.netCashflowAdvantage} currency highlight />
       </Section>
+
+      {talkingPoints ? (
+        <>
+          <Divider />
+
+          <Section title="HDHP Narrative Highlights">
+            {talkingPoints.compatibility && (
+              <Text style={{ fontSize: 9, marginBottom: 6, color: '#374151' }}>{`• ${talkingPoints.compatibility}`}</Text>
+            )}
+            {talkingPoints.employerSupport && (
+              <Text style={{ fontSize: 9, marginBottom: 6, color: '#374151' }}>{`• ${talkingPoints.employerSupport}`}</Text>
+            )}
+            {talkingPoints.premiumOffsets && (
+              <Text style={{ fontSize: 9, marginBottom: 6, color: '#374151' }}>{`• ${talkingPoints.premiumOffsets}`}</Text>
+            )}
+            {talkingPoints.cashflow && (
+              <Text style={{ fontSize: 9, color: '#374151' }}>{`• ${talkingPoints.cashflow}`}</Text>
+            )}
+          </Section>
+        </>
+      ) : null}
 
       <Divider />
 

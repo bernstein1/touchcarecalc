@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { generateAndDownloadPDF, getFilenameSuffix, PDFReportData, ComparisonReportData } from './pdf-utils';
+import { generateAndDownloadPDF, getFilenameSuffix, PDFReportData, ComparisonReportData, formatCurrency } from './pdf-utils';
 import { HSAReport } from './templates/hsa-report';
 import { FSAReport } from './templates/fsa-report';
 import { CommuterReport } from './templates/commuter-report';
@@ -31,12 +31,21 @@ export const usePDFExport = () => {
     setError(null);
     
     try {
+      const coverageText = inputs.coverage === 'family' ? 'family' : 'individual';
       const data: PDFReportData = {
         type: 'hsa',
         title: 'HSA Strategy Analysis',
         generatedAt: new Date(),
         inputs,
-        results
+        results,
+        additionalData: {
+          narrative: {
+            compatibility: `Qualified ${coverageText} HDHP coverage unlocks ${formatCurrency(results.annualContributionLimit)} of annual HSA capacity, including ${formatCurrency(results.catchUpContribution ?? 0)} in catch-up room.`,
+            employerSupport: `Employer contributions of ${formatCurrency(results.employerContribution)} combine with your payroll deferrals to reach the ${formatCurrency(inputs.targetReserve)} reserve target.`,
+            premiumOffsets: `Switching plans frees ${formatCurrency(results.annualPremiumSavings)} in annual premiums that can be redirected to the HSA.`,
+            cashflow: `Net cashflow advantage of ${formatCurrency(results.netCashflowAdvantage)} blends premium savings, employer seeding, and tax benefits to blunt deductible exposure.`
+          }
+        }
       };
       
       const filename = `HSA_Report_${getFilenameSuffix()}.pdf`;
@@ -60,7 +69,14 @@ export const usePDFExport = () => {
         title: 'FSA Election Analysis',
         generatedAt: new Date(),
         inputs,
-        results
+        results,
+        additionalData: {
+          narrative: {
+            electionSizing: `Health FSA election of ${formatCurrency(inputs.healthElection)} captures ${formatCurrency(results.expectedUtilization)} in expected expenses across routine care, planned procedures, and prescriptions.`,
+            gracePeriod: `Carryover allowances protect ${formatCurrency(results.carryoverProtected)} with a ${inputs.gracePeriodMonths.toFixed(1)}-month grace period to finish spending prior-year dollars.`,
+            forfeiture: `Monitor ${formatCurrency(results.forfeitureRisk)} of potential forfeitures and adjust before year-end to preserve the ${formatCurrency(results.netBenefit)} net benefit after taxes.`
+          }
+        }
       };
 
       const filename = `FSA_Report_${getFilenameSuffix()}.pdf`;

@@ -54,7 +54,7 @@ export default function HSACalculator() {
   const reserveProgress = results.projectedReserve;
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8" data-analytics-id="page-hsa-calculator">
       <div className="flex items-center justify-between mb-8">
         <div className="flex items-center space-x-4">
           <Button

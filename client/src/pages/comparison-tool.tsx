@@ -1,11 +1,12 @@
 import { useState } from "react";
-import { ArrowLeft, Plus, GitCompare, HeartPulse, Bus, Shield, TrendingUp, Download } from "lucide-react";
+import { ArrowLeft, Plus, GitCompare, HeartPulse, ClipboardList, Bus, Shield, TrendingUp, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import GlassCard from "@/components/glass-card";
 import HSAComparison from "@/components/comparisons/hsa-comparison";
+import FSAComparison from "@/components/comparisons/fsa-comparison";
 import CommuterComparison from "@/components/comparisons/commuter-comparison";
 import LifeInsuranceComparison from "@/components/comparisons/life-insurance-comparison";
 import RetirementComparison from "@/components/comparisons/retirement-comparison";
@@ -13,7 +14,7 @@ import { useLocation } from "wouter";
 import { usePDFExport } from "@/lib/pdf/use-pdf-export";
 import { CALCULATOR_THEME, type CalculatorId } from "@/lib/calculatorTheme";
 
-type CalculatorType = 'hsa' | 'commuter' | 'life-insurance' | 'retirement';
+type CalculatorType = 'hsa' | 'fsa' | 'commuter' | 'life-insurance' | 'retirement';
 type Scenario = {
   id: string;
   name: string;
@@ -27,6 +28,8 @@ const normaliseCalculatorId = (id: CalculatorType): CalculatorId => {
       return "life";
     case "hsa":
       return "hsa";
+    case "fsa":
+      return "fsa";
     case "commuter":
       return "commuter";
     case "retirement":
@@ -40,6 +43,12 @@ const calculatorTypes = [
     name: 'HSA Strategy',
     icon: HeartPulse,
     description: 'Compare HDHP premium savings and HSA reserve strategies'
+  },
+  {
+    id: 'fsa' as const,
+    name: 'FSA Forecast',
+    icon: ClipboardList,
+    description: 'Compare election sizing, grace periods, and forfeiture exposure'
   },
   {
     id: 'commuter' as const,
@@ -107,6 +116,22 @@ export default function ComparisonTool() {
           employerSeed: 500,
           targetReserve: 4000,
           taxBracket: 22
+        };
+      case 'fsa':
+        return {
+          healthElection: 2600,
+          expectedEligibleExpenses: 2400,
+          planCarryover: 640,
+          gracePeriodMonths: 2,
+          includeDependentCare: true,
+          dependentCareElection: 4000,
+          expectedDependentCareExpenses: 3600,
+          taxBracket: 22,
+          expenseBuckets: {
+            routineCare: 900,
+            plannedProcedures: 1000,
+            pharmacy: 500
+          }
         };
       case 'commuter':
         return {
@@ -195,6 +220,7 @@ export default function ComparisonTool() {
                   onClick={() => setSelectedCalculator(calculator.id)}
                   className="text-center hover:scale-105"
                   data-testid={`card-calculator-${calculator.id}`}
+                  analyticsId={`comparison-select-${calculator.id}`}
                 >
                   <div className={`w-16 h-16 ${theme.bgClass} rounded-2xl flex items-center justify-center mx-auto mb-4`}>
                     <Icon className="text-white" size={32} />
@@ -314,16 +340,24 @@ export default function ComparisonTool() {
               
               {/* Scenario Comparison Components */}
               {selectedCalculator === 'hsa' && (
-                <HSAComparison 
-                  scenarios={scenarios} 
+                <HSAComparison
+                  scenarios={scenarios}
                   onUpdateScenario={handleUpdateScenario}
                   onRemoveScenario={handleRemoveScenario}
                 />
               )}
-              
+
+              {selectedCalculator === 'fsa' && (
+                <FSAComparison
+                  scenarios={scenarios}
+                  onUpdateScenario={handleUpdateScenario}
+                  onRemoveScenario={handleRemoveScenario}
+                />
+              )}
+
               {selectedCalculator === 'commuter' && (
-                <CommuterComparison 
-                  scenarios={scenarios} 
+                <CommuterComparison
+                  scenarios={scenarios}
                   onUpdateScenario={handleUpdateScenario}
                   onRemoveScenario={handleRemoveScenario}
                 />

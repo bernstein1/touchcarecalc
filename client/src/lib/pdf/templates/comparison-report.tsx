@@ -2,9 +2,9 @@ import React from 'react';
 import { Text, View } from '@react-pdf/renderer';
 import { BaseDocument } from '../components/base-document';
 import { Section, ValueRow, MetricCard, MetricGrid, Divider, Note } from '../components/pdf-sections';
-import { formatCurrency, formatPercentage, ComparisonReportData } from '../pdf-utils';
-import { calculateHSA, calculateCommuter, calculateLifeInsurance, calculateRetirement } from '@/lib/calculations';
-import { HSAResults, CommuterResults, LifeInsuranceResults, RetirementResults, RetirementInputs } from '@shared/schema';
+import { formatCurrency, ComparisonReportData } from '../pdf-utils';
+import { calculateHSA, calculateFSA, calculateCommuter, calculateLifeInsurance, calculateRetirement } from '@/lib/calculations';
+import { HSAResults, FSAResults, CommuterResults, LifeInsuranceResults, RetirementResults, RetirementInputs } from '@shared/schema';
 
 interface ComparisonReportProps {
   data: ComparisonReportData;
@@ -15,7 +15,8 @@ export const ComparisonReport: React.FC<ComparisonReportProps> = ({ data }) => {
   
   const getCalculatorTitle = (type: string) => {
     switch (type) {
-      case 'hsa': return 'HSA/FSA Benefits';
+      case 'hsa': return 'HSA Strategy';
+      case 'fsa': return 'FSA Election';
       case 'commuter': return 'Commuter Benefits';
       case 'life-insurance': return 'Life Insurance Needs';
       case 'retirement': return '401(k) Retirement Planning';
@@ -25,7 +26,8 @@ export const ComparisonReport: React.FC<ComparisonReportProps> = ({ data }) => {
 
   const getCalculatorDescription = (type: string) => {
     switch (type) {
-      case 'hsa': return 'Compare health savings and flexible spending account scenarios';
+      case 'hsa': return 'Compare HDHP premium offsets, employer contributions, and deductible reserves';
+      case 'fsa': return 'Compare election sizing, grace-period timing, and forfeiture exposure';
       case 'commuter': return 'Compare pre-tax transportation benefit scenarios';
       case 'life-insurance': return 'Compare life insurance coverage need scenarios';
       case 'retirement': return 'Compare retirement planning contribution strategies';
@@ -35,10 +37,13 @@ export const ComparisonReport: React.FC<ComparisonReportProps> = ({ data }) => {
 
   // Calculate results for each scenario
   const scenariosWithResults = scenarios.map(scenario => {
-    let results: HSAResults | CommuterResults | LifeInsuranceResults | RetirementResults;
+    let results: HSAResults | FSAResults | CommuterResults | LifeInsuranceResults | RetirementResults;
     switch (calculatorType) {
       case 'hsa':
         results = calculateHSA(scenario.inputs) as HSAResults;
+        break;
+      case 'fsa':
+        results = calculateFSA(scenario.inputs) as FSAResults;
         break;
       case 'commuter':
         results = calculateCommuter(scenario.inputs) as CommuterResults;
@@ -75,6 +80,41 @@ export const ComparisonReport: React.FC<ComparisonReportProps> = ({ data }) => {
                 <ValueRow label="Annual Contribution" value={hsaResults.totalContribution ?? hsaResults.actualContribution ?? 0} currency />
                 <ValueRow label="Tax Savings" value={hsaResults.taxSavings} currency success />
                 <ValueRow label="Effective Cost" value={hsaResults.effectiveCost ?? 0} currency primary />
+              </View>
+            );
+          })}
+        </View>
+      </Section>
+    </View>
+  );
+
+  const renderFSAComparison = () => (
+    <View>
+      <Section title="Use-It-or-Lose-It Outlook">
+        <View style={{ marginBottom: 15 }}>
+          <Text style={{ fontSize: 10, marginBottom: 8, color: '#374151' }}>
+            Health and dependent-care FSA projections for each scenario:
+          </Text>
+          {scenariosWithResults.map((scenario, index) => {
+            const fsaResults = scenario.results as FSAResults;
+            return (
+              <View key={index} style={{ marginBottom: 10, padding: 8, backgroundColor: index % 2 === 0 ? '#f9fafb' : '#ffffff' }}>
+                <Text style={{ fontSize: 11, fontWeight: 'bold', marginBottom: 5, color: '#1f2937' }}>
+                  {scenario.name}
+                </Text>
+                <ValueRow label="Health FSA Election" value={scenario.inputs.healthElection} currency />
+                <ValueRow label="Expected Utilisation" value={fsaResults.expectedUtilization} currency primary />
+                <ValueRow label="Carryover Protected" value={fsaResults.carryoverProtected} currency />
+                <ValueRow label="Grace Period Months" value={(scenario.inputs.gracePeriodMonths ?? 0).toFixed(1)} />
+                <ValueRow label="Forfeiture Risk" value={fsaResults.forfeitureRisk} currency highlight />
+                <ValueRow label="Net Benefit" value={fsaResults.netBenefit} currency success />
+                {scenario.inputs.includeDependentCare ? (
+                  <ValueRow
+                    label="Dependent-care Tax Savings"
+                    value={fsaResults.dependentCareTaxSavings}
+                    currency
+                  />
+                ) : null}
               </View>
             );
           })}
@@ -202,6 +242,7 @@ export const ComparisonReport: React.FC<ComparisonReportProps> = ({ data }) => {
       const getBestMetric = (scenario: { results: HSAResults | CommuterResults | LifeInsuranceResults | RetirementResults }) => {
         switch (calculatorType) {
           case 'hsa': return (scenario.results as HSAResults).taxSavings;
+          case 'fsa': return (scenario.results as FSAResults).netBenefit;
           case 'commuter': return (scenario.results as CommuterResults).totalSavings;
           case 'life-insurance': return (scenario.results as LifeInsuranceResults).dimeTotal;
           case 'retirement': return (scenario.results as RetirementResults).finalBalance;
@@ -211,24 +252,26 @@ export const ComparisonReport: React.FC<ComparisonReportProps> = ({ data }) => {
       return getBestMetric(current) > getBestMetric(best) ? current : best;
     });
 
-    const getMetricName = () => {
-      switch (calculatorType) {
-        case 'hsa': return 'Highest Tax Savings';
-        case 'commuter': return 'Highest Total Savings';
-        case 'life-insurance': return 'Highest Coverage Need';
-        case 'retirement': return 'Highest Final Balance';
-        default: return 'Best Scenario';
-      }
-    };
+      const getMetricName = () => {
+        switch (calculatorType) {
+          case 'hsa': return 'Highest Tax Savings';
+          case 'fsa': return 'Highest Net Benefit';
+          case 'commuter': return 'Highest Total Savings';
+          case 'life-insurance': return 'Highest Coverage Need';
+          case 'retirement': return 'Highest Final Balance';
+          default: return 'Best Scenario';
+        }
+      };
 
-    const getMetricValue = (scenario: { results: HSAResults | CommuterResults | LifeInsuranceResults | RetirementResults }) => {
-      switch (calculatorType) {
-        case 'hsa': return (scenario.results as HSAResults).taxSavings;
-        case 'commuter': return (scenario.results as CommuterResults).totalSavings;
-        case 'life-insurance': return (scenario.results as LifeInsuranceResults).dimeTotal;
-        case 'retirement': return (scenario.results as RetirementResults).finalBalance;
-        default: return 0;
-      }
+      const getMetricValue = (scenario: { results: HSAResults | CommuterResults | LifeInsuranceResults | RetirementResults }) => {
+        switch (calculatorType) {
+          case 'hsa': return (scenario.results as HSAResults).taxSavings;
+          case 'fsa': return (scenario.results as FSAResults).netBenefit;
+          case 'commuter': return (scenario.results as CommuterResults).totalSavings;
+          case 'life-insurance': return (scenario.results as LifeInsuranceResults).dimeTotal;
+          case 'retirement': return (scenario.results as RetirementResults).finalBalance;
+          default: return 0;
+        }
     };
 
     return (
@@ -257,6 +300,7 @@ export const ComparisonReport: React.FC<ComparisonReportProps> = ({ data }) => {
           </Text>
           <Text style={{ fontSize: 9, color: '#374151' }}>
             {calculatorType === 'hsa' && `Provides the highest annual tax savings of ${formatCurrency((bestScenario.results as HSAResults).taxSavings)}.`}
+            {calculatorType === 'fsa' && `Balances election sizing with carryover rules for a net benefit of ${formatCurrency((bestScenario.results as FSAResults).netBenefit)}.`}
             {calculatorType === 'commuter' && `Delivers the highest total annual savings of ${formatCurrency((bestScenario.results as CommuterResults).totalSavings)} on transportation costs.`}
             {calculatorType === 'life-insurance' && `Indicates the highest coverage need of ${formatCurrency((bestScenario.results as LifeInsuranceResults).dimeTotal)} based on the DIME methodology.`}
             {calculatorType === 'retirement' && `Projects the highest retirement balance of ${formatCurrency((bestScenario.results as RetirementResults).finalBalance)} at retirement.`}
@@ -274,11 +318,12 @@ export const ComparisonReport: React.FC<ComparisonReportProps> = ({ data }) => {
     >
       {/* Summary */}
       {renderSummaryComparison()}
-      
+
       <Divider />
 
       {/* Detailed Comparison by Calculator Type */}
       {calculatorType === 'hsa' && renderHSAComparison()}
+      {calculatorType === 'fsa' && renderFSAComparison()}
       {calculatorType === 'commuter' && renderCommuterComparison()}
       {calculatorType === 'life-insurance' && renderLifeInsuranceComparison()}
       {calculatorType === 'retirement' && renderRetirementComparison()}
@@ -296,17 +341,34 @@ export const ComparisonReport: React.FC<ComparisonReportProps> = ({ data }) => {
             <Text style={{ fontSize: 11, fontWeight: 'bold', marginBottom: 8, color: '#1f2937' }}>
               {scenario.name} - Input Parameters
             </Text>
-            
+
             {Object.entries(scenario.inputs).map(([key, value]: [string, unknown]) => {
               const label = key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase());
-              const formattedValue = typeof value === 'number' 
+              if (value && typeof value === 'object' && !Array.isArray(value)) {
+                return Object.entries(value as Record<string, unknown>).map(([nestedKey, nestedValue]) => {
+                  const nestedLabel = `${label} - ${nestedKey.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}`;
+                  const nestedFormatted = typeof nestedValue === 'number'
+                    ? (nestedKey.toLowerCase().includes('month') || nestedKey.toLowerCase().includes('rate')
+                        ? nestedValue.toString()
+                        : formatCurrency(nestedValue))
+                    : String(nestedValue);
+                  return (
+                    <ValueRow
+                      key={`${key}.${nestedKey}`}
+                      label={nestedLabel}
+                      value={nestedFormatted}
+                    />
+                  );
+                });
+              }
+              const formattedValue = typeof value === 'number'
                 ? (key.includes('Cost') || key.includes('Income') || key.includes('Salary') || key.includes('Debt') || key.includes('Balance') || key.includes('Savings') ? formatCurrency(value) : value.toString())
                 : String(value);
-              
+
               return (
-                <ValueRow 
+                <ValueRow
                   key={key}
-                  label={label} 
+                  label={label}
                   value={formattedValue}
                 />
               );
