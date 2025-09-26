@@ -13,20 +13,23 @@ export default function CalculatorHub() {
     description: string;
     icon: typeof HeartPulse;
     route: string;
+    analyticsId: string;
   }> = [
     {
       id: "hsa",
       title: "HSA Strategy Planner",
-      description: "Plan HDHP premium savings, employer seed money, and deductible reserves for your HSA.",
+      description: "Pair your HDHP with employer seeding, premium offsets, and a deductible reserve strategy so the account stays future-ready.",
       icon: HeartPulse,
       route: "/hsa",
+      analyticsId: "calculator-hsa-entry",
     },
     {
       id: "fsa",
       title: "FSA Election Forecaster",
-      description: "Project healthcare and dependent-care expenses to choose confident FSA elections.",
+      description: "Model health and dependent-care elections with carryover rules and avoid forfeiting dollars under use-it-or-lose-it policies.",
       icon: ClipboardList,
       route: "/fsa",
+      analyticsId: "calculator-fsa-entry",
     },
     {
       id: "commuter",
@@ -34,6 +37,7 @@ export default function CalculatorHub() {
       description: "Calculate pre-tax savings on transit and parking expenses for your daily commute.",
       icon: Bus,
       route: "/commuter",
+      analyticsId: "calculator-commuter-entry",
     },
     {
       id: "life",
@@ -41,6 +45,7 @@ export default function CalculatorHub() {
       description: "Determine the right coverage amount using income replacement and debt analysis methodologies.",
       icon: Shield,
       route: "/life-insurance",
+      analyticsId: "calculator-life-entry",
     },
     {
       id: "retirement",
@@ -48,6 +53,7 @@ export default function CalculatorHub() {
       description: "Plan your retirement with compound interest projections and employer matching calculations.",
       icon: TrendingUp,
       route: "/retirement",
+      analyticsId: "calculator-retirement-entry",
     },
   ];
 
@@ -72,6 +78,7 @@ export default function CalculatorHub() {
               key={calculator.id}
               onClick={() => navigate(calculator.route)}
               data-testid={`card-calculator-${calculator.id}`}
+              analyticsId={calculator.analyticsId}
             >
               <div className="text-center">
                 <div className={`w-16 h-16 ${theme.bgClass} rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform`}>

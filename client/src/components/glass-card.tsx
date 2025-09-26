@@ -5,9 +5,10 @@ interface GlassCardProps {
   children: React.ReactNode;
   className?: string;
   onClick?: () => void;
+  analyticsId?: string;
 }
 
-export default function GlassCard({ children, className, onClick }: GlassCardProps) {
+export default function GlassCard({ children, className, onClick, analyticsId }: GlassCardProps) {
   const isInteractive = typeof onClick === "function";
 
   const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
@@ -33,6 +34,7 @@ export default function GlassCard({ children, className, onClick }: GlassCardPro
       onKeyDown={handleKeyDown}
       role={isInteractive ? "button" : undefined}
       tabIndex={isInteractive ? 0 : undefined}
+      data-analytics-id={analyticsId}
     >
       {children}
     </div>

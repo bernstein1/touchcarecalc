@@ -14,6 +14,13 @@ interface FSAReportProps {
 
 export const FSAReport: React.FC<FSAReportProps> = ({ data }) => {
   const { inputs, results, generatedAt } = data;
+  const talkingPoints = data.additionalData?.narrative as
+    | {
+        electionSizing?: string;
+        gracePeriod?: string;
+        forfeiture?: string;
+      }
+    | undefined;
 
   return (
     <BaseDocument title="FSA Election Analysis" subtitle="Health & Dependent Care FSAs - Tax Year 2025" generatedAt={generatedAt}>
@@ -62,6 +69,22 @@ export const FSAReport: React.FC<FSAReportProps> = ({ data }) => {
           </>
         ) : null}
       </Section>
+
+      <Divider />
+
+      {talkingPoints ? (
+        <Section title="Election Storyline">
+          {talkingPoints.electionSizing && (
+            <Text style={{ fontSize: 9, marginBottom: 6, color: '#374151' }}>{`• ${talkingPoints.electionSizing}`}</Text>
+          )}
+          {talkingPoints.gracePeriod && (
+            <Text style={{ fontSize: 9, marginBottom: 6, color: '#374151' }}>{`• ${talkingPoints.gracePeriod}`}</Text>
+          )}
+          {talkingPoints.forfeiture && (
+            <Text style={{ fontSize: 9, color: '#374151' }}>{`• ${talkingPoints.forfeiture}`}</Text>
+          )}
+        </Section>
+      ) : null}
 
       <Divider />
 
