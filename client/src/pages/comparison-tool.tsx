@@ -45,7 +45,7 @@ const calculatorTypes = [
     id: 'fsa' as const,
     name: 'FSA Forecast',
     icon: ClipboardList,
-    description: 'Compare election sizing, grace periods, and forfeiture exposure'
+    description: 'Compare Flexible Spending Account elections, carryover cushions, and what happens under the use-it-or-lose-it rule'
   },
   {
     id: 'commuter' as const,

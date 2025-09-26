@@ -112,7 +112,7 @@ export default function FSAComparison({ scenarios, onUpdateScenario, onRemoveSce
         <div className="text-center py-8">
           <Calculator className="mx-auto text-muted-foreground mb-4" size={48} />
           <p className="text-muted-foreground">
-            Add FSA scenarios above to compare elections, grace periods, and forfeiture risk.
+            Add Flexible Spending Account scenarios above to compare elections, grace periods, and how much money could be forfeited.
           </p>
         </div>
       </GlassCard>
@@ -141,7 +141,7 @@ export default function FSAComparison({ scenarios, onUpdateScenario, onRemoveSce
   return (
     <div className="space-y-8">
       <GlassCard>
-        <h3 className="text-lg font-semibold text-foreground mb-6">FSA Scenario Summary</h3>
+        <h3 className="text-lg font-semibold text-foreground mb-6">FSA scenario snapshot</h3>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
@@ -156,7 +156,7 @@ export default function FSAComparison({ scenarios, onUpdateScenario, onRemoveSce
             </thead>
             <tbody>
               <tr className="border-b border-border">
-                <td className="p-3 font-medium text-foreground">Health FSA Election</td>
+                <td className="p-3 font-medium text-foreground">Health FSA election</td>
                 {summaryMetrics.map((metric) => (
                   <td key={`election-${metric.id}`} className="p-3 text-center">
                     {currency(metric.healthElection)}
@@ -164,7 +164,7 @@ export default function FSAComparison({ scenarios, onUpdateScenario, onRemoveSce
                 ))}
               </tr>
               <tr className="border-b border-border">
-                <td className="p-3 font-medium text-foreground">Expected Utilisation</td>
+                <td className="p-3 font-medium text-foreground">Expected spending</td>
                 {summaryMetrics.map((metric) => (
                   <td key={`util-${metric.id}`} className="p-3 text-center">
                     <div className="flex items-center justify-center">
@@ -175,7 +175,7 @@ export default function FSAComparison({ scenarios, onUpdateScenario, onRemoveSce
                 ))}
               </tr>
               <tr className="border-b border-border">
-                <td className="p-3 font-medium text-foreground">Carryover Utilised</td>
+                <td className="p-3 font-medium text-foreground">Carryover or grace protection</td>
                 {summaryMetrics.map((metric) => (
                   <td key={`carryover-${metric.id}`} className="p-3 text-center">
                     <div className="flex items-center justify-center">
@@ -186,7 +186,7 @@ export default function FSAComparison({ scenarios, onUpdateScenario, onRemoveSce
                 ))}
               </tr>
               <tr className="border-b border-border">
-                <td className="p-3 font-medium text-foreground">Forfeiture Risk</td>
+                <td className="p-3 font-medium text-foreground">Money at risk of forfeiture</td>
                 {summaryMetrics.map((metric) => (
                   <td key={`forfeit-${metric.id}`} className="p-3 text-center">
                     <div className="flex items-center justify-center">
@@ -197,7 +197,7 @@ export default function FSAComparison({ scenarios, onUpdateScenario, onRemoveSce
                 ))}
               </tr>
               <tr>
-                <td className="p-3 font-medium text-foreground">Net Benefit (Tax Savings − Risk)</td>
+                <td className="p-3 font-medium text-foreground">Net benefit after possible forfeiture</td>
                 {summaryMetrics.map((metric) => (
                   <td key={`benefit-${metric.id}`} className="p-3 text-center">
                     <div className="flex items-center justify-center">
@@ -224,7 +224,7 @@ export default function FSAComparison({ scenarios, onUpdateScenario, onRemoveSce
               <div className="flex items-start justify-between border-b border-border pb-2">
                 <div>
                   <h4 className="text-lg font-semibold text-foreground">{scenario.name}</h4>
-                  <p className="text-xs text-muted-foreground">Plan for eligible expenses and carryover rules</p>
+                  <p className="text-xs text-muted-foreground">Outline expected bills and the rules that help you avoid losing funds</p>
                 </div>
                 <Button
                   variant="ghost"
@@ -245,8 +245,7 @@ export default function FSAComparison({ scenarios, onUpdateScenario, onRemoveSce
                       title="Election sizing"
                       content={
                         <p>
-                          Align the election with known medical bills. Any dollars beyond carryover and grace-period rules
-                          are forfeited back to the plan.
+                          Choose an election that matches medical bills you can name now. Money above what you spend or keep under the rules goes back to the plan.
                         </p>
                       }
                     />
@@ -271,11 +270,10 @@ export default function FSAComparison({ scenarios, onUpdateScenario, onRemoveSce
                   <div className="flex items-center justify-between">
                     <Label className="text-sm font-medium text-foreground">Eligible expense buckets</Label>
                     <Tooltip
-                      title="Track expected spend"
+                      title="Track expected spending"
                       content={
                         <p>
-                          Break expenses into predictable categories so you can see how much of the election is spoken for
-                          before relying on carryover rules.
+                          Split your forecast into simple buckets. When most of the election is tied to real bills, you rely less on carryover or grace rules to save leftovers.
                         </p>
                       }
                     />
@@ -311,7 +309,7 @@ export default function FSAComparison({ scenarios, onUpdateScenario, onRemoveSce
                   </div>
                   <div className="rounded-lg bg-primary/5 border border-dashed border-primary/40 p-3 text-xs text-muted-foreground">
                     <p>Expected eligible spend: {currency(scenario.data.expectedEligibleExpenses)}</p>
-                    <p>Carryover cushion: {currency(results?.carryoverProtected ?? 0)} • Forfeiture risk: {currency(results?.forfeitureRisk ?? 0)}</p>
+                    <p>Carryover or grace cushion: {currency(results?.carryoverProtected ?? 0)} • At risk of forfeiture: {currency(results?.forfeitureRisk ?? 0)}</p>
                   </div>
                 </div>
 
@@ -319,11 +317,10 @@ export default function FSAComparison({ scenarios, onUpdateScenario, onRemoveSce
                   <div className="flex items-center justify-between">
                     <Label className="text-sm font-medium text-foreground">Carryover & grace rules</Label>
                     <Tooltip
-                      title="Grace period usage"
+                      title="Carryover and grace timing"
                       content={
                         <p>
-                          Document how long you have to spend remaining dollars after year-end. More time reduces forfeiture
-                          risk if your expenses arrive late.
+                          Write down how much can roll forward and how long you have to spend last year's dollars. Extra time or rollover space lowers the chance of losing money.
                         </p>
                       }
                     />
@@ -353,7 +350,7 @@ export default function FSAComparison({ scenarios, onUpdateScenario, onRemoveSce
                         <span>0 months</span>
                         <span>3 months</span>
                       </div>
-                      <p className="text-xs text-muted-foreground mt-1">You have {gracePeriodDisplay} to spend on prior-year expenses.</p>
+                      <p className="text-xs text-muted-foreground mt-1">You have {gracePeriodDisplay} to spend on last year's eligible expenses.</p>
                     </div>
                   </div>
                 </div>
@@ -388,7 +385,7 @@ export default function FSAComparison({ scenarios, onUpdateScenario, onRemoveSce
                       </Select>
                     </div>
                     <p className="text-xs text-muted-foreground">
-                      Estimated marginal tax rate: <span className="font-semibold text-foreground">{scenarioResults[scenario.id]?.marginalRate ?? 0}%</span>
+                      Estimated marginal tax rate: <span className="font-semibold text-foreground">{scenarioResults[scenario.id]?.marginalRate ?? 0}%</span>. Each pre-tax dollar saves roughly this percentage in taxes.
                     </p>
                   </div>
 
@@ -396,7 +393,7 @@ export default function FSAComparison({ scenarios, onUpdateScenario, onRemoveSce
                     <div className="flex items-center justify-between">
                       <div>
                         <Label className="text-sm font-medium text-foreground">Dependent-care FSA</Label>
-                        <p className="text-xs text-muted-foreground">Payroll reimbursements as expenses occur</p>
+                        <p className="text-xs text-muted-foreground">Money is reimbursed after you submit receipts for care</p>
                       </div>
                       <Switch
                         checked={scenario.data.includeDependentCare}
@@ -438,14 +435,14 @@ export default function FSAComparison({ scenarios, onUpdateScenario, onRemoveSce
                           />
                         </div>
                         <div className="rounded-lg bg-secondary/10 border border-dashed border-secondary/40 p-3 text-xs text-muted-foreground">
-                          <p>Tax savings: {currency(results?.dependentCareTaxSavings ?? 0)}</p>
-                          <p>Forfeiture risk: {currency(results?.dependentCareForfeitureRisk ?? 0)}</p>
+                          <p>Estimated tax savings: {currency(results?.dependentCareTaxSavings ?? 0)}</p>
+                          <p>Money at risk of forfeiture: {currency(results?.dependentCareForfeitureRisk ?? 0)}</p>
                         </div>
                       </div>
                     ) : (
                       <div className="flex items-center gap-2 text-xs text-muted-foreground">
                         <AlertTriangle size={14} className="text-amber-500" />
-                        <span>Enable dependent-care to compare childcare reimbursements.</span>
+                        <span>Enable dependent-care to compare how childcare reimbursements change your taxes.</span>
                       </div>
                     )}
                   </div>

@@ -27,7 +27,8 @@ export default function CalculatorHub() {
     {
       id: "fsa",
       title: "FSA Election Forecaster",
-      description: "Model health and dependent-care elections with carryover rules and avoid forfeiting dollars under use-it-or-lose-it policies.",
+      description:
+        "Plan Flexible Spending Account elections with clear guardrails so you understand how much can carry into next year and how the use-it-or-lose-it rule works.",
       icon: ClipboardList,
       route: "/fsa",
       analyticsId: "calculator-fsa-entry",
