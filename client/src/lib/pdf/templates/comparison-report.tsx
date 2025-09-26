@@ -6,6 +6,11 @@ import { formatCurrency, ComparisonReportData } from '../pdf-utils';
 import { calculateHSA, calculateFSA, calculateCommuter, calculateLifeInsurance } from '@/lib/calculations';
 import { HSAResults, FSAResults, CommuterResults, LifeInsuranceResults } from '@shared/schema';
 
+type ComparisonScenarioResults = HSAResults | FSAResults | CommuterResults | LifeInsuranceResults;
+type ComparisonScenarioWithResults = Omit<ComparisonReportData['scenarios'][number], 'results'> & {
+  results: ComparisonScenarioResults;
+};
+
 interface ComparisonReportProps {
   data: ComparisonReportData;
 }
@@ -34,8 +39,8 @@ export const ComparisonReport: React.FC<ComparisonReportProps> = ({ data }) => {
   };
 
   // Calculate results for each scenario
-  const scenariosWithResults = scenarios.map(scenario => {
-    let results: HSAResults | FSAResults | CommuterResults | LifeInsuranceResults;
+  const scenariosWithResults: ComparisonScenarioWithResults[] = scenarios.map(scenario => {
+    let results: ComparisonScenarioResults;
     switch (calculatorType) {
       case 'hsa':
         results = calculateHSA(scenario.inputs) as HSAResults;
@@ -186,18 +191,23 @@ export const ComparisonReport: React.FC<ComparisonReportProps> = ({ data }) => {
   );
 
   const renderSummaryComparison = () => {
-    const bestScenario = scenariosWithResults.reduce((best, current) => {
-      const getBestMetric = (scenario: { results: HSAResults | CommuterResults | LifeInsuranceResults }) => {
-        switch (calculatorType) {
-          case 'hsa': return (scenario.results as HSAResults).taxSavings;
-          case 'fsa': return (scenario.results as FSAResults).netBenefit;
-          case 'commuter': return (scenario.results as CommuterResults).totalSavings;
-          case 'life-insurance': return (scenario.results as LifeInsuranceResults).dimeTotal;
-          default: return 0;
-        }
-      };
+    if (scenariosWithResults.length === 0) {
+      return null;
+    }
+
+    const getBestMetric = (scenario: ComparisonScenarioWithResults) => {
+      switch (calculatorType) {
+        case 'hsa': return (scenario.results as HSAResults).taxSavings;
+        case 'fsa': return (scenario.results as FSAResults).netBenefit;
+        case 'commuter': return (scenario.results as CommuterResults).totalSavings;
+        case 'life-insurance': return (scenario.results as LifeInsuranceResults).dimeTotal;
+        default: return 0;
+      }
+    };
+
+    const bestScenario = scenariosWithResults.reduce<ComparisonScenarioWithResults>((best, current) => {
       return getBestMetric(current) > getBestMetric(best) ? current : best;
-    });
+    }, scenariosWithResults[0]);
 
     const getMetricName = () => {
       switch (calculatorType) {
@@ -209,7 +219,7 @@ export const ComparisonReport: React.FC<ComparisonReportProps> = ({ data }) => {
       }
     };
 
-    const getMetricValue = (scenario: { results: HSAResults | CommuterResults | LifeInsuranceResults }) => {
+    const getMetricValue = (scenario: ComparisonScenarioWithResults) => {
       switch (calculatorType) {
         case 'hsa': return (scenario.results as HSAResults).taxSavings;
         case 'fsa': return (scenario.results as FSAResults).netBenefit;
