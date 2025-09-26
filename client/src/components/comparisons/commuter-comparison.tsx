@@ -92,7 +92,7 @@ export default function CommuterComparison({ scenarios, onUpdateScenario, onRemo
     <div className="space-y-8">
       {/* Results Comparison Table */}
       <GlassCard>
-        <h3 className="text-lg font-semibold text-foreground mb-6">Results Comparison</h3>
+        <h3 className="text-lg font-semibold text-foreground mb-6">Savings You Keep Each Year</h3>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
@@ -158,7 +158,7 @@ export default function CommuterComparison({ scenarios, onUpdateScenario, onRemo
 
       {/* Additional Results Details */}
       <GlassCard>
-        <h3 className="text-lg font-semibold text-foreground mb-6">Annual Spending Details</h3>
+        <h3 className="text-lg font-semibold text-foreground mb-6">What You Spend On Commuting</h3>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
@@ -238,7 +238,7 @@ export default function CommuterComparison({ scenarios, onUpdateScenario, onRemo
               <div>
                 <Label className="flex items-center text-sm font-medium text-foreground mb-3">
                   Monthly Transit Cost
-                  <Tooltip content="Include the monthly cost of eligible public transit for your commute—subways, buses, commuter rail, ferries, and employer-sponsored vanpools. The IRS allows up to $315 per month in 2025 to be set aside pre-tax; anything above that is paid with after-tax dollars." />
+                  <Tooltip content="Eligible expenses are the bus, train, subway, ferry, or employer vanpool rides you take to get to work. In 2025 you can move up to $315 per month from your paycheck before taxes for these rides; extra costs are paid with normal taxed pay." />
                 </Label>
                 <div className="space-y-3">
                   <div className="relative">
@@ -264,7 +264,7 @@ export default function CommuterComparison({ scenarios, onUpdateScenario, onRemo
                     />
                     <div className="flex justify-between text-xs text-muted-foreground mt-1">
                       <span>$0</span>
-                      <span>${CONTRIBUTION_LIMITS.COMMUTER_TRANSIT}/month limit</span>
+                      <span>${CONTRIBUTION_LIMITS.COMMUTER_TRANSIT}/month tax-free cap</span>
                     </div>
                   </div>
                 </div>
@@ -274,7 +274,7 @@ export default function CommuterComparison({ scenarios, onUpdateScenario, onRemo
               <div>
                 <Label className="flex items-center text-sm font-medium text-foreground mb-3">
                   Monthly Parking Cost
-                  <Tooltip content="Add what you spend to park at or near your workplace or a transit station. Only parking tied directly to your commute qualifies for the $315 per month pre-tax limit in 2025; general street parking or mileage reimbursement does not count." />
+                  <Tooltip content="Eligible parking means spots connected to your commute, like the lot at your office or the garage by the train station. You can set aside up to $315 per month before taxes in 2025; parking beyond that amount is treated like regular pay." />
                 </Label>
                 <div className="space-y-3">
                   <div className="relative">
@@ -300,7 +300,7 @@ export default function CommuterComparison({ scenarios, onUpdateScenario, onRemo
                     />
                     <div className="flex justify-between text-xs text-muted-foreground mt-1">
                       <span>$0</span>
-                      <span>${CONTRIBUTION_LIMITS.COMMUTER_PARKING}/month limit</span>
+                      <span>${CONTRIBUTION_LIMITS.COMMUTER_PARKING}/month tax-free cap</span>
                     </div>
                   </div>
                 </div>
@@ -344,7 +344,7 @@ export default function CommuterComparison({ scenarios, onUpdateScenario, onRemo
 
               {/* Quick Summary */}
               <div className="bg-background/50 rounded-lg p-4 space-y-2">
-                <div className="text-xs text-muted-foreground uppercase tracking-wide">Monthly Summary</div>
+                <div className="text-xs text-muted-foreground uppercase tracking-wide">Monthly Snapshot</div>
                 <div className="space-y-1">
                   <div className="flex justify-between text-sm">
                     <span>Transit:</span>

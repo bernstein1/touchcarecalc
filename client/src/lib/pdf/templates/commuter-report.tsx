@@ -65,22 +65,23 @@ export const CommuterReport: React.FC<CommuterReportProps> = ({ data }) => {
       <Divider />
 
       {/* 2025 Benefit Limits and Calculations */}
-      <Section title="2025 Benefit Limits & Tax Calculations">
+      <Section title="How the 2025 Limits Work">
         <Text style={{ fontSize: 10, marginBottom: 10, color: '#374151' }}>
-          Federal law allows pre-tax deductions for qualified transportation expenses up to monthly limits.
+          A monthly limit is the most you can move from your paycheck before taxes. For 2025 the IRS lets you set aside up to
+          {` ${formatCurrency(315)}`} for transit and another {` ${formatCurrency(315)}`} for parking each month.
         </Text>
-        
+
         <View style={{ marginBottom: 15 }}>
           <Text style={{ fontSize: 11, fontWeight: 'bold', marginBottom: 8, color: '#1f2937' }}>
-            Transit Benefits (Bus, Train, Subway, Ferry, Vanpool)
+            Transit rides that count (bus, train, subway, ferry, vanpool)
           </Text>
           <ValueRow label="Your Monthly Transit Cost" value={inputs.transitCost} currency />
-          <ValueRow label="2025 Monthly Limit" value={315} currency />
-          <ValueRow 
-            label="Eligible Monthly Amount" 
-            value={Math.min(inputs.transitCost, 315)} 
-            currency 
-            primary 
+          <ValueRow label="2025 monthly limit" value={315} currency />
+          <ValueRow
+            label="Amount you can set aside before taxes"
+            value={Math.min(inputs.transitCost, 315)}
+            currency
+            primary
           />
           <ValueRow label="Annual Transit Benefit" value={results.annualTransit} currency />
           <ValueRow
@@ -93,15 +94,15 @@ export const CommuterReport: React.FC<CommuterReportProps> = ({ data }) => {
 
         <View style={{ marginBottom: 15 }}>
           <Text style={{ fontSize: 11, fontWeight: 'bold', marginBottom: 8, color: '#1f2937' }}>
-            Parking Benefits (Workplace Parking)
+            Parking that counts (garage or lot tied to your commute)
           </Text>
           <ValueRow label="Your Monthly Parking Cost" value={inputs.parkingCost} currency />
-          <ValueRow label="2025 Monthly Limit" value={315} currency />
-          <ValueRow 
-            label="Eligible Monthly Amount" 
-            value={Math.min(inputs.parkingCost, 315)} 
-            currency 
-            primary 
+          <ValueRow label="2025 monthly limit" value={315} currency />
+          <ValueRow
+            label="Amount you can set aside before taxes"
+            value={Math.min(inputs.parkingCost, 315)}
+            currency
+            primary
           />
           <ValueRow label="Annual Parking Benefit" value={results.annualParking} currency />
           <ValueRow
@@ -130,98 +131,66 @@ export const CommuterReport: React.FC<CommuterReportProps> = ({ data }) => {
       <Divider />
 
       {/* Eligible Expenses */}
-      <Section title="Eligible Transportation Expenses">
+      <Section title="What Counts as an Eligible Expense">
+        <Text style={{ fontSize: 10, marginBottom: 10, color: '#374151' }}>
+          Eligible expenses are the commute costs directly tied to getting to work. Keep your passes and receipts—substantiation
+          just means you may need to show that proof to your benefit administrator.
+        </Text>
+
         <View style={{ marginBottom: 10 }}>
           <Text style={{ fontSize: 11, fontWeight: 'bold', marginBottom: 8, color: '#1f2937' }}>
-            Qualified Transit Expenses Include:
+            Covered transit examples
           </Text>
-          <Text style={{ fontSize: 9, marginBottom: 3, color: '#374151' }}>
-            • Bus, subway, train, and ferry fares
-          </Text>
-          <Text style={{ fontSize: 9, marginBottom: 3, color: '#374151' }}>
-            • Vanpool transportation to/from work
-          </Text>
-          <Text style={{ fontSize: 9, marginBottom: 3, color: '#374151' }}>
-            • Transit passes and tokens
-          </Text>
-          <Text style={{ fontSize: 9, marginBottom: 8, color: '#374151' }}>
-            • Stored value cards for transit systems
-          </Text>
+          <Text style={{ fontSize: 9, marginBottom: 3, color: '#374151' }}>• Bus, subway, train, and ferry fares</Text>
+          <Text style={{ fontSize: 9, marginBottom: 3, color: '#374151' }}>• Employer-sponsored or public vanpools</Text>
+          <Text style={{ fontSize: 9, marginBottom: 3, color: '#374151' }}>• Monthly passes, tokens, or stored-value cards you use to commute</Text>
         </View>
 
         <View style={{ marginBottom: 10 }}>
           <Text style={{ fontSize: 11, fontWeight: 'bold', marginBottom: 8, color: '#1f2937' }}>
-            Qualified Parking Expenses Include:
+            Covered parking examples
           </Text>
-          <Text style={{ fontSize: 9, marginBottom: 3, color: '#374151' }}>
-            • Parking at or near your workplace
-          </Text>
-          <Text style={{ fontSize: 9, marginBottom: 3, color: '#374151' }}>
-            • Parking at transit facilities for commuting
-          </Text>
-          <Text style={{ fontSize: 9, marginBottom: 8, color: '#374151' }}>
-            • Monthly or daily parking fees
-          </Text>
+          <Text style={{ fontSize: 9, marginBottom: 3, color: '#374151' }}>• Parking garages or lots next to your workplace</Text>
+          <Text style={{ fontSize: 9, marginBottom: 3, color: '#374151' }}>• Parking at a transit hub you use for your commute</Text>
+          <Text style={{ fontSize: 9, marginBottom: 3, color: '#374151' }}>• Monthly or daily parking passes bought for work travel</Text>
         </View>
 
         <View>
           <Text style={{ fontSize: 11, fontWeight: 'bold', marginBottom: 8, color: '#dc2626' }}>
-            Non-Eligible Expenses:
+            These do not qualify
           </Text>
-          <Text style={{ fontSize: 9, marginBottom: 3, color: '#374151' }}>
-            • Tolls and gas for personal vehicles
-          </Text>
-          <Text style={{ fontSize: 9, marginBottom: 3, color: '#374151' }}>
-            • Parking for personal errands or appointments
-          </Text>
-          <Text style={{ fontSize: 9, marginBottom: 3, color: '#374151' }}>
-            • Vehicle maintenance, insurance, or loan payments
-          </Text>
-          <Text style={{ fontSize: 9, color: '#374151' }}>
-            • Rides from personal car services (Uber, Lyft)
-          </Text>
+          <Text style={{ fontSize: 9, marginBottom: 3, color: '#374151' }}>• Gas, tolls, or mileage for your personal car</Text>
+          <Text style={{ fontSize: 9, marginBottom: 3, color: '#374151' }}>• Parking used for errands, entertainment, or personal appointments</Text>
+          <Text style={{ fontSize: 9, marginBottom: 3, color: '#374151' }}>• Car payments, maintenance, or insurance</Text>
+          <Text style={{ fontSize: 9, color: '#374151' }}>• Rideshare trips not connected to a vanpool program</Text>
         </View>
       </Section>
 
       <Divider />
 
       {/* Optimization Recommendations */}
-      <Section title="Optimization Recommendations">
+      <Section title="Next Steps to Use the Benefit">
         <Text style={{ fontSize: 10, marginBottom: 8, color: '#374151' }}>
-          Maximize your commuter benefit savings with these strategies:
+          Follow these plain-language steps to keep your commute tax savings on track:
         </Text>
-        
-        {inputs.transitCost > 315 && (
-          <Text style={{ fontSize: 9, marginBottom: 5, color: '#374151' }}>
-            • Your transit costs ({formatCurrency(inputs.transitCost)}) exceed the monthly limit. 
-            Consider if any expenses could be restructured to maximize the {formatCurrency(315)} monthly benefit.
-          </Text>
-        )}
-        
-        {inputs.parkingCost > 315 && (
-          <Text style={{ fontSize: 9, marginBottom: 5, color: '#374151' }}>
-            • Your parking costs ({formatCurrency(inputs.parkingCost)}) exceed the monthly limit. 
-            You'll save the maximum {formatCurrency((315 * (results.marginalRate / 100)) * 12)} annually on parking.
-          </Text>
-        )}
-        
-        {inputs.transitCost < 315 && inputs.parkingCost < 315 && (
-          <Text style={{ fontSize: 9, marginBottom: 5, color: '#374151' }}>
-            • You're well within both benefit limits. Consider if you have any additional eligible 
-            transportation expenses that could be included.
-          </Text>
-        )}
-        
+
         <Text style={{ fontSize: 9, marginBottom: 5, color: '#374151' }}>
-          • Enroll during your company's open enrollment period or when starting employment.
+          1. Confirm your monthly transit and parking costs. If they are above {formatCurrency(315)}, you will still get the
+          maximum tax-free amount and pay the rest with normal taxed pay.
         </Text>
-        
+
         <Text style={{ fontSize: 9, marginBottom: 5, color: '#374151' }}>
-          • Keep receipts and documentation for all commuter expenses in case of audit.
+          2. Enroll or update your election through your employer's commuter program and pick amounts up to the monthly limits.
+          Adjust during open enrollment or when your costs change.
         </Text>
-        
+
+        <Text style={{ fontSize: 9, marginBottom: 5, color: '#374151' }}>
+          3. Use the benefit card or submit receipts quickly. Substantiation is simply proving the expense was for your commute,
+          so upload tickets, invoices, or parking statements as you receive them.
+        </Text>
+
         <Text style={{ fontSize: 9, color: '#374151' }}>
-          • Review your commuting patterns annually as routes and costs may change.
+          4. Recheck your commute once or twice a year to make sure the deduction still matches your real costs.
         </Text>
       </Section>
 
@@ -230,15 +199,13 @@ export const CommuterReport: React.FC<CommuterReportProps> = ({ data }) => {
       {/* Important Notes */}
       <Section title="Important Program Details">
         <Note>
-          Commuter benefits are typically offered through employer-sponsored programs and may have 
-          different enrollment periods and rules. The pre-tax deduction reduces both federal income 
-          taxes and Social Security/Medicare taxes in most cases. State tax treatment may vary.
+          Commuter benefits come through your employer, so enrollment windows, payment cards, and deadlines can differ. The
+          pre-tax deduction usually lowers federal income and Social Security/Medicare taxes, but some states tax the benefit.
         </Note>
-        
+
         <Text style={{ fontSize: 8, marginTop: 8, color: '#6b7280' }}>
-          Benefits shown are based on 2025 IRS limits and your current tax bracket. Actual savings 
-          may vary based on total income, state taxes, and other deductions. Consult your HR department 
-          or tax advisor for specific program details and eligibility requirements.
+          The savings in this report use the 2025 IRS limits and the tax rate you entered. Your results can change if your pay or
+          state rules are different. Check with your HR team or a tax professional for the exact steps to join and stay compliant.
         </Text>
       </Section>
     </BaseDocument>

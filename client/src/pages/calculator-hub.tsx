@@ -36,7 +36,8 @@ export default function CalculatorHub() {
     {
       id: "commuter",
       title: "Commuter Benefits",
-      description: "Calculate pre-tax savings on transit and parking expenses for your daily commute.",
+      description:
+        "Learn how setting aside part of your paycheck before taxes can help cover transit passes and parking for your commute.",
       icon: Bus,
       route: "/commuter",
       analyticsId: "calculator-commuter-entry",
