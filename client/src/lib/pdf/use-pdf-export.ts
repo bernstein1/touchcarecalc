@@ -69,9 +69,9 @@ export const usePDFExport = () => {
         results,
         additionalData: {
           narrative: {
-            electionSizing: `Health FSA election of ${formatCurrency(inputs.healthElection)} captures ${formatCurrency(results.expectedUtilization)} in expected expenses across routine care, planned procedures, and prescriptions.`,
-            gracePeriod: `Carryover allowances protect ${formatCurrency(results.carryoverProtected)} with a ${inputs.gracePeriodMonths.toFixed(1)}-month grace period to finish spending prior-year dollars.`,
-            forfeiture: `Monitor ${formatCurrency(results.forfeitureRisk)} of potential forfeitures and adjust before year-end to preserve the ${formatCurrency(results.netBenefit)} net benefit after taxes.`
+            electionSizing: `You chose to set aside ${formatCurrency(inputs.healthElection)}. That amount should cover about ${formatCurrency(results.expectedUtilization)} in medical costs you already expect, such as routine visits and prescriptions.`,
+            gracePeriod: `Your plan protects roughly ${formatCurrency(results.carryoverProtected)} through carryover rules and a ${inputs.gracePeriodMonths.toFixed(1)}-month grace period, giving extra time to spend leftovers.`,
+            forfeiture: `Keep an eye on the ${formatCurrency(results.forfeitureRisk)} that could be forfeited so you hold on to the ${formatCurrency(results.netBenefit)} net benefit after taxes.`
           }
         }
       };

@@ -71,9 +71,9 @@ export default function FSACalculator() {
               FSA Election Forecaster
             </h2>
             <p className="text-muted-foreground max-w-xl">
-              Forecast medical and dependent-care expenses so you can elect the right FSA amounts. FSAs give you the
-              full-year election on day one, but unused dollars are forfeited—pair the upfront access with realistic
-              expense planning.
+              A Flexible Spending Account lets you choose an annual election, get the full balance on day one, and pay
+              back the money through paychecks. This planner explains how the use-it-or-lose-it rule, carryovers, and
+              grace periods work so you only set aside what you can spend.
             </p>
           </div>
         </div>
@@ -88,20 +88,20 @@ export default function FSACalculator() {
           <GlassCard className="space-y-6">
             <div className="flex items-start justify-between gap-4">
               <div>
-                <h3 className="text-xl font-semibold text-foreground">Plan-year blueprint</h3>
+                <h3 className="text-xl font-semibold text-foreground">Plan your yearly election</h3>
                 <p className="text-sm text-muted-foreground mt-2 leading-relaxed">
-                  Choose how much to lock into your health FSA and map out when those dollars will be needed. Because the
-                  entire election is available on the first day of the plan year, align your forecast with surgeries,
-                  pregnancies, therapy, or prescriptions you know are coming.
+                  Decide how much money to promise to the health FSA for the year. You can swipe the card or request a
+                  reimbursement for the full election even if only a few paychecks have been taken so far. Match that
+                  upfront access with real appointments such as braces, prescriptions, or therapy visits.
                 </p>
               </div>
               <Tooltip
-                title="Front-loaded access"
+                title="Explain the election"
                 content={
                   <p>
-                    Health FSA elections are front-loaded—you can spend the full annual amount early in the plan year even
-                    though you have only contributed a few pay periods. Plan for that float while keeping forfeiture risk in
-                    check.
+                    Your election is the total dollars you promise to spend through the health FSA. The plan front-loads
+                    that money, so you can use all of it at once and repay it over the rest of the year. Keep that loan in
+                    mind when you size the election.
                   </p>
                 }
               />
@@ -132,7 +132,7 @@ export default function FSACalculator() {
                   onChange={(event) => updateInput("expectedEligibleExpenses", Number(event.target.value) || 0)}
                 />
                 <p className="text-xs text-muted-foreground mt-2">
-                  Add up copays, deductibles, glasses, dental work—anything your health plan does not fully cover.
+                  Add up copays, deductibles, glasses, dental work—any health bill you expect to pay out of pocket this year.
                 </p>
               </div>
 
@@ -170,7 +170,7 @@ export default function FSACalculator() {
                 </div>
 
                 <p className="text-xs text-muted-foreground">
-                  Estimated marginal tax rate: <span className="font-semibold text-foreground">{marginalRate}%</span>
+                  Estimated marginal tax rate: <span className="font-semibold text-foreground">{marginalRate}%</span>. Every FSA dollar avoids taxes at roughly this rate.
                 </p>
 
                 <div>
@@ -188,8 +188,8 @@ export default function FSACalculator() {
                       onChange={(event) => updateInput("planCarryover", Number(event.target.value) || 0)}
                     />
                     <p className="text-xs text-muted-foreground">
-                      Enter your plan's carryover allowance. If you have a grace period instead, set carryover to 0 and use
-                      the months slider below.
+                      Enter how much your plan lets you roll into the next year. If your plan only offers a grace period,
+                      set the carryover to 0 and adjust the months slider instead.
                     </p>
                     <DecisionSlider
                       id="grace-period"
@@ -200,7 +200,7 @@ export default function FSACalculator() {
                       step={0.5}
                       formatValue={(value) => `${value.toFixed(1)} months`}
                       onChange={(value) => updateInput("gracePeriodMonths", value)}
-                      helperText="How long after the plan year ends you can spend leftover dollars on prior-year expenses."
+                      helperText="Months after the plan year when you can still swipe your FSA card for last year's bills."
                       focusLabel="Plan-year timing"
                     />
                   </div>
@@ -212,18 +212,19 @@ export default function FSACalculator() {
           <GlassCard className="space-y-6">
             <div className="flex items-start justify-between gap-4">
               <div>
-                <h3 className="text-xl font-semibold text-foreground">Dependent-care coordination</h3>
+                <h3 className="text-xl font-semibold text-foreground">Add dependent-care savings</h3>
                 <p className="text-sm text-muted-foreground mt-2 leading-relaxed">
-                  If you have daycare, after-school, or elder-care bills, coordinate the dependent-care FSA alongside the
-                  medical FSA. The benefit is capped separately and follows the same use-it-or-lose-it rules.
+                  A dependent-care FSA covers daycare, summer camp, after-school programs, and certain elder care. It has
+                  its own household limit and also follows a use-it-or-lose-it rule, so line up the election with invoices
+                  you already pay.
                 </p>
               </div>
               <Tooltip
-                title="Limits work differently"
+                title="How this account pays you back"
                 content={
                   <p>
-                    Dependent-care FSA dollars are shared per household and capped at {currency(FSA_LIMITS.dependentCare)}.
-                    Elections are not available upfront—funds accumulate as you contribute through payroll.
+                    Families share one dependent-care FSA limit of {currency(FSA_LIMITS.dependentCare)}. Money builds each
+                    payday and can only be reimbursed after you have paid for care, so submit receipts often.
                   </p>
                 }
               />
@@ -233,7 +234,7 @@ export default function FSACalculator() {
               <div>
                 <p className="text-sm font-medium text-foreground">Include dependent-care FSA</p>
                 <p className="text-xs text-muted-foreground">
-                  Toggle on if you plan to set aside pre-tax dollars for child or elder care expenses.
+                  Turn this on if you expect to pay child or elder care that qualifies for pre-tax reimbursement.
                 </p>
               </div>
               <Switch
@@ -269,7 +270,7 @@ export default function FSACalculator() {
                     onChange={(event) => updateInput("expectedDependentCareExpenses", Number(event.target.value) || 0)}
                   />
                   <p className="text-xs text-muted-foreground mt-2">
-                    Include daycare, preschool, or qualified elder care costs you expect this year.
+                    Include daycare, preschool, day camps, after-school programs, or qualified elder care costs for this year.
                   </p>
                 </div>
               </div>
@@ -288,21 +289,21 @@ export default function FSACalculator() {
                 <p className="text-sm text-muted-foreground">Health FSA tax savings</p>
                 <p className="text-2xl font-bold text-primary">{currency(results.taxSavings)}</p>
                 <p className="text-xs text-muted-foreground mt-1">
-                  Immediate payroll tax reduction from your health FSA election.
+                  Estimated taxes avoided because your election comes out of your paycheck before taxes.
                 </p>
               </div>
               <div className="rounded-xl border border-emerald-300/40 bg-emerald-500/10 p-4">
                 <p className="text-sm text-muted-foreground">Protected by carryover/grace</p>
                 <p className="text-2xl font-bold text-emerald-500">{currency(results.carryoverProtected)}</p>
                 <p className="text-xs text-muted-foreground mt-1">
-                  Amount likely saved from forfeiture thanks to your plan's safety net.
+                  Dollars that should survive the use-it-or-lose-it rule because of your carryover or grace period.
                 </p>
               </div>
               <div className="rounded-xl border border-amber-300/40 bg-amber-500/10 p-4">
                 <p className="text-sm text-muted-foreground">Potential forfeiture risk</p>
                 <p className="text-2xl font-bold text-amber-500">{currency(results.forfeitureRisk)}</p>
                 <p className="text-xs text-muted-foreground mt-1">
-                  Dollars at risk if spending runs below your election after grace/carryover buffers.
+                  Money you might lose back to the plan if you do not spend it by the deadline.
                 </p>
               </div>
               {inputs.includeDependentCare ? (
@@ -310,7 +311,7 @@ export default function FSACalculator() {
                   <p className="text-sm text-muted-foreground">Dependent-care tax savings</p>
                   <p className="text-2xl font-bold text-foreground">{currency(results.dependentCareTaxSavings)}</p>
                   <p className="text-xs text-muted-foreground mt-1">
-                    Withheld pre-tax to offset childcare or elder care invoices.
+                    Withheld before taxes so you are reimbursed for childcare or elder care bills.
                   </p>
                 </div>
               ) : null}
@@ -331,21 +332,21 @@ export default function FSACalculator() {
           <ShowMathSection
             title="Show the math"
             focusLabel="Forecast vs. IRS limits"
-            description="Compare what you plan to spend with what you elected so you can avoid forfeiting dollars while still enjoying the front-loaded access an FSA provides."
+            description="See how your planned bills line up with your election, the carryover cushion, and any money at risk of being lost."
             items={[
               {
                 label: "Health FSA election vs. forecast",
                 value: `${currency(inputs.healthElection)} elected / ${currency(inputs.expectedEligibleExpenses)} planned`,
                 helperText:
                   results.expectedUtilization < inputs.healthElection
-                    ? `${currency(inputs.healthElection - results.expectedUtilization)} may go unused unless carryover or a grace period saves it.`
-                    : "Your election matches the care you expect to receive—low forfeiture risk.",
+                    ? `${currency(inputs.healthElection - results.expectedUtilization)} could be lost unless your carryover or grace period saves it.`
+                    : "Your election matches the care you expect to receive, so little should be forfeited.",
                 accent: results.expectedUtilization < inputs.healthElection ? "warning" : "success",
               },
               {
-                label: "Carryover + grace coverage",
+                label: "Carryover and grace protection",
                 value: `${currency(results.carryoverProtected)} protected`,
-                helperText: "Set expectations for how much of any leftover funds your plan rules will allow you to keep.",
+                helperText: "Shows how much of any leftover balance should roll or stay available into the next year.",
                 accent: "primary",
               },
               {
@@ -353,8 +354,8 @@ export default function FSACalculator() {
                 value: currency(results.netBenefit),
                 helperText:
                   results.netBenefit >= 0
-                    ? "Positive numbers mean tax savings outpace potential forfeitures."
-                    : "If the number is negative, trim your election or accelerate eligible spending.",
+                    ? "If this is positive, your tax savings beat the dollars you might forfeit."
+                    : "If this is negative, lower the election or plan qualified spending before deadlines.",
                 accent: results.netBenefit >= 0 ? "success" : "warning",
               },
               ...(inputs.includeDependentCare
@@ -364,7 +365,7 @@ export default function FSACalculator() {
                       value: `${currency(inputs.dependentCareElection)} elected / ${currency(inputs.expectedDependentCareExpenses)} planned`,
                       helperText:
                         results.dependentCareForfeitureRisk > 0
-                          ? `${currency(results.dependentCareForfeitureRisk)} could be forfeited—double-check invoices or reduce the election.`
+                          ? `${currency(results.dependentCareForfeitureRisk)} could be lost—double-check invoices or lower the election.`
                           : "Your dependent-care election is covered by expected expenses.",
                       accent: results.dependentCareForfeitureRisk > 0 ? "warning" : "success",
                     },
@@ -379,9 +380,9 @@ export default function FSACalculator() {
               <h3 className="text-lg font-semibold text-foreground">Coordinate with your health plan</h3>
             </div>
             <p className="text-sm text-muted-foreground leading-relaxed">
-              FSAs pair best with copay-based medical plans or HDHPs where you limit contributions. Track reimbursements
-              through the year so you do not leave money in the account at year end, and revisit elections if your plan
-              switches between carryover and grace period provisions.
+              Check how your health plan handles deductibles and copays before locking in an election. Track
+              reimbursements during the year so money does not sit unused, and ask HR if carryover or grace rules change
+              before you re-enroll.
             </p>
           </GlassCard>
         </div>

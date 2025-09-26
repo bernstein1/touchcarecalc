@@ -24,9 +24,18 @@ export const BENEFIT_FACTS: Record<CalculatorId, BenefitFact[]> = {
     },
   ],
   fsa: [
-    { label: "Health FSA Limit:", value: formatCurrency(CONTRIBUTION_LIMITS.FSA) },
-    { label: "Use-it-or-lose-it:", value: "Forfeit amounts beyond carryover/grace" },
-    { label: "Dependent Care Max:", value: formatCurrency(FSA_LIMITS.dependentCare) },
+    {
+      label: "Health FSA annual limit (2025):",
+      value: `${formatCurrency(CONTRIBUTION_LIMITS.FSA)} you can pledge for eligible medical costs this plan year`,
+    },
+    {
+      label: '"Use-it-or-lose-it" rule:',
+      value: "Spend the money by the deadline or give it back—only carryover or a grace period protects leftovers",
+    },
+    {
+      label: "Dependent-care FSA household limit (2025):",
+      value: `${formatCurrency(FSA_LIMITS.dependentCare)} shared across the household for childcare or elder care reimbursements`,
+    },
   ],
   commuter: [
     { label: "Transit Limit:", value: `${formatCurrency(CONTRIBUTION_LIMITS.COMMUTER_TRANSIT)}/month` },
