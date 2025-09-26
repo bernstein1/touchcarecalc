@@ -28,7 +28,7 @@ export default function CalculatorHub() {
       id: "fsa",
       title: "FSA Election Forecaster",
       description:
-        "Plan Flexible Spending Account elections with clear guardrails so you understand how much can carry into next year and how the use-it-or-lose-it rule works.",
+        "Size your Flexible Spending Account election quickly with clear guardrails for carryover and deadlines.",
       icon: ClipboardList,
       route: "/fsa",
       analyticsId: "calculator-fsa-entry",

@@ -26,15 +26,15 @@ export const BENEFIT_FACTS: Record<CalculatorId, BenefitFact[]> = {
   fsa: [
     {
       label: "Health FSA annual limit (2025):",
-      value: `${formatCurrency(CONTRIBUTION_LIMITS.FSA)} you can pledge for eligible medical costs this plan year`,
+      value: `${formatCurrency(CONTRIBUTION_LIMITS.FSA)} max you can elect for health expenses in 2025`,
     },
     {
       label: '"Use-it-or-lose-it" rule:',
-      value: "Spend the money by the deadline or give it back—only carryover or a grace period protects leftovers",
+      value: "Only a carryover or grace period saves leftover dollars from the use-it-or-lose-it rule",
     },
     {
       label: "Dependent-care FSA household limit (2025):",
-      value: `${formatCurrency(FSA_LIMITS.dependentCare)} shared across the household for childcare or elder care reimbursements`,
+      value: `${formatCurrency(FSA_LIMITS.dependentCare)} per household for dependent-care expenses like childcare or elder care`,
     },
   ],
   commuter: [
