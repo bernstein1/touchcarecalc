@@ -2,7 +2,7 @@
 
 ## Overview
 
-FinanceCalc Pro is a comprehensive financial calculator web application built for calculating various tax-advantaged benefits and financial planning scenarios. The application provides calculators for HSA/FSA contributions, commuter benefits, life insurance needs assessment, and 401(k) retirement planning, all updated with 2025 tax rules and contribution limits.
+FinanceCalc Pro is a comprehensive financial calculator web application built for calculating various tax-advantaged benefits and financial planning scenarios. The application provides calculators for HSA/FSA contributions, commuter benefits, and life insurance needs assessment, all updated with 2025 tax rules and contribution limits.
 
 The application features a modern React frontend with a Node.js/Express backend, designed with a glassmorphism UI aesthetic and comprehensive calculation engines for each financial scenario.
 
@@ -40,7 +40,7 @@ Preferred communication style: Simple, everyday language.
 - **Build Strategy**: Separate build processes for client (Vite) and server (esbuild)
 
 ### Key Features
-- **Calculator Types**: Four main calculators (HSA/FSA, Commuter Benefits, Life Insurance, 401k Retirement)
+- **Calculator Types**: Three main calculators (HSA/FSA, Commuter Benefits, Life Insurance)
 - **Real-time Calculations**: Immediate updates as users modify inputs
 - **Session Persistence**: Ability to save and retrieve calculation sessions
 - **Responsive Design**: Mobile-first responsive layout
@@ -51,7 +51,7 @@ Preferred communication style: Simple, everyday language.
 
 ### Frontend Dependencies
 - **UI Components**: Radix UI primitives for accessible component foundations
-- **Charts**: Recharts for data visualization in retirement calculator
+- **Charts**: Recharts for data visualization where applicable
 - **Form Handling**: React Hook Form with Hookform Resolvers for form validation
 - **Date Utilities**: date-fns for date manipulation and formatting
 - **Styling**: class-variance-authority and clsx for dynamic className management

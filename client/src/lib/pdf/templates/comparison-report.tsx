@@ -3,8 +3,8 @@ import { Text, View } from '@react-pdf/renderer';
 import { BaseDocument } from '../components/base-document';
 import { Section, ValueRow, MetricCard, MetricGrid, Divider, Note } from '../components/pdf-sections';
 import { formatCurrency, ComparisonReportData } from '../pdf-utils';
-import { calculateHSA, calculateFSA, calculateCommuter, calculateLifeInsurance, calculateRetirement } from '@/lib/calculations';
-import { HSAResults, FSAResults, CommuterResults, LifeInsuranceResults, RetirementResults, RetirementInputs } from '@shared/schema';
+import { calculateHSA, calculateFSA, calculateCommuter, calculateLifeInsurance } from '@/lib/calculations';
+import { HSAResults, FSAResults, CommuterResults, LifeInsuranceResults } from '@shared/schema';
 
 interface ComparisonReportProps {
   data: ComparisonReportData;
@@ -19,7 +19,6 @@ export const ComparisonReport: React.FC<ComparisonReportProps> = ({ data }) => {
       case 'fsa': return 'FSA Election';
       case 'commuter': return 'Commuter Benefits';
       case 'life-insurance': return 'Life Insurance Needs';
-      case 'retirement': return '401(k) Retirement Planning';
       default: return 'Financial Planning';
     }
   };
@@ -30,14 +29,13 @@ export const ComparisonReport: React.FC<ComparisonReportProps> = ({ data }) => {
       case 'fsa': return 'Compare election sizing, grace-period timing, and forfeiture exposure';
       case 'commuter': return 'Compare pre-tax transportation benefit scenarios';
       case 'life-insurance': return 'Compare life insurance coverage need scenarios';
-      case 'retirement': return 'Compare retirement planning contribution strategies';
       default: return 'Compare financial planning scenarios';
     }
   };
 
   // Calculate results for each scenario
   const scenariosWithResults = scenarios.map(scenario => {
-    let results: HSAResults | FSAResults | CommuterResults | LifeInsuranceResults | RetirementResults;
+    let results: HSAResults | FSAResults | CommuterResults | LifeInsuranceResults;
     switch (calculatorType) {
       case 'hsa':
         results = calculateHSA(scenario.inputs) as HSAResults;
@@ -50,9 +48,6 @@ export const ComparisonReport: React.FC<ComparisonReportProps> = ({ data }) => {
         break;
       case 'life-insurance':
         results = calculateLifeInsurance(scenario.inputs) as LifeInsuranceResults;
-        break;
-      case 'retirement':
-        results = calculateRetirement(scenario.inputs) as RetirementResults;
         break;
       default:
         // Fallback with basic structure
@@ -184,94 +179,38 @@ export const ComparisonReport: React.FC<ComparisonReportProps> = ({ data }) => {
     </View>
   );
 
-  const renderRetirementComparison = () => (
-    <View>
-      <Section title="Retirement Projection Comparison">
-        <View style={{ marginBottom: 15 }}>
-          <Text style={{ fontSize: 10, marginBottom: 8, color: '#374151' }}>
-            401(k) balance projections and tax benefits for each scenario:
-          </Text>
-          {scenariosWithResults.map((scenario, index) => {
-            const retirementResults = scenario.results as RetirementResults;
-            const inputs = scenario.inputs as RetirementInputs;
-            const sliderTraditional = inputs.bothSplitTraditional ?? 50;
-            const contributionTypeLabel = inputs.contributionType === 'both'
-              ? 'Traditional + Roth'
-              : inputs.contributionType === 'traditional'
-                ? 'Traditional (Pre-tax)'
-                : 'Roth (After-tax)';
-            const effectiveTraditionalShare = retirementResults.totalContributions > 0
-              ? Math.round((retirementResults.totalTraditionalContributions / retirementResults.totalContributions) * 100)
-              : sliderTraditional;
-            const effectiveRothShare = Math.max(0, 100 - effectiveTraditionalShare);
-            return (
-              <View key={index} style={{ marginBottom: 15, padding: 8, backgroundColor: index % 2 === 0 ? '#f9fafb' : '#ffffff' }}>
-                <Text style={{ fontSize: 11, fontWeight: 'bold', marginBottom: 5, color: '#1f2937' }}>
-                  {scenario.name}
-                </Text>
-                <ValueRow label="Current Age / Retirement Age" value={`${inputs.currentAge} / ${inputs.retirementAge}`} />
-                <ValueRow label="Current Salary" value={inputs.currentSalary} currency />
-                <ValueRow label="Employee Contribution" value={`${inputs.employeeContribution}%`} />
-                <ValueRow label="Expected Return" value={`${inputs.expectedReturn}%`} />
-                <ValueRow label="Contribution Type" value={contributionTypeLabel} />
-                {inputs.contributionType === 'both' && (
-                  <>
-                    <ValueRow label="Selected Split" value={`Traditional ${sliderTraditional}% / Roth ${100 - sliderTraditional}%`} />
-                    <ValueRow label="Effective Allocation" value={`Traditional ${effectiveTraditionalShare}% / Roth ${effectiveRothShare}%`} />
-                    <ValueRow label="Traditional Contributions" value={retirementResults.totalTraditionalContributions} currency />
-                    <ValueRow label="Roth Contributions" value={retirementResults.totalRothContributions} currency />
-                  </>
-                )}
-                <ValueRow label="Monthly Contribution" value={retirementResults.monthlyContribution} currency />
-                <ValueRow label="Projected Final Balance" value={retirementResults.finalBalance} currency primary />
-                <ValueRow label="Total Contributions" value={retirementResults.totalContributions + retirementResults.employerContributions} currency />
-                <ValueRow label="Investment Growth" value={retirementResults.investmentGrowth} currency success />
-                {retirementResults.taxSavings > 0 && (
-                  <ValueRow label="Annual Tax Savings" value={retirementResults.taxSavings} currency />
-                )}
-              </View>
-            );
-          })}
-        </View>
-      </Section>
-    </View>
-  );
-
   const renderSummaryComparison = () => {
     const bestScenario = scenariosWithResults.reduce((best, current) => {
-      const getBestMetric = (scenario: { results: HSAResults | CommuterResults | LifeInsuranceResults | RetirementResults }) => {
+      const getBestMetric = (scenario: { results: HSAResults | CommuterResults | LifeInsuranceResults }) => {
         switch (calculatorType) {
           case 'hsa': return (scenario.results as HSAResults).taxSavings;
           case 'fsa': return (scenario.results as FSAResults).netBenefit;
           case 'commuter': return (scenario.results as CommuterResults).totalSavings;
           case 'life-insurance': return (scenario.results as LifeInsuranceResults).dimeTotal;
-          case 'retirement': return (scenario.results as RetirementResults).finalBalance;
           default: return 0;
         }
       };
       return getBestMetric(current) > getBestMetric(best) ? current : best;
     });
 
-      const getMetricName = () => {
-        switch (calculatorType) {
-          case 'hsa': return 'Highest Tax Savings';
-          case 'fsa': return 'Highest Net Benefit';
-          case 'commuter': return 'Highest Total Savings';
-          case 'life-insurance': return 'Highest Coverage Need';
-          case 'retirement': return 'Highest Final Balance';
-          default: return 'Best Scenario';
-        }
-      };
+    const getMetricName = () => {
+      switch (calculatorType) {
+        case 'hsa': return 'Highest Tax Savings';
+        case 'fsa': return 'Highest Net Benefit';
+        case 'commuter': return 'Highest Total Savings';
+        case 'life-insurance': return 'Highest Coverage Need';
+        default: return 'Best Scenario';
+      }
+    };
 
-      const getMetricValue = (scenario: { results: HSAResults | CommuterResults | LifeInsuranceResults | RetirementResults }) => {
-        switch (calculatorType) {
-          case 'hsa': return (scenario.results as HSAResults).taxSavings;
-          case 'fsa': return (scenario.results as FSAResults).netBenefit;
-          case 'commuter': return (scenario.results as CommuterResults).totalSavings;
-          case 'life-insurance': return (scenario.results as LifeInsuranceResults).dimeTotal;
-          case 'retirement': return (scenario.results as RetirementResults).finalBalance;
-          default: return 0;
-        }
+    const getMetricValue = (scenario: { results: HSAResults | CommuterResults | LifeInsuranceResults }) => {
+      switch (calculatorType) {
+        case 'hsa': return (scenario.results as HSAResults).taxSavings;
+        case 'fsa': return (scenario.results as FSAResults).netBenefit;
+        case 'commuter': return (scenario.results as CommuterResults).totalSavings;
+        case 'life-insurance': return (scenario.results as LifeInsuranceResults).dimeTotal;
+        default: return 0;
+      }
     };
 
     return (
@@ -303,7 +242,6 @@ export const ComparisonReport: React.FC<ComparisonReportProps> = ({ data }) => {
             {calculatorType === 'fsa' && `Balances election sizing with carryover rules for a net benefit of ${formatCurrency((bestScenario.results as FSAResults).netBenefit)}.`}
             {calculatorType === 'commuter' && `Delivers the highest total annual savings of ${formatCurrency((bestScenario.results as CommuterResults).totalSavings)} on transportation costs.`}
             {calculatorType === 'life-insurance' && `Indicates the highest coverage need of ${formatCurrency((bestScenario.results as LifeInsuranceResults).dimeTotal)} based on the DIME methodology.`}
-            {calculatorType === 'retirement' && `Projects the highest retirement balance of ${formatCurrency((bestScenario.results as RetirementResults).finalBalance)} at retirement.`}
           </Text>
         </View>
       </Section>
@@ -326,7 +264,6 @@ export const ComparisonReport: React.FC<ComparisonReportProps> = ({ data }) => {
       {calculatorType === 'fsa' && renderFSAComparison()}
       {calculatorType === 'commuter' && renderCommuterComparison()}
       {calculatorType === 'life-insurance' && renderLifeInsuranceComparison()}
-      {calculatorType === 'retirement' && renderRetirementComparison()}
 
       <Divider />
 

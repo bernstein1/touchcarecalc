@@ -4,7 +4,6 @@ import { HSAReport } from './templates/hsa-report';
 import { FSAReport } from './templates/fsa-report';
 import { CommuterReport } from './templates/commuter-report';
 import { LifeInsuranceReport } from './templates/life-insurance-report';
-import { RetirementReport } from './templates/retirement-report';
 import { ComparisonReport } from './templates/comparison-report';
 import {
   HSAInputs,
@@ -14,13 +13,11 @@ import {
   CommuterInputs,
   CommuterResults,
   LifeInsuranceInputs,
-  LifeInsuranceResults,
-  RetirementInputs,
-  RetirementResults
+  LifeInsuranceResults
 } from '@shared/schema';
 
-type CalculatorInputs = HSAInputs | FSAInputs | CommuterInputs | LifeInsuranceInputs | RetirementInputs;
-type CalculatorResults = HSAResults | FSAResults | CommuterResults | LifeInsuranceResults | RetirementResults;
+type CalculatorInputs = HSAInputs | FSAInputs | CommuterInputs | LifeInsuranceInputs;
+type CalculatorResults = HSAResults | FSAResults | CommuterResults | LifeInsuranceResults;
 
 export const usePDFExport = () => {
   const [isGenerating, setIsGenerating] = useState(false);
@@ -138,30 +135,6 @@ export const usePDFExport = () => {
     }
   };
 
-  const exportRetirementReport = async (inputs: RetirementInputs, results: RetirementResults) => {
-    setIsGenerating(true);
-    setError(null);
-    
-    try {
-      const data: PDFReportData = {
-        type: 'retirement',
-        title: '401(k) Retirement Planning Analysis',
-        generatedAt: new Date(),
-        inputs,
-        results
-      };
-      
-      const filename = `Retirement_Report_${getFilenameSuffix()}.pdf`;
-      const reportElement = RetirementReport({ data }) as React.ReactElement;
-      await generateAndDownloadPDF(reportElement, filename);
-    } catch (err) {
-      setError('Failed to generate Retirement report. Please try again.');
-      console.error('Retirement PDF export error:', err);
-    } finally {
-      setIsGenerating(false);
-    }
-  };
-
   const exportComparisonReport = async (data: Omit<ComparisonReportData, 'generatedAt'>) => {
     setIsGenerating(true);
     setError(null);
@@ -184,7 +157,7 @@ export const usePDFExport = () => {
   };
 
   const exportReport = async (
-    type: 'hsa' | 'fsa' | 'commuter' | 'life-insurance' | 'retirement',
+    type: 'hsa' | 'fsa' | 'commuter' | 'life-insurance',
     inputs: CalculatorInputs,
     results: CalculatorResults
   ) => {
@@ -201,9 +174,6 @@ export const usePDFExport = () => {
       case 'life-insurance':
         await exportLifeInsuranceReport(inputs as LifeInsuranceInputs, results as LifeInsuranceResults);
         break;
-      case 'retirement':
-        await exportRetirementReport(inputs as RetirementInputs, results as RetirementResults);
-        break;
       default:
         setError('Unknown report type');
     }
@@ -216,7 +186,6 @@ export const usePDFExport = () => {
     exportFSAReport,
     exportCommuterReport,
     exportLifeInsuranceReport,
-    exportRetirementReport,
     exportComparisonReport,
     exportReport
   };
