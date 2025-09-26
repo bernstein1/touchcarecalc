@@ -72,6 +72,8 @@ export const ComparisonReport: React.FC<ComparisonReportProps> = ({ data }) => {
                 </Text>
                 <ValueRow label="Account Type" value={(scenario.inputs.accountType ?? 'hsa').toUpperCase()} />
                 <ValueRow label="Coverage" value={scenario.inputs.coverage === 'family' ? 'Family' : 'Individual'} />
+                <ValueRow label="Household Annual Income" value={scenario.inputs.annualIncome} currency />
+                <ValueRow label="Marginal Tax Rate" value={`${hsaResults.marginalRate}%`} />
                 <ValueRow label="Annual Contribution" value={hsaResults.totalContribution ?? hsaResults.actualContribution ?? 0} currency />
                 <ValueRow label="Tax Savings" value={hsaResults.taxSavings} currency success />
                 <ValueRow label="Effective Cost" value={hsaResults.effectiveCost ?? 0} currency primary />
@@ -100,6 +102,8 @@ export const ComparisonReport: React.FC<ComparisonReportProps> = ({ data }) => {
                 <ValueRow label="Health FSA Election" value={scenario.inputs.healthElection} currency />
                 <ValueRow label="Expected Utilisation" value={fsaResults.expectedUtilization} currency primary />
                 <ValueRow label="Carryover Protected" value={fsaResults.carryoverProtected} currency />
+                <ValueRow label="Household Annual Income" value={scenario.inputs.annualIncome} currency />
+                <ValueRow label="Marginal Tax Rate" value={`${fsaResults.marginalRate}%`} />
                 <ValueRow label="Grace Period Months" value={(scenario.inputs.gracePeriodMonths ?? 0).toFixed(1)} />
                 <ValueRow label="Forfeiture Risk" value={fsaResults.forfeitureRisk} currency highlight />
                 <ValueRow label="Net Benefit" value={fsaResults.netBenefit} currency success />
@@ -134,6 +138,8 @@ export const ComparisonReport: React.FC<ComparisonReportProps> = ({ data }) => {
                 </Text>
                 <ValueRow label="Monthly Transit Cost" value={scenario.inputs.transitCost} currency />
                 <ValueRow label="Monthly Parking Cost" value={scenario.inputs.parkingCost} currency />
+                <ValueRow label="Household Annual Income" value={scenario.inputs.annualIncome} currency />
+                <ValueRow label="Marginal Tax Rate" value={`${commuterResults.marginalRate}%`} />
                 <ValueRow label="Transit Savings" value={commuterResults.transitSavings} currency />
                 <ValueRow label="Parking Savings" value={commuterResults.parkingSavings} currency />
                 <ValueRow label="Total Annual Savings" value={commuterResults.totalSavings} currency success />

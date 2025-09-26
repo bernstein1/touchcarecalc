@@ -8,7 +8,8 @@ import { Slider } from "@/components/ui/slider";
 import GlassCard from "@/components/glass-card";
 import Tooltip from "@/components/tooltip";
 import { calculateCommuter, CONTRIBUTION_LIMITS } from "@/lib/calculations";
-import { CommuterInputs, CommuterResults } from "@shared/schema";
+import { describeFilingStatus } from "@/lib/tax/brackets";
+import { CommuterInputs, CommuterResults, FilingStatus } from "@shared/schema";
 
 interface CommuterScenario {
   id: string;
@@ -29,6 +30,13 @@ interface CommuterComparisonProps {
 
 export default function CommuterComparison({ scenarios, onUpdateScenario, onRemoveScenario }: CommuterComparisonProps) {
   const [scenarioResults, setScenarioResults] = useState<Record<string, CommuterResults>>({});
+
+  const filingStatusOptions: { value: FilingStatus; label: string }[] = [
+    { value: "single", label: describeFilingStatus("single") },
+    { value: "marriedJoint", label: describeFilingStatus("marriedJoint") },
+    { value: "marriedSeparate", label: describeFilingStatus("marriedSeparate") },
+    { value: "headOfHousehold", label: describeFilingStatus("headOfHousehold") },
+  ];
 
   // Calculate results for all scenarios
   useEffect(() => {
@@ -298,25 +306,40 @@ export default function CommuterComparison({ scenarios, onUpdateScenario, onRemo
                 </div>
               </div>
 
-              {/* Tax Bracket */}
-              <div>
-                <Label className="text-sm font-medium text-foreground mb-2 block">
-                  Tax Bracket
-                </Label>
-                <Select value={scenario.data.taxBracket.toString()} onValueChange={(value) => updateScenarioInput(scenario.id, 'taxBracket', parseFloat(value))}>
-                  <SelectTrigger className="glass-input" data-testid={`select-tax-bracket-${scenario.id}`}>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="10">10% - Income up to $11,000</SelectItem>
-                    <SelectItem value="12">12% - Income $11,000 - $44,725</SelectItem>
-                    <SelectItem value="22">22% - Income $44,725 - $95,375</SelectItem>
-                    <SelectItem value="24">24% - Income $95,375 - $182,050</SelectItem>
-                    <SelectItem value="32">32% - Income $182,050 - $231,250</SelectItem>
-                    <SelectItem value="35">35% - Income $231,250 - $578,125</SelectItem>
-                    <SelectItem value="37">37% - Income over $578,125</SelectItem>
-                  </SelectContent>
-                </Select>
+              {/* Income & Filing */}
+              <div className="space-y-4">
+                <div>
+                  <Label className="text-sm font-medium text-foreground mb-2 block">Household annual income</Label>
+                  <Input
+                    type="number"
+                    className="glass-input"
+                    min={0}
+                    value={scenario.data.annualIncome}
+                    onChange={(event) => updateScenarioInput(scenario.id, 'annualIncome', Number(event.target.value) || 0)}
+                  />
+                </div>
+                <div>
+                  <Label className="text-sm font-medium text-foreground mb-2 block">Filing status</Label>
+                  <Select
+                    value={scenario.data.filingStatus ?? 'single'}
+                    onValueChange={(value: FilingStatus) => updateScenarioInput(scenario.id, 'filingStatus', value)}
+                  >
+                    <SelectTrigger className="glass-input" data-testid={`select-tax-bracket-${scenario.id}`}>
+                      <SelectValue placeholder="Select filing status" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {filingStatusOptions.map(option => (
+                        <SelectItem key={option.value} value={option.value}>
+                          {option.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Estimated marginal tax rate:{' '}
+                  <span className="font-semibold text-foreground">{scenarioResults[scenario.id]?.marginalRate ?? 0}%</span>
+                </p>
               </div>
 
               {/* Quick Summary */}

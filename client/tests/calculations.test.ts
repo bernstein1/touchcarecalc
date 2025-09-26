@@ -19,20 +19,25 @@ describe("calculator math", () => {
       hdhpMonthlyPremium: 300,
       altPlanMonthlyPremium: 500,
       targetReserve: 6000,
-      taxBracket: 24,
+      annualIncome: 185000,
+      filingStatus: "marriedJoint",
     });
 
     expect(result.annualContributionLimit).toBe(HSA_LIMITS.family + HSA_LIMITS.catchUp);
     expect(result.totalContribution).toBe(result.annualContributionLimit);
     expect(result.catchUpContribution).toBe(HSA_LIMITS.catchUp);
-    expect(result.taxSavings).toBeCloseTo(result.employeeContribution * 0.24, 2);
+    expect(result.marginalRate).toBeGreaterThan(0);
+    expect(result.taxSavings).toBeCloseTo(result.employeeContribution * (result.marginalRate / 100), 2);
     expect(result.annualPremiumSavings).toBeCloseTo((500 - 300) * 12);
   });
 
   it("caps commuter transit at $315/mo", () => {
-    const result = calculateCommuter({ transitCost: 500, parkingCost: 250, taxBracket: 22 });
+    const result = calculateCommuter({ transitCost: 500, parkingCost: 250, annualIncome: 90000, filingStatus: "single" });
     expect(result.annualTransit).toBe(COMMUTER_LIMITS.transit * 12);
-    expect(result.totalSavings).toBeCloseTo(result.annualTransit * 0.22 + result.annualParking * 0.22, 2);
+    expect(result.totalSavings).toBeCloseTo(
+      result.annualTransit * (result.marginalRate / 100) + result.annualParking * (result.marginalRate / 100),
+      2
+    );
   });
 
   it("estimates FSA forfeiture risk with carryover and grace period protections", () => {
@@ -44,13 +49,15 @@ describe("calculator math", () => {
       includeDependentCare: true,
       dependentCareElection: 6000,
       expectedDependentCareExpenses: 4000,
-      taxBracket: 24,
+      annualIncome: 165000,
+      filingStatus: "marriedJoint",
     });
 
     expect(result.cappedHealthElection).toBe(FSA_LIMITS.health);
     expect(result.forfeitureRisk).toBeGreaterThanOrEqual(0);
-    expect(result.taxSavings).toBeCloseTo(FSA_LIMITS.health * 0.24, 2);
-    expect(result.dependentCareTaxSavings).toBeCloseTo(FSA_LIMITS.dependentCare * 0.24, 2);
+    expect(result.marginalRate).toBeGreaterThan(0);
+    expect(result.taxSavings).toBeCloseTo(FSA_LIMITS.health * (result.marginalRate / 100), 2);
+    expect(result.dependentCareTaxSavings).toBeCloseTo(FSA_LIMITS.dependentCare * (result.marginalRate / 100), 2);
     expect(result.dependentCareForfeitureRisk).toBeCloseTo(FSA_LIMITS.dependentCare - 4000, 2);
   });
 

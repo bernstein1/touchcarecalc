@@ -9,8 +9,16 @@ import GlassCard from "@/components/glass-card";
 import Tooltip from "@/components/tooltip";
 import { useLocation } from "wouter";
 import { calculateCommuter } from "@/lib/calculations";
-import { CommuterInputs, CommuterResults } from "@shared/schema";
+import { getMarginalTaxRate, describeFilingStatus } from "@/lib/tax/brackets";
+import { CommuterInputs, CommuterResults, FilingStatus } from "@shared/schema";
 import { usePDFExport } from "@/lib/pdf/use-pdf-export";
+
+const FILING_STATUS_OPTIONS: { value: FilingStatus; label: string }[] = [
+  { value: "single", label: describeFilingStatus("single") },
+  { value: "marriedJoint", label: describeFilingStatus("marriedJoint") },
+  { value: "marriedSeparate", label: describeFilingStatus("marriedSeparate") },
+  { value: "headOfHousehold", label: describeFilingStatus("headOfHousehold") },
+];
 
 export default function CommuterCalculator() {
   const [, navigate] = useLocation();
@@ -19,7 +27,8 @@ export default function CommuterCalculator() {
   const [inputs, setInputs] = useState<CommuterInputs>({
     transitCost: 200,
     parkingCost: 150,
-    taxBracket: 22,
+    annualIncome: 85000,
+    filingStatus: "single",
   });
 
   const [results, setResults] = useState<CommuterResults>({
@@ -29,6 +38,7 @@ export default function CommuterCalculator() {
     annualTransit: 0,
     annualParking: 0,
     annualTotal: 0,
+    marginalRate: 0,
   });
 
   useEffect(() => {
@@ -36,9 +46,11 @@ export default function CommuterCalculator() {
     setResults(calculatedResults);
   }, [inputs]);
 
-  const updateInput = (key: keyof CommuterInputs, value: number) => {
+  const updateInput = <K extends keyof CommuterInputs>(key: K, value: CommuterInputs[K]) => {
     setInputs(prev => ({ ...prev, [key]: value }));
   };
+
+  const marginalRate = results.marginalRate ?? getMarginalTaxRate(inputs.annualIncome, inputs.filingStatus);
 
   return (
     <div className="space-y-8">
@@ -116,18 +128,42 @@ export default function CommuterCalculator() {
               </div>
 
               {/* Tax Information */}
-              <div>
-                <Label className="text-sm font-medium text-foreground mb-2">Tax Bracket</Label>
-                <Select value={inputs.taxBracket.toString()} onValueChange={(value) => updateInput('taxBracket', parseFloat(value))}>
-                  <SelectTrigger className="glass-input" data-testid="select-tax-bracket">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="22">22% - Income $44,725 - $95,375</SelectItem>
-                    <SelectItem value="24">24% - Income $95,375 - $182,050</SelectItem>
-                    <SelectItem value="32">32% - Income $182,050 - $231,250</SelectItem>
-                  </SelectContent>
-                </Select>
+              <div className="space-y-4">
+                <div>
+                  <Label htmlFor="annual-income" className="text-sm font-medium text-foreground mb-2">
+                    Household annual income
+                  </Label>
+                  <Input
+                    id="annual-income"
+                    type="number"
+                    min={0}
+                    value={inputs.annualIncome}
+                    onChange={(event) => updateInput('annualIncome', Number(event.target.value) || 0)}
+                  />
+                </div>
+
+                <div>
+                  <Label className="text-sm font-medium text-foreground mb-2">Filing status</Label>
+                  <Select
+                    value={inputs.filingStatus ?? 'single'}
+                    onValueChange={(value: FilingStatus) => updateInput('filingStatus', value)}
+                  >
+                    <SelectTrigger className="glass-input" data-testid="select-tax-bracket">
+                      <SelectValue placeholder="Select filing status" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {FILING_STATUS_OPTIONS.map(option => (
+                        <SelectItem key={option.value} value={option.value}>
+                          {option.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <p className="text-xs text-muted-foreground">
+                  Estimated marginal tax rate: <span className="font-semibold text-foreground">{marginalRate}%</span>
+                </p>
               </div>
             </div>
           </GlassCard>
@@ -200,7 +236,7 @@ export default function CommuterCalculator() {
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Tax Rate:</span>
                   <span className="text-foreground font-mono" data-testid="math-rate">
-                    {inputs.taxBracket}%
+                    {marginalRate}%
                   </span>
                 </div>
                 <div className="flex justify-between">
