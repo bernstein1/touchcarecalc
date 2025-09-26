@@ -29,6 +29,16 @@ export const usePDFExport = () => {
     
     try {
       const coverageText = inputs.coverage === 'family' ? 'family' : 'individual';
+      const combinedReserve = results.projectedReserve;
+      const shortfall = results.reserveShortfall;
+      const targetReserve = inputs.targetReserve ?? 0;
+      const startingBalance = results.currentHSABalance ?? inputs.currentHSABalance ?? 0;
+
+      const employerSupportNarrative =
+        shortfall > 0
+          ? `Employer contributions of ${formatCurrency(results.employerContribution)} combine with your paycheck deposits and the ${formatCurrency(startingBalance)} already saved to build ${formatCurrency(combinedReserve)} of the ${formatCurrency(targetReserve)} cushion—leaving ${formatCurrency(shortfall)} still to fund.`
+          : `Employer contributions of ${formatCurrency(results.employerContribution)} plus your paycheck deposits and the ${formatCurrency(startingBalance)} already saved fully cover the ${formatCurrency(targetReserve)} cushion.`;
+
       const data: PDFReportData = {
         type: 'hsa',
         title: 'HSA Strategy Analysis',
@@ -38,7 +48,7 @@ export const usePDFExport = () => {
         additionalData: {
           narrative: {
             compatibility: `Qualified ${coverageText} high-deductible health plan (HDHP) coverage opens ${formatCurrency(results.annualContributionLimit)} of health savings account (HSA) room, including ${formatCurrency(results.catchUpContribution ?? 0)} in catch-up space once you turn 55.`,
-            employerSupport: `Employer contributions of ${formatCurrency(results.employerContribution)} combine with your paycheck deposits to build the ${formatCurrency(inputs.targetReserve)} safety cushion.`,
+            employerSupport: employerSupportNarrative,
             premiumOffsets: `Switching plans frees ${formatCurrency(results.annualPremiumSavings)} in yearly premiums that can move straight into the HSA.`,
             cashflow: `After premium savings, employer help, and tax savings, you keep ${formatCurrency(results.netCashflowAdvantage)} more than the payroll contributions going out.`,
           }

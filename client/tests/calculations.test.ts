@@ -19,6 +19,7 @@ describe("calculator math", () => {
       hdhpMonthlyPremium: 300,
       altPlanMonthlyPremium: 500,
       targetReserve: 6000,
+      currentHSABalance: 0,
       annualIncome: 185000,
       filingStatus: "marriedJoint",
     });
@@ -29,6 +30,44 @@ describe("calculator math", () => {
     expect(result.marginalRate).toBeGreaterThan(0);
     expect(result.taxSavings).toBeCloseTo(result.employeeContribution * (result.marginalRate / 100), 2);
     expect(result.annualPremiumSavings).toBeCloseTo((500 - 300) * 12);
+  });
+
+  it("credits the current HSA balance toward the projected reserve and shortfall", () => {
+    const result = calculateHSA({
+      coverage: "individual",
+      age: 40,
+      employeeContribution: 2000,
+      employerSeed: 500,
+      currentHSABalance: 1500,
+      targetReserve: 4000,
+      hdhpMonthlyPremium: 300,
+      altPlanMonthlyPremium: 450,
+      annualIncome: 90000,
+      filingStatus: "single",
+    });
+
+    expect(result.currentHSABalance).toBe(1500);
+    expect(result.projectedReserve).toBeCloseTo(1500 + result.employeeContribution + result.employerContribution);
+    expect(result.reserveShortfall).toBe(Math.max(4000 - result.projectedReserve, 0));
+  });
+
+  it("shows no reserve shortfall when the existing balance already covers the target", () => {
+    const result = calculateHSA({
+      coverage: "individual",
+      age: 30,
+      employeeContribution: 0,
+      employerSeed: 0,
+      currentHSABalance: 2500,
+      targetReserve: 2000,
+      hdhpMonthlyPremium: 250,
+      altPlanMonthlyPremium: 325,
+      annualIncome: 60000,
+      filingStatus: "single",
+    });
+
+    expect(result.projectedReserve).toBe(2500);
+    expect(result.reserveShortfall).toBe(0);
+    expect(result.netCashflowAdvantage).toBeCloseTo(result.annualPremiumSavings + result.taxSavings);
   });
 
   it("caps commuter transit at $315/mo", () => {

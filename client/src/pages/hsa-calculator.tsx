@@ -24,6 +24,7 @@ const DEFAULT_INPUTS: HSAInputs = {
   altPlanMonthlyPremium: 515,
   employerSeed: 750,
   targetReserve: 4000,
+  currentHSABalance: 0,
   annualIncome: 85000,
   filingStatus: "single",
 };
@@ -63,6 +64,7 @@ export default function HSACalculator() {
 
   const premiumDifference = results.annualPremiumSavings;
   const reserveProgress = results.projectedReserve;
+  const startingBalance = results.currentHSABalance ?? 0;
 
   return (
     <div className="space-y-8" data-analytics-id="page-hsa-calculator">
@@ -229,8 +231,9 @@ export default function HSACalculator() {
               <div>
                 <h3 className="text-xl font-semibold text-foreground">Plan your HSA deposits</h3>
                 <p className="text-sm text-muted-foreground mt-2 leading-relaxed">
-                  Decide how much to send from your paycheck and how much your employer adds. Together these deposits
-                  should build a cushion that can handle the plan deductible without wrecking your monthly budget.
+                  Decide how much to send from your paycheck and how much your employer adds. Together with the money you
+                  already have in the HSA, these deposits should build a cushion that can handle the plan deductible
+                  without wrecking your monthly budget.
                 </p>
               </div>
               <Tooltip
@@ -258,7 +261,7 @@ export default function HSACalculator() {
               focusLabel="Target deductible coverage"
             />
 
-            <div className="grid md:grid-cols-2 gap-6">
+            <div className="grid gap-6 md:grid-cols-2">
               <div>
                 <Label htmlFor="employer-seed" className="text-sm font-medium text-foreground mb-2">
                   Employer contribution
@@ -275,20 +278,37 @@ export default function HSACalculator() {
                   matching deposits.
                 </p>
               </div>
-              <div>
-                <Label htmlFor="target-reserve" className="text-sm font-medium text-foreground mb-2">
-                  Desired HSA reserve
-                </Label>
-                <Input
-                  id="target-reserve"
-                  type="number"
-                  min={0}
-                  value={inputs.targetReserve}
-                  onChange={(event) => updateInput("targetReserve", Number(event.target.value) || 0)}
-                />
-                <p className="text-xs text-muted-foreground mt-2">
-                  Aim for an amount that covers your HDHP deductible or whatever balance would let you sleep at night.
-                </p>
+              <div className="grid gap-6 md:grid-cols-2">
+                <div>
+                  <Label htmlFor="current-hsa-balance" className="text-sm font-medium text-foreground mb-2">
+                    Current HSA balance
+                  </Label>
+                  <Input
+                    id="current-hsa-balance"
+                    type="number"
+                    min={0}
+                    value={inputs.currentHSABalance ?? 0}
+                    onChange={(event) => updateInput("currentHSABalance", Number(event.target.value) || 0)}
+                  />
+                  <p className="text-xs text-muted-foreground mt-2">
+                    Dollars already in the account that can be paired with new contributions to handle the deductible.
+                  </p>
+                </div>
+                <div>
+                  <Label htmlFor="target-reserve" className="text-sm font-medium text-foreground mb-2">
+                    Desired HSA reserve
+                  </Label>
+                  <Input
+                    id="target-reserve"
+                    type="number"
+                    min={0}
+                    value={inputs.targetReserve}
+                    onChange={(event) => updateInput("targetReserve", Number(event.target.value) || 0)}
+                  />
+                  <p className="text-xs text-muted-foreground mt-2">
+                    Aim for an amount that covers your HDHP deductible or whatever balance would let you sleep at night.
+                  </p>
+                </div>
               </div>
             </div>
           </GlassCard>
@@ -360,10 +380,10 @@ export default function HSACalculator() {
                 </p>
               </div>
               <div className="rounded-xl border border-emerald-300/40 bg-emerald-500/10 p-4">
-                <p className="text-sm text-muted-foreground">Projected HSA reserve after contributions</p>
+                <p className="text-sm text-muted-foreground">Projected HSA reserve with current balance</p>
                 <p className="text-2xl font-bold text-emerald-500">{formatCurrency(reserveProgress)}</p>
                 <p className="text-xs text-muted-foreground mt-1">
-                  Employer contributions plus your pre-tax deposits available to handle medical surprises.
+                  Your existing balance, employer contributions, and pre-tax deposits available to handle medical surprises.
                 </p>
               </div>
               <div className="rounded-xl border border-border p-4">
@@ -391,7 +411,7 @@ export default function HSACalculator() {
           <ShowMathSection
             title="See how the dollars work"
             focusLabel="Premium savings vs. deductible readiness"
-            description="Trace how lower premiums, tax savings, and employer contributions come together to keep your HDHP affordable while you build a deductible-sized buffer."
+            description="Trace how lower premiums, tax savings, employer contributions, and any dollars you have already saved come together to keep your HDHP affordable while you build a deductible-sized buffer."
             items={[
               {
                 label: "Annual premium gap",
@@ -411,12 +431,21 @@ export default function HSACalculator() {
                 helperText: "Money your employer adds to the HSA to boost your medical safety net.",
               },
               {
+                label: "Current HSA balance",
+                value: formatCurrency(startingBalance),
+                helperText:
+                  startingBalance > 0
+                    ? "Existing HSA dollars that count toward your reserve goal on day one."
+                    : "Enter what is already saved to show how close you are before new contributions.",
+                accent: startingBalance > 0 ? "success" : undefined,
+              },
+              {
                 label: "Projected reserve vs. goal",
                 value: `${formatCurrency(results.projectedReserve)} of ${formatCurrency(inputs.targetReserve)}`,
                 helperText:
                   results.reserveShortfall > 0
-                    ? `${formatCurrency(results.reserveShortfall)} shy of your target—consider raising contributions or lowering the deductible exposure.`
-                    : "You are on pace to meet or exceed the reserve you want ready for a worst-case bill.",
+                    ? `${formatCurrency(results.reserveShortfall)} shy of your target—even after counting today's balance. Consider raising contributions or lowering the deductible exposure.`
+                    : "Today's balance plus planned funding is enough to hit the reserve you want ready for a worst-case bill.",
                 accent: results.reserveShortfall > 0 ? "warning" : "success",
               },
               {
