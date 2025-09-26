@@ -37,9 +37,9 @@ const normaliseCalculatorId = (id: CalculatorType): CalculatorId => {
 const calculatorTypes = [
   {
     id: 'hsa' as const,
-    name: 'HSA/FSA Benefits',
+    name: 'HSA Strategy',
     icon: HeartPulse,
-    description: 'Compare health savings and flexible spending account scenarios'
+    description: 'Compare HDHP premium savings and HSA reserve strategies'
   },
   {
     id: 'commuter' as const,
@@ -98,8 +98,14 @@ export default function ComparisonTool() {
         return {
           accountType: 'hsa',
           coverage: 'individual',
+          age: 40,
           income: 75000,
           contribution: 3000,
+          employeeContribution: 3000,
+          hdhpMonthlyPremium: 320,
+          altPlanMonthlyPremium: 520,
+          employerSeed: 500,
+          targetReserve: 4000,
           taxBracket: 22
         };
       case 'commuter':

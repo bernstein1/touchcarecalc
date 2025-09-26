@@ -1,4 +1,4 @@
-import { CONTRIBUTION_LIMITS } from "@/lib/calculations";
+import { CONTRIBUTION_LIMITS, FSA_LIMITS } from "@/lib/calculations";
 import type { CalculatorId } from "./calculatorTheme";
 
 export interface BenefitFact {
@@ -12,6 +12,10 @@ export const BENEFIT_FACTS: Record<CalculatorId, BenefitFact[]> = {
   hsa: [
     { label: "HSA Individual Limit:", value: formatCurrency(CONTRIBUTION_LIMITS.HSA_INDIVIDUAL) },
     { label: "HSA Family Limit:", value: formatCurrency(CONTRIBUTION_LIMITS.HSA_FAMILY) },
+  ],
+  fsa: [
+    { label: "Health FSA Limit:", value: formatCurrency(CONTRIBUTION_LIMITS.FSA) },
+    { label: "Dependent Care Max:", value: formatCurrency(FSA_LIMITS.dependentCare) },
   ],
   commuter: [
     { label: "Transit Limit:", value: `${formatCurrency(CONTRIBUTION_LIMITS.COMMUTER_TRANSIT)}/month` },

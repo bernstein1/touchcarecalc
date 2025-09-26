@@ -1,3 +1,4 @@
+import { type ReactNode } from "react";
 import { Info } from "lucide-react";
 import {
   Tooltip as ShadcnTooltip,
@@ -7,11 +8,12 @@ import {
 import { cn } from "@/lib/utils";
 
 interface TooltipProps {
-  content: string;
+  content: ReactNode;
+  title?: string;
   className?: string;
 }
 
-export default function Tooltip({ content, className }: TooltipProps) {
+export default function Tooltip({ content, title, className }: TooltipProps) {
   return (
     <ShadcnTooltip>
       <TooltipTrigger asChild>
@@ -27,8 +29,11 @@ export default function Tooltip({ content, className }: TooltipProps) {
           <Info className="w-4 h-4" aria-hidden="true" />
         </button>
       </TooltipTrigger>
-      <TooltipContent className="max-w-72 leading-relaxed text-sm" sideOffset={8}>
-        <p>{content}</p>
+      <TooltipContent className="max-w-80 leading-relaxed text-sm" sideOffset={8}>
+        <div className="space-y-1">
+          {title ? <p className="font-semibold text-foreground">{title}</p> : null}
+          <div className="text-muted-foreground [&>p]:mt-0 [&>p]:mb-0">{content}</div>
+        </div>
       </TooltipContent>
     </ShadcnTooltip>
   );

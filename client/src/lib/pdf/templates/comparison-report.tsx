@@ -70,11 +70,11 @@ export const ComparisonReport: React.FC<ComparisonReportProps> = ({ data }) => {
                 <Text style={{ fontSize: 11, fontWeight: 'bold', marginBottom: 5, color: '#1f2937' }}>
                   {scenario.name}
                 </Text>
-                <ValueRow label="Account Type" value={scenario.inputs.accountType.toUpperCase()} />
+                <ValueRow label="Account Type" value={(scenario.inputs.accountType ?? 'hsa').toUpperCase()} />
                 <ValueRow label="Coverage" value={scenario.inputs.coverage === 'family' ? 'Family' : 'Individual'} />
-                <ValueRow label="Annual Contribution" value={hsaResults.actualContribution} currency />
+                <ValueRow label="Annual Contribution" value={hsaResults.totalContribution ?? hsaResults.actualContribution ?? 0} currency />
                 <ValueRow label="Tax Savings" value={hsaResults.taxSavings} currency success />
-                <ValueRow label="Effective Cost" value={hsaResults.effectiveCost} currency primary />
+                <ValueRow label="Effective Cost" value={hsaResults.effectiveCost ?? 0} currency primary />
               </View>
             );
           })}

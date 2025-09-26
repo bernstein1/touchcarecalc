@@ -1,4 +1,4 @@
-import { HeartPulse, Bus, Shield, TrendingUp } from "lucide-react";
+import { HeartPulse, ClipboardList, Bus, Shield, TrendingUp } from "lucide-react";
 import GlassCard from "@/components/glass-card";
 import { useLocation } from "wouter";
 import { CALCULATOR_THEME, type CalculatorId } from "@/lib/calculatorTheme";
@@ -16,10 +16,17 @@ export default function CalculatorHub() {
   }> = [
     {
       id: "hsa",
-      title: "HSA/FSA Calculator",
-      description: "Calculate your health savings and flexible spending account benefits with 2025 contribution limits.",
+      title: "HSA Strategy Planner",
+      description: "Plan HDHP premium savings, employer seed money, and deductible reserves for your HSA.",
       icon: HeartPulse,
       route: "/hsa",
+    },
+    {
+      id: "fsa",
+      title: "FSA Election Forecaster",
+      description: "Project healthcare and dependent-care expenses to choose confident FSA elections.",
+      icon: ClipboardList,
+      route: "/fsa",
     },
     {
       id: "commuter",

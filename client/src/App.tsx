@@ -6,6 +6,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import NavigationHeader from "@/components/navigation-header";
 import CalculatorHub from "@/pages/calculator-hub";
 import HSACalculator from "@/pages/hsa-calculator";
+import FSACalculator from "@/pages/fsa-calculator";
 import CommuterCalculator from "@/pages/commuter-calculator";
 import LifeInsuranceCalculator from "@/pages/life-insurance-calculator";
 import RetirementCalculator from "@/pages/retirement-calculator";
@@ -17,6 +18,7 @@ function Router() {
     <Switch>
       <Route path="/" component={CalculatorHub} />
       <Route path="/hsa" component={HSACalculator} />
+      <Route path="/fsa" component={FSACalculator} />
       <Route path="/commuter" component={CommuterCalculator} />
       <Route path="/life-insurance" component={LifeInsuranceCalculator} />
       <Route path="/retirement" component={RetirementCalculator} />
