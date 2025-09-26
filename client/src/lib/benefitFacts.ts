@@ -51,12 +51,12 @@ export const BENEFIT_FACTS: Record<CalculatorId, BenefitFact[]> = {
     {
       label: "Income replacement guide:",
       value:
-        "A common rule of thumb is to target 10–15 times your annual income so your family can cover daily expenses, save for goals, and keep pace with inflation after you’re gone.",
+        "Aim for roughly 10–15 times your annual income so your family can cover everyday expenses, keep saving, and stay ahead of inflation.",
     },
     {
       label: "Methodology explained:",
       value:
-        "The DIME method totals Debt, ongoing Income needs, Mortgage payoff, and future Education costs to create a practical estimate of how much coverage keeps your household secure.",
+        "The DIME method combines Debt, Income replacement, Mortgage payoff, and Education costs to size coverage that keeps your household secure.",
     },
   ],
 };

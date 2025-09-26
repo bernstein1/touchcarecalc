@@ -46,7 +46,7 @@ export default function CalculatorHub() {
       id: "life",
       title: "Life Insurance Needs",
       description:
-        "Estimate how much life insurance your family may need by adding together debts, income replacement, mortgage payoff, and education goals using the DIME approach.",
+        "Add up debts, income replacement, mortgage payoff, and education goals with the DIME method.",
       icon: Shield,
       route: "/life-insurance",
       analyticsId: "calculator-life-entry",
