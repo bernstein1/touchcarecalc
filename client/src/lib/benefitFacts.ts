@@ -12,15 +12,15 @@ export const BENEFIT_FACTS: Record<CalculatorId, BenefitFact[]> = {
   hsa: [
     {
       label: "Individual contribution limit (2025):",
-      value: `${formatCurrency(CONTRIBUTION_LIMITS.HSA_INDIVIDUAL)} plus an extra $1,000 once you turn 55`,
+      value: `${formatCurrency(CONTRIBUTION_LIMITS.HSA_INDIVIDUAL)} for self-only HDHP coverage, plus a $1,000 catch-up once you turn 55`,
     },
     {
       label: "Family contribution limit (2025):",
-      value: `${formatCurrency(CONTRIBUTION_LIMITS.HSA_FAMILY)} plus the $1,000 age-55 catch-up allowance`,
+      value: `${formatCurrency(CONTRIBUTION_LIMITS.HSA_FAMILY)} when your HDHP covers family members, plus the same $1,000 catch-up after age 55`,
     },
     {
       label: "Employer contributions:",
-      value: "Allowed on top of your deposits—confirm whether the money arrives upfront or through matching",
+      value: "Stack on top of your own deposits—confirm whether the money arrives upfront or through paycheck matching",
     },
   ],
   fsa: [

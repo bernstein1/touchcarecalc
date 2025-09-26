@@ -19,7 +19,7 @@ export default function CalculatorHub() {
       id: "hsa",
       title: "HSA Strategy Planner",
       description:
-        "See how a high-deductible health plan (HDHP) and health savings account (HSA) can share costs by mapping premium differences, employer contributions, and an emergency medical cushion.",
+        "Show how HDHP premiums, employer HSA deposits, and your own savings affect yearly costs.",
       icon: HeartPulse,
       route: "/hsa",
       analyticsId: "calculator-hsa-entry",
