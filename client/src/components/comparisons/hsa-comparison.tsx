@@ -76,7 +76,9 @@ export default function HSAComparison({ scenarios, onUpdateScenario, onRemoveSce
       <GlassCard>
         <div className="text-center py-8">
           <Calculator className="mx-auto text-muted-foreground mb-4" size={48} />
-          <p className="text-muted-foreground">Add HSA scenarios above to analyse premium savings and deductible exposure.</p>
+          <p className="text-muted-foreground">
+            Add HSA scenarios above to compare plan costs, HSA deposits, and savings in everyday language.
+          </p>
         </div>
       </GlassCard>
     );
@@ -105,12 +107,12 @@ export default function HSAComparison({ scenarios, onUpdateScenario, onRemoveSce
   return (
     <div className="space-y-8">
       <GlassCard>
-        <h3 className="text-lg font-semibold text-foreground mb-6">HDHP Cashflow Comparison</h3>
+        <h3 className="text-lg font-semibold text-foreground mb-6">Compare plan savings and HSA funding</h3>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-border">
-                <th className="text-left p-3 font-medium text-muted-foreground">Metric</th>
+                <th className="text-left p-3 font-medium text-muted-foreground">What we are measuring</th>
                 {summary.map((scenario) => (
                   <th key={scenario.id} className="text-center p-3 font-medium text-foreground">
                     {scenario.name}
@@ -120,7 +122,7 @@ export default function HSAComparison({ scenarios, onUpdateScenario, onRemoveSce
             </thead>
             <tbody>
               <tr className="border-b border-border">
-                <td className="p-3 font-medium text-foreground">Premium savings vs PPO</td>
+                <td className="p-3 font-medium text-foreground">Yearly premium savings versus the other plan</td>
                 {summary.map((scenario) => (
                   <td key={`premium-${scenario.id}`} className="p-3 text-center">
                     <div className="flex items-center justify-center">
@@ -131,7 +133,7 @@ export default function HSAComparison({ scenarios, onUpdateScenario, onRemoveSce
                 ))}
               </tr>
               <tr className="border-b border-border">
-                <td className="p-3 font-medium text-foreground">Employer seed money</td>
+                <td className="p-3 font-medium text-foreground">Employer HSA contribution</td>
                 {summary.map((scenario) => (
                   <td key={`seed-${scenario.id}`} className="p-3 text-center">
                     <div className="flex items-center justify-center">
@@ -142,7 +144,7 @@ export default function HSAComparison({ scenarios, onUpdateScenario, onRemoveSce
                 ))}
               </tr>
               <tr className="border-b border-border">
-                <td className="p-3 font-medium text-foreground">Projected HSA reserve</td>
+                <td className="p-3 font-medium text-foreground">Estimated HSA balance after contributions</td>
                 {summary.map((scenario) => (
                   <td key={`reserve-${scenario.id}`} className="p-3 text-center">
                     <div className="flex items-center justify-center">
@@ -153,7 +155,7 @@ export default function HSAComparison({ scenarios, onUpdateScenario, onRemoveSce
                 ))}
               </tr>
               <tr className="border-b border-border">
-                <td className="p-3 font-medium text-foreground">Deductible gap remaining</td>
+                <td className="p-3 font-medium text-foreground">Estimated shortfall to your reserve goal</td>
                 {summary.map((scenario) => (
                   <td key={`gap-${scenario.id}`} className="p-3 text-center">
                     <div className="flex items-center justify-center">
@@ -164,7 +166,7 @@ export default function HSAComparison({ scenarios, onUpdateScenario, onRemoveSce
                 ))}
               </tr>
               <tr>
-                <td className="p-3 font-medium text-foreground">Net cashflow advantage</td>
+                <td className="p-3 font-medium text-foreground">Money left after savings and deposits</td>
                 {summary.map((scenario) => (
                   <td key={`advantage-${scenario.id}`} className="p-3 text-center">
                     <div className="flex items-center justify-center">
@@ -190,7 +192,7 @@ export default function HSAComparison({ scenarios, onUpdateScenario, onRemoveSce
               <div className="flex items-start justify-between border-b border-border pb-2">
                 <div>
                   <h4 className="text-lg font-semibold text-foreground">{scenario.name}</h4>
-                  <p className="text-xs text-muted-foreground">{coverageLabel} HDHP pairing</p>
+                  <p className="text-xs text-muted-foreground">{coverageLabel} HDHP scenario overview</p>
                 </div>
                 <Button
                   variant="ghost"
@@ -211,8 +213,8 @@ export default function HSAComparison({ scenarios, onUpdateScenario, onRemoveSce
                       title="HDHP compatibility"
                       content={
                         <p>
-                          Coverage level and age unlock different IRS limits. Confirm your medical plan is a qualified HDHP
-                          before relying on these HSA numbers.
+                          Your coverage level and age decide how much the IRS lets you put in an HSA. Confirm the medical plan
+                          counts as an HDHP before relying on these results.
                         </p>
                       }
                     />
@@ -262,7 +264,7 @@ export default function HSAComparison({ scenarios, onUpdateScenario, onRemoveSce
                     </div>
                     <div className="rounded-lg bg-primary/5 border border-dashed border-primary/40 p-3 text-xs text-muted-foreground">
                       <p>2025 limit: {currency(contributionLimit)}</p>
-                      <p>Includes {scenario.data.age >= 55 ? "catch-up allowance" : "catch-up once you turn 55"}</p>
+                      <p>{scenario.data.age >= 55 ? "Includes the $1,000 catch-up for age 55+" : "Add $1,000 more once you turn 55"}</p>
                     </div>
                   </div>
                 </div>
@@ -275,7 +277,7 @@ export default function HSAComparison({ scenarios, onUpdateScenario, onRemoveSce
                       content={
                         <p>
                           Track how much cheaper the HDHP is each month. Redirect that savings to your HSA so the deductible is
-                          banked before claims arrive.
+                          covered before any claims arrive.
                         </p>
                       }
                     />
@@ -302,7 +304,7 @@ export default function HSAComparison({ scenarios, onUpdateScenario, onRemoveSce
                   </div>
                   <div className="rounded-lg bg-secondary/10 border border-dashed border-secondary/40 p-3 text-xs text-muted-foreground">
                     <p>Annual premium savings: {currency(results?.annualPremiumSavings ?? 0)}</p>
-                    <p>Net cashflow advantage: {currency(results?.netCashflowAdvantage ?? 0)}</p>
+                    <p>Money left after inflows and deposits: {currency(results?.netCashflowAdvantage ?? 0)}</p>
                   </div>
                 </div>
 
@@ -313,15 +315,15 @@ export default function HSAComparison({ scenarios, onUpdateScenario, onRemoveSce
                       title="Employer contributions"
                       content={
                         <p>
-                          Employer seed money can bridge the deductible faster. Combine it with your payroll contributions to
-                          hit the reserve target before high-cost claims appear.
+                          Employer contributions can bridge the deductible faster. Combine them with your payroll deposits to
+                          reach the reserve target before high-cost claims appear.
                         </p>
                       }
                     />
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <Label className="text-xs uppercase text-muted-foreground">Employer seed</Label>
+                      <Label className="text-xs uppercase text-muted-foreground">Employer contribution</Label>
                       <Input
                         type="number"
                         min={0}
@@ -353,9 +355,15 @@ export default function HSAComparison({ scenarios, onUpdateScenario, onRemoveSce
                       <span>{currency(contributionLimit)}</span>
                     </div>
                     <p className="text-xs text-muted-foreground mt-1">
-                      Payroll dollars planned: {currency(scenario.data.employeeContribution)} • Employer seed: {currency(results?.employerContribution ?? 0)}
+                      Payroll contributions planned: {currency(scenario.data.employeeContribution)} • Employer contribution:
+                      {" "}
+                      {currency(results?.employerContribution ?? 0)}
                     </p>
-                    <p className="text-xs text-muted-foreground">Projected reserve: {currency(results?.projectedReserve ?? 0)} • Gap to target: {currency(results?.reserveShortfall ?? 0)}</p>
+                    <p className="text-xs text-muted-foreground">
+                      Projected HSA balance: {currency(results?.projectedReserve ?? 0)} • Difference from your goal:
+                      {" "}
+                      {currency(results?.reserveShortfall ?? 0)}
+                    </p>
                   </div>
                 </div>
 
@@ -394,7 +402,7 @@ export default function HSAComparison({ scenarios, onUpdateScenario, onRemoveSce
                   </div>
                   <div className="rounded-xl border border-dashed border-border/60 bg-muted/40 p-4 text-xs text-muted-foreground">
                     <p>Tax savings: {currency(results?.taxSavings ?? 0)}</p>
-                    <p>Effective cost after taxes: {currency(results?.effectiveCost ?? 0)}</p>
+                    <p>Estimated after-tax cost of the HDHP: {currency(results?.effectiveCost ?? 0)}</p>
                   </div>
                 </div>
               </div>
