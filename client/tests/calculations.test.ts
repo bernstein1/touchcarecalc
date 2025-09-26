@@ -1,30 +1,59 @@
 import { describe, it, expect } from "vitest";
 import {
   calculateHSA,
+  calculateFSA,
   calculateCommuter,
   calculateLifeInsurance,
   calculateRetirement,
-  CONTRIBUTION_LIMITS,
+  HSA_LIMITS,
+  FSA_LIMITS,
+  COMMUTER_LIMITS,
+  RETIREMENT_LIMITS,
 } from "@/lib/calculations";
 
 describe("calculator math", () => {
-  it("caps HSA contributions to the IRS limit", () => {
+  it("caps HSA contributions, applies catch-up, and surfaces premium savings", () => {
     const result = calculateHSA({
-      accountType: "hsa",
-      coverage: "individual",
-      income: 75000,
-      contribution: 10000,
-      taxBracket: 22,
+      coverage: "family",
+      age: 57,
+      employeeContribution: 9000,
+      employerSeed: 1000,
+      hdhpMonthlyPremium: 300,
+      altPlanMonthlyPremium: 500,
+      targetReserve: 6000,
+      taxBracket: 24,
     });
 
-    expect(result.actualContribution).toBe(CONTRIBUTION_LIMITS.HSA_INDIVIDUAL);
-    expect(result.taxSavings).toBeCloseTo(CONTRIBUTION_LIMITS.HSA_INDIVIDUAL * 0.22, 2);
+    expect(result.annualContributionLimit).toBe(HSA_LIMITS.family + HSA_LIMITS.catchUp);
+    expect(result.totalContribution).toBe(result.annualContributionLimit);
+    expect(result.catchUpContribution).toBe(HSA_LIMITS.catchUp);
+    expect(result.taxSavings).toBeCloseTo(result.employeeContribution * 0.24, 2);
+    expect(result.annualPremiumSavings).toBeCloseTo((500 - 300) * 12);
   });
 
   it("caps commuter transit at $315/mo", () => {
     const result = calculateCommuter({ transitCost: 500, parkingCost: 250, taxBracket: 22 });
-    expect(result.annualTransit).toBe(CONTRIBUTION_LIMITS.COMMUTER_TRANSIT * 12);
+    expect(result.annualTransit).toBe(COMMUTER_LIMITS.transit * 12);
     expect(result.totalSavings).toBeCloseTo(result.annualTransit * 0.22 + result.annualParking * 0.22, 2);
+  });
+
+  it("estimates FSA forfeiture risk with carryover and grace period protections", () => {
+    const result = calculateFSA({
+      healthElection: 3500,
+      expectedEligibleExpenses: 2800,
+      planCarryover: 500,
+      gracePeriodMonths: 2,
+      includeDependentCare: true,
+      dependentCareElection: 6000,
+      expectedDependentCareExpenses: 4000,
+      taxBracket: 24,
+    });
+
+    expect(result.cappedHealthElection).toBe(FSA_LIMITS.health);
+    expect(result.forfeitureRisk).toBeGreaterThanOrEqual(0);
+    expect(result.taxSavings).toBeCloseTo(FSA_LIMITS.health * 0.24, 2);
+    expect(result.dependentCareTaxSavings).toBeCloseTo(FSA_LIMITS.dependentCare * 0.24, 2);
+    expect(result.dependentCareForfeitureRisk).toBeCloseTo(FSA_LIMITS.dependentCare - 4000, 2);
   });
 
   it("computes DIME coverage", () => {
@@ -99,7 +128,7 @@ describe("calculator math", () => {
       bothSplitTraditional: 40,
     });
 
-    expect(result.totalContributions).toBe(30500);
+    expect(result.totalContributions).toBe(RETIREMENT_LIMITS.employee + RETIREMENT_LIMITS.catchUp);
     expect(result.totalTraditionalContributions).toBe(16700);
     expect(result.totalRothContributions).toBe(13800);
     expect(result.taxSavings).toBeCloseTo(16700 * 0.24, 0);
