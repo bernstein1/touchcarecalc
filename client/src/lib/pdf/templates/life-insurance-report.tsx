@@ -18,35 +18,40 @@ export const LifeInsuranceReport: React.FC<LifeInsuranceReportProps> = ({ data }
   return (
     <BaseDocument
       title="Life Insurance Needs Analysis Report"
-      subtitle="DIME Methodology Assessment"
+      subtitle="Plain-Language DIME Assessment"
       generatedAt={generatedAt}
     >
       {/* Executive Summary */}
       <Section title="Executive Summary">
+        <Text style={{ fontSize: 10, marginBottom: 10, color: '#374151' }}>
+          This report estimates how much life insurance could help your family stay financially secure if you were no longer
+          here. It applies the DIME method—adding together Debt, Income replacement, Mortgage payoff, and Education goals—to
+          translate insurance jargon into everyday numbers.
+        </Text>
         <MetricGrid>
           <MetricCard
             title="Recommended Coverage"
             value={results.dimeTotal}
             currency
-            description="Total DIME calculation"
+            description="Combined total of Debt, Income, Mortgage, and Education"
           />
           <MetricCard
             title="Current Coverage"
             value={inputs.currentInsurance}
             currency
-            description="Existing life insurance"
+            description="Life insurance that would pay out today"
           />
           <MetricCard
             title="Coverage Gap"
             value={results.additionalNeeded}
             currency
-            description="Additional insurance needed"
+            description="What’s still needed after subtracting current coverage"
           />
           <MetricCard
             title="Income Replacement"
             value={results.incomeReplacement}
             currency
-            description={`${inputs.incomeYears} years of income`}
+            description={`${inputs.incomeYears} years of your paycheck for your family`}
           />
         </MetricGrid>
       </Section>
@@ -56,7 +61,8 @@ export const LifeInsuranceReport: React.FC<LifeInsuranceReportProps> = ({ data }
       {/* DIME Methodology Breakdown */}
       <Section title="DIME Methodology Calculation">
         <Text style={{ fontSize: 10, marginBottom: 10, color: '#374151' }}>
-          The DIME method calculates life insurance needs based on four key financial components:
+          The DIME method is a straightforward way to estimate coverage: pay off debts, replace lost paychecks, remove housing
+          costs, and fund future schooling. The following pages walk through each piece in plain language.
         </Text>
         
         <View style={{ marginBottom: 15 }}>
@@ -65,7 +71,7 @@ export const LifeInsuranceReport: React.FC<LifeInsuranceReportProps> = ({ data }
           </Text>
           <ValueRow label="Total Outstanding Debt" value={inputs.totalDebt} currency />
           <Text style={{ fontSize: 9, marginBottom: 8, color: '#6b7280' }}>
-            Covers all existing debts to prevent burden on survivors.
+            Pays off credit cards, auto loans, student loans, and other balances so loved ones are not left with monthly bills.
           </Text>
         </View>
 
@@ -77,7 +83,7 @@ export const LifeInsuranceReport: React.FC<LifeInsuranceReportProps> = ({ data }
           <ValueRow label="Years of Coverage" value={`${inputs.incomeYears} years`} />
           <ValueRow label="Total Income Replacement" value={results.incomeReplacement} currency primary />
           <Text style={{ fontSize: 9, marginBottom: 8, color: '#6b7280' }}>
-            Replaces income to maintain family's standard of living.
+            Provides paychecks your family can rely on while they adjust, continue saving, and meet daily expenses.
           </Text>
         </View>
 
@@ -87,7 +93,7 @@ export const LifeInsuranceReport: React.FC<LifeInsuranceReportProps> = ({ data }
           </Text>
           <ValueRow label="Outstanding Mortgage Balance" value={inputs.mortgageBalance} currency />
           <Text style={{ fontSize: 9, marginBottom: 8, color: '#6b7280' }}>
-            Eliminates mortgage payments to reduce ongoing expenses.
+            Clears remaining housing loans so your household can stay in the home without a large monthly payment.
           </Text>
         </View>
 
@@ -97,7 +103,7 @@ export const LifeInsuranceReport: React.FC<LifeInsuranceReportProps> = ({ data }
           </Text>
           <ValueRow label="Future Education Costs" value={inputs.educationCosts} currency />
           <Text style={{ fontSize: 9, marginBottom: 8, color: '#6b7280' }}>
-            Ensures children's education expenses are covered.
+            Sets aside money for college, trade school, or other education goals so plans stay on track.
           </Text>
         </View>
 
@@ -110,7 +116,7 @@ export const LifeInsuranceReport: React.FC<LifeInsuranceReportProps> = ({ data }
             primary 
           />
           <Text style={{ fontSize: 8, color: '#6b7280', marginTop: 5 }}>
-            Sum of Debt + Income + Mortgage + Education
+            Sum of Debt + Income + Mortgage + Education. This is the total amount of protection the DIME method suggests.
           </Text>
         </View>
       </Section>
@@ -131,11 +137,11 @@ export const LifeInsuranceReport: React.FC<LifeInsuranceReportProps> = ({ data }
         
         <Text style={{ fontSize: 10, marginTop: 10, color: '#374151' }}>
           {results.additionalNeeded > 0 ? (
-            `You currently have a coverage gap of ${formatCurrency(results.additionalNeeded)}. Consider increasing your life insurance coverage to ensure your family's financial security.`
+            `You currently have a coverage gap of ${formatCurrency(results.additionalNeeded)}. Adding this amount of coverage would let your family pay debts, replace income, and pursue future goals without financial strain.`
           ) : results.additionalNeeded < 0 ? (
-            `You have adequate coverage with a surplus of ${formatCurrency(Math.abs(results.additionalNeeded))}. Your current coverage exceeds the calculated need.`
+            `You have a coverage surplus of ${formatCurrency(Math.abs(results.additionalNeeded))}. Your existing policies already exceed what the DIME method suggests, so you could review whether the extra protection still fits your goals.`
           ) : (
-            "Your current coverage exactly matches the calculated need based on the DIME methodology."
+            "Your current coverage matches the DIME estimate. Continue reviewing it each year or after major life changes."
           )}
         </Text>
       </Section>
@@ -149,13 +155,13 @@ export const LifeInsuranceReport: React.FC<LifeInsuranceReportProps> = ({ data }
             Term Life Insurance
           </Text>
           <Text style={{ fontSize: 9, marginBottom: 3, color: '#374151' }}>
-            • Lower premiums, temporary coverage (10-30 years)
+            • Provides coverage for a set period (commonly 10–30 years) with lower premiums.
           </Text>
           <Text style={{ fontSize: 9, marginBottom: 3, color: '#374151' }}>
-            • Ideal for covering specific time periods (mortgage, children's education)
+            • Works well for needs that end over time, such as mortgages or raising children.
           </Text>
           <Text style={{ fontSize: 9, marginBottom: 8, color: '#374151' }}>
-            • No cash value, pure insurance protection
+            • Pure protection—no savings or investment component.
           </Text>
         </View>
 
@@ -164,19 +170,19 @@ export const LifeInsuranceReport: React.FC<LifeInsuranceReportProps> = ({ data }
             Permanent Life Insurance
           </Text>
           <Text style={{ fontSize: 9, marginBottom: 3, color: '#374151' }}>
-            • Higher premiums, lifelong coverage
+            • Offers lifelong coverage with higher premiums.
           </Text>
           <Text style={{ fontSize: 9, marginBottom: 3, color: '#374151' }}>
-            • Builds cash value that can be borrowed against
+            • Builds cash value that you can borrow from or withdraw.
           </Text>
           <Text style={{ fontSize: 9, marginBottom: 8, color: '#374151' }}>
-            • Includes whole life, universal life, and variable life options
+            • Includes whole life, universal life, and variable life options.
           </Text>
         </View>
 
         <Note>
-          For most families, term life insurance provides adequate coverage at an affordable cost 
-          during the years when financial protection is most critical.
+          For most families, term life insurance delivers the most coverage for the money during the years when financial
+          protection is most critical.
         </Note>
       </Section>
 
@@ -194,35 +200,35 @@ export const LifeInsuranceReport: React.FC<LifeInsuranceReportProps> = ({ data }
               Priority: Address Coverage Gap
             </Text>
             <Text style={{ fontSize: 9, marginBottom: 3, color: '#374151' }}>
-              • Shop for additional {formatCurrency(results.additionalNeeded)} in life insurance coverage
+              • Shop for about {formatCurrency(results.additionalNeeded)} in added life insurance coverage.
             </Text>
             <Text style={{ fontSize: 9, marginBottom: 3, color: '#374151' }}>
-              • Consider term life insurance for cost-effective coverage
+              • Consider term life insurance for cost-effective coverage.
             </Text>
             <Text style={{ fontSize: 9, marginBottom: 5, color: '#374151' }}>
-              • Get quotes from multiple insurance providers
+              • Get quotes from multiple insurance providers.
             </Text>
           </View>
         )}
-        
+
         <Text style={{ fontSize: 9, marginBottom: 3, color: '#374151' }}>
-          • Review and update beneficiary designations on all policies
+          • Review and update beneficiary designations on all policies.
         </Text>
-        
+
         <Text style={{ fontSize: 9, marginBottom: 3, color: '#374151' }}>
-          • Consider the impact of inflation on future education and living costs
+          • Consider the impact of inflation on future education and living costs.
         </Text>
-        
+
         <Text style={{ fontSize: 9, marginBottom: 3, color: '#374151' }}>
-          • Evaluate employer-provided life insurance as a starting point
+          • Evaluate employer-provided life insurance as a starting point.
         </Text>
-        
+
         <Text style={{ fontSize: 9, marginBottom: 3, color: '#374151' }}>
-          • Review your coverage annually or after major life events
+          • Review your coverage annually or after major life events.
         </Text>
-        
+
         <Text style={{ fontSize: 9, color: '#374151' }}>
-          • Consult with a licensed insurance professional for personalized advice
+          • Consult with a licensed insurance professional for personalized advice.
         </Text>
       </Section>
 
@@ -231,16 +237,14 @@ export const LifeInsuranceReport: React.FC<LifeInsuranceReportProps> = ({ data }
       {/* Important Disclaimers */}
       <Section title="Important Considerations">
         <Note>
-          The DIME method provides a baseline estimate for life insurance needs. Your actual needs may 
-          vary based on factors such as existing savings, Social Security survivor benefits, spouse's 
-          income, family size, and personal financial goals. This analysis does not constitute 
-          insurance advice - please consult with qualified insurance professionals.
+          The DIME method offers a helpful baseline, but your actual needs may vary based on savings, Social Security survivor
+          benefits, your spouse’s income, family size, and personal financial goals. This report is educational—please consult a
+          licensed professional before making policy decisions.
         </Note>
-        
+
         <Text style={{ fontSize: 8, marginTop: 8, color: '#6b7280' }}>
-          Additional factors to consider: emergency fund adequacy, retirement savings goals, 
-          estate planning objectives, and potential inheritance. Life insurance needs typically 
-          decrease over time as debts are paid off and savings accumulate.
+          Also think about emergency savings, retirement accounts, estate-planning wishes, and any inheritance you expect. As
+          debts shrink and savings grow, the amount of life insurance you need often decreases.
         </Text>
       </Section>
     </BaseDocument>

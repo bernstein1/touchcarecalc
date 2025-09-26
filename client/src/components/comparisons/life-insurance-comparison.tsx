@@ -71,7 +71,10 @@ export default function LifeInsuranceComparison({ scenarios, onUpdateScenario, o
     <div className="space-y-8">
       {/* Results Comparison Table */}
       <GlassCard>
-        <h3 className="text-lg font-semibold text-foreground mb-6">DIME Analysis Results</h3>
+        <h3 className="text-lg font-semibold text-foreground mb-2">Life Insurance Estimates (DIME Method)</h3>
+        <p className="text-sm text-muted-foreground mb-4">
+          Each column shows how a scenario stacks up when you total Debt, Income replacement, Mortgage payoff, and Education goals. Use the notes beneath each metric to understand what the numbers mean for your household.
+        </p>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
@@ -88,7 +91,9 @@ export default function LifeInsuranceComparison({ scenarios, onUpdateScenario, o
               <tr className="border-b border-border">
                 <td className="p-3 font-medium text-foreground">
                   Total DIME Coverage Need
-                  <div className="text-xs text-muted-foreground font-normal">Debt + Income + Mortgage + Education</div>
+                  <div className="text-xs text-muted-foreground font-normal">
+                    Debt + Income + Mortgage + Education combined—the full amount that would keep plans on track.
+                  </div>
                 </td>
                 {scenarios.map(scenario => {
                   const result = scenarioResults[scenario.id];
@@ -106,7 +111,9 @@ export default function LifeInsuranceComparison({ scenarios, onUpdateScenario, o
               <tr className="border-b border-border">
                 <td className="p-3 font-medium text-foreground">
                   Income Replacement Value
-                  <div className="text-xs text-muted-foreground font-normal">Annual Income × Years</div>
+                  <div className="text-xs text-muted-foreground font-normal">
+                    Annual income multiplied by the years selected, representing paychecks your family would miss.
+                  </div>
                 </td>
                 {scenarios.map(scenario => {
                   const result = scenarioResults[scenario.id];
@@ -124,7 +131,9 @@ export default function LifeInsuranceComparison({ scenarios, onUpdateScenario, o
               <tr>
                 <td className="p-3 font-medium text-foreground">
                   Additional Coverage Needed
-                  <div className="text-xs text-muted-foreground font-normal">DIME Total - Current Coverage</div>
+                  <div className="text-xs text-muted-foreground font-normal">
+                    Also called the coverage gap: DIME total minus the life insurance you already carry.
+                  </div>
                 </td>
                 {scenarios.map(scenario => {
                   const result = scenarioResults[scenario.id];
@@ -166,6 +175,9 @@ export default function LifeInsuranceComparison({ scenarios, onUpdateScenario, o
                   <Trash2 size={16} />
                 </Button>
               </div>
+              <p className="text-sm text-muted-foreground">
+                Adjust the numbers below to see how this scenario changes the coverage estimate for your household.
+              </p>
 
               {/* Annual Income */}
               <div>
@@ -280,6 +292,9 @@ export default function LifeInsuranceComparison({ scenarios, onUpdateScenario, o
               {/* DIME Breakdown */}
               <div className="bg-background/50 rounded-lg p-4 space-y-2">
                 <div className="text-xs text-muted-foreground uppercase tracking-wide">DIME Breakdown</div>
+                <p className="text-xs text-muted-foreground">
+                  Adds together Debt, Income, Mortgage, and Education so you can see the story behind the total need.
+                </p>
                 <div className="space-y-1 text-sm">
                   <div className="flex justify-between">
                     <span>Debt:</span>
