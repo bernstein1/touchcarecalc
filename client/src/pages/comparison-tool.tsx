@@ -57,7 +57,7 @@ const calculatorTypes = [
     id: 'life-insurance' as const,
     name: 'Life Insurance',
     icon: Shield,
-    description: 'Compare life insurance coverage need scenarios'
+    description: 'Stack up different life insurance plans by estimating total needs with the DIME method (Debt, Income, Mortgage, Education)'
   }
 ];
 

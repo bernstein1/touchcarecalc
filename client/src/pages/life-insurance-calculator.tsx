@@ -56,7 +56,10 @@ export default function LifeInsuranceCalculator() {
             <h2 className="text-3xl font-bold text-foreground" data-testid="text-page-title">
               Life Insurance Needs Calculator
             </h2>
-            <p className="text-muted-foreground">Determine adequate coverage using DIME methodology</p>
+            <p className="text-muted-foreground">
+              Estimate how much life insurance could support your family by walking through the DIME method—adding together
+              outstanding debts, income replacement, mortgage payoff, and future education goals.
+            </p>
           </div>
         </div>
       </div>
@@ -65,7 +68,11 @@ export default function LifeInsuranceCalculator() {
         <div className="lg:col-span-2">
           <GlassCard>
             <h3 className="text-xl font-semibold text-foreground mb-6">Financial Information</h3>
-            
+            <p className="text-sm text-muted-foreground mb-8">
+              Move through each step of the DIME framework. The sliders and fields below translate complex insurance formulas
+              into everyday numbers so you can size coverage that keeps loved ones housed, educated, and financially stable.
+            </p>
+
             <div className="space-y-8">
               {/* DIME Method Inputs */}
               <div className="grid md:grid-cols-2 gap-6">
@@ -154,7 +161,10 @@ export default function LifeInsuranceCalculator() {
               {/* Additional Parameters */}
               <div className="grid md:grid-cols-2 gap-6">
                 <div>
-                  <Label className="text-sm font-medium text-foreground mb-2">Years of Income Replacement</Label>
+                  <Label className="flex items-center text-sm font-medium text-foreground mb-2">
+                    Years of Income Replacement
+                    <Tooltip content="Choose the number of years your family would need your paycheck to stay on track. Many families pick enough years to reach retirement age or until kids are financially independent." />
+                  </Label>
                   <Select value={inputs.incomeYears.toString()} onValueChange={(value) => updateInput('incomeYears', parseFloat(value))}>
                     <SelectTrigger className="glass-input" data-testid="select-income-years">
                       <SelectValue />
@@ -171,6 +181,7 @@ export default function LifeInsuranceCalculator() {
                 <div>
                   <Label className="text-sm font-medium text-foreground mb-2">
                     Current Life Insurance: ${inputs.currentInsurance.toLocaleString()}
+                    <Tooltip content="Enter the total life insurance that would pay out today, including employer plans and any personal policies. We'll subtract this amount so you only see the potential shortfall." />
                   </Label>
                   <Slider
                     value={[inputs.currentInsurance]}
@@ -208,7 +219,10 @@ export default function LifeInsuranceCalculator() {
             </div>
             <div className="space-y-4">
               <div className="flex justify-between items-center">
-                <span className="text-muted-foreground">DIME Total</span>
+                <span className="flex items-center text-muted-foreground">
+                  DIME Total
+                  <Tooltip content="This is the combined total of Debt, Income replacement, Mortgage payoff, and Education goals—the full amount that would keep your household on track." />
+                </span>
                 <span className="text-lg font-semibold text-primary" data-testid="result-dime-total">
                   ${results.dimeTotal.toLocaleString()}
                 </span>
@@ -221,11 +235,18 @@ export default function LifeInsuranceCalculator() {
               </div>
               <div className="border-t border-border pt-4">
                 <div className="flex justify-between items-center">
-                  <span className="text-foreground font-medium">Additional Needed</span>
+                  <span className="flex items-center text-foreground font-medium">
+                    Additional Needed
+                    <Tooltip content="Also called your coverage gap, this is how much more life insurance may be needed beyond what you already have to meet the DIME total." />
+                  </span>
                   <span className="text-xl font-bold text-accent" data-testid="result-additional-needed">
                     ${results.additionalNeeded.toLocaleString()}
                   </span>
                 </div>
+                <p className="text-xs text-muted-foreground mt-2">
+                  If this number is above zero, consider adding that amount of coverage so your family can pay debts, replace
+                  income, and pursue future goals without financial strain.
+                </p>
               </div>
             </div>
           </GlassCard>
@@ -235,6 +256,10 @@ export default function LifeInsuranceCalculator() {
               <Calculator className="inline mr-2" size={20} />
               DIME Breakdown
             </h3>
+            <p className="text-sm text-muted-foreground mb-4">
+              The DIME acronym stands for Debt, Income, Mortgage, and Education. Adding these building blocks together creates a
+              practical coverage estimate tailored to your household’s obligations and future plans.
+            </p>
             <div className="space-y-3 text-sm">
               <div className="flex justify-between">
                 <span className="text-muted-foreground"><strong>D</strong>ebt:</span>
@@ -278,21 +303,21 @@ export default function LifeInsuranceCalculator() {
                 <Lightbulb className="text-accent mt-1" size={16} />
                 <div>
                   <div className="font-medium text-foreground">Term vs Whole Life</div>
-                  <div className="text-xs text-muted-foreground">Consider term life for temporary needs</div>
+                  <div className="text-xs text-muted-foreground">Term life typically offers the most coverage for the lowest cost during the years your family relies on your income.</div>
                 </div>
               </div>
               <div className="flex items-start space-x-3">
                 <TrendingUp className="text-accent mt-1" size={16} />
                 <div>
                   <div className="font-medium text-foreground">Regular Reviews</div>
-                  <div className="text-xs text-muted-foreground">Update calculations annually</div>
+                  <div className="text-xs text-muted-foreground">Revisit this calculation every year or after milestones like a home purchase, new child, or job change.</div>
                 </div>
               </div>
               <div className="flex items-start space-x-3">
                 <Users className="text-accent mt-1" size={16} />
                 <div>
                   <div className="font-medium text-foreground">Professional Advice</div>
-                  <div className="text-xs text-muted-foreground">Consult with insurance professional</div>
+                  <div className="text-xs text-muted-foreground">A licensed advisor can help translate these estimates into the right policy type and coverage amount.</div>
                 </div>
               </div>
             </div>
@@ -302,10 +327,10 @@ export default function LifeInsuranceCalculator() {
             <h3 className="text-lg font-semibold text-foreground mb-4">TouchCare Coverage Guidance</h3>
             <div className="space-y-3 text-sm text-muted-foreground">
               <p>
-                The DIME framework adds together outstanding debts, income replacement, mortgage payoff, and education goals to estimate coverage. It does not consider Social Security survivor benefits, employer-provided life insurance, or unique estate planning needs.
+                The DIME framework adds together outstanding debts, income replacement, mortgage payoff, and education goals to estimate coverage. It is a starting point and does not include Social Security survivor benefits, investment assets, or estate-planning nuances.
               </p>
               <p>
-                Review beneficiaries annually and after major life events. Most households revisit coverage every 24 months or when income changes by more than 10%.
+                Review beneficiaries annually and after major life events. Many households revisit coverage every 24 months or when income changes by more than 10%.
               </p>
               <p className="text-xs text-foreground">
                 TouchCare provides educational guidance only. For policy selection or underwriting, consult a licensed insurance professional or financial advisor.
