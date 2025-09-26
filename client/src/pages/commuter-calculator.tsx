@@ -83,7 +83,7 @@ export default function CommuterCalculator() {
               <div>
                 <Label className="flex items-center text-sm font-medium text-foreground mb-4">
                   Monthly Transit Costs: ${inputs.transitCost}
-                  <Tooltip content="Include what you spend each month on eligible public transportation—subways, buses, commuter rail, ferries, and qualified employer-sponsored vanpools. Federal rules cap the tax-free benefit at $315 per month in 2025, so amounts above that limit must be paid with after-tax dollars." />
+                  <Tooltip content="Eligible expenses are the rides the IRS says count for this benefit—monthly passes, pay-per-ride fares, or employer vanpools you use to get to work. You can move up to $315 per month in 2025 from your paycheck before taxes for these costs; anything over that comes out after tax." />
                 </Label>
                 <Slider
                   value={[inputs.transitCost]}
@@ -99,7 +99,7 @@ export default function CommuterCalculator() {
                   <span>$500</span>
                 </div>
                 <div className="mt-2 text-xs text-muted-foreground">
-                  2025 Monthly Limit: $315
+                  2025 monthly limit (the most you can set aside before taxes): $315
                 </div>
               </div>
 
@@ -107,7 +107,7 @@ export default function CommuterCalculator() {
               <div>
                 <Label className="flex items-center text-sm font-medium text-foreground mb-4">
                   Monthly Parking Costs: ${inputs.parkingCost}
-                  <Tooltip content="Add the average you pay to park at or near your workplace or a transit station. The IRS allows up to $315 per month in 2025 to be excluded from taxes when the parking space is tied to your commute; general street parking or mileage reimbursement is not covered." />
+                  <Tooltip content="Eligible parking means spaces tied to getting to work, like a garage at your office or lot at the train station. In 2025 you can shield up to $315 per month from taxes for this parking; paying more than that means the extra is taxed like normal pay." />
                 </Label>
                 <Slider
                   value={[inputs.parkingCost]}
@@ -123,7 +123,7 @@ export default function CommuterCalculator() {
                   <span>$500</span>
                 </div>
                 <div className="mt-2 text-xs text-muted-foreground">
-                  2025 Monthly Limit: $315
+                  2025 monthly limit (tax-free cap): $315
                 </div>
               </div>
 
@@ -253,13 +253,21 @@ export default function CommuterCalculator() {
             <h3 className="text-lg font-semibold text-foreground mb-4">TouchCare Transit Guidance</h3>
             <div className="space-y-3 text-sm text-muted-foreground">
               <p>
-                Pre-tax commuter benefits are capped at $315 per month for transit and $315 for parking in 2025 (IRS Rev. Proc. 2024-45). Savings shown assume payroll deductions and no local taxes.
+                A monthly limit is the most you can move from your paycheck before taxes. For 2025 that limit is $315 for transit and another $315 for parking. Money above those caps still pays for your commute, it just isn’t tax-free.
               </p>
               <p>
-                Submit eligible receipts promptly—many plans require substantiation within 180 days. Parking reimbursements often cover rideshare to transit hubs but not mileage to your office.
+                Eligible expenses are the commute costs tied directly to getting to work, like transit passes, vanpools, or parking next to your job or station. Substantiation simply means showing proof—usually uploading a receipt or pass—so keep those records handy and send them in within your plan’s deadline.
               </p>
+              <div className="space-y-1">
+                <p className="font-medium text-foreground text-xs uppercase tracking-wide">Quick steps</p>
+                <ol className="list-decimal list-inside space-y-1 text-xs text-muted-foreground">
+                  <li>Estimate your average monthly transit and parking costs.</li>
+                  <li>Enroll through your employer’s commuter program and choose amounts up to the monthly limits.</li>
+                  <li>Use the benefit card or submit receipts so your expenses stay tax-free.</li>
+                </ol>
+              </div>
               <p className="text-xs text-foreground">
-                Use this illustration for planning only. Final eligibility, ordering windows, and rollover rules are determined by your employer’s plan document and local ordinances.
+                Use this illustration for planning only. Your employer’s commuter benefit rules, local taxes, and deadlines will control the final details.
               </p>
             </div>
           </GlassCard>

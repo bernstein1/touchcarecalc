@@ -51,7 +51,7 @@ const calculatorTypes = [
     id: 'commuter' as const,
     name: 'Commuter Benefits',
     icon: Bus,
-    description: 'Compare pre-tax transit and parking benefit scenarios'
+    description: 'See how pre-tax transit and parking dollars change take-home pay across commute plans'
   },
   {
     id: 'life-insurance' as const,
