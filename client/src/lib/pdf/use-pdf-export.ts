@@ -37,10 +37,10 @@ export const usePDFExport = () => {
         results,
         additionalData: {
           narrative: {
-            compatibility: `Qualified ${coverageText} HDHP coverage unlocks ${formatCurrency(results.annualContributionLimit)} of annual HSA capacity, including ${formatCurrency(results.catchUpContribution ?? 0)} in catch-up room.`,
-            employerSupport: `Employer contributions of ${formatCurrency(results.employerContribution)} combine with your payroll deferrals to reach the ${formatCurrency(inputs.targetReserve)} reserve target.`,
-            premiumOffsets: `Switching plans frees ${formatCurrency(results.annualPremiumSavings)} in annual premiums that can be redirected to the HSA.`,
-            cashflow: `Net cashflow advantage of ${formatCurrency(results.netCashflowAdvantage)} blends premium savings, employer seeding, and tax benefits to blunt deductible exposure.`
+            compatibility: `Qualified ${coverageText} high-deductible health plan (HDHP) coverage opens ${formatCurrency(results.annualContributionLimit)} of health savings account (HSA) room, including ${formatCurrency(results.catchUpContribution ?? 0)} in catch-up space once you turn 55.`,
+            employerSupport: `Employer contributions of ${formatCurrency(results.employerContribution)} combine with your paycheck deposits to build the ${formatCurrency(inputs.targetReserve)} safety cushion.`,
+            premiumOffsets: `Switching plans frees ${formatCurrency(results.annualPremiumSavings)} in yearly premiums that can move straight into the HSA.`,
+            cashflow: `After premium savings, employer help, and tax savings, you keep ${formatCurrency(results.netCashflowAdvantage)} more than the payroll contributions going out.`,
           }
         }
       };

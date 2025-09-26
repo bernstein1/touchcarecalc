@@ -18,7 +18,8 @@ export default function CalculatorHub() {
     {
       id: "hsa",
       title: "HSA Strategy Planner",
-      description: "Pair your HDHP with employer seeding, premium offsets, and a deductible reserve strategy so the account stays future-ready.",
+      description:
+        "See how a high-deductible health plan (HDHP) and health savings account (HSA) can share costs by mapping premium differences, employer contributions, and an emergency medical cushion.",
       icon: HeartPulse,
       route: "/hsa",
       analyticsId: "calculator-hsa-entry",

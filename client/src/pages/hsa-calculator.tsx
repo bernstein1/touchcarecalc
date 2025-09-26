@@ -81,9 +81,9 @@ export default function HSACalculator() {
               HSA Strategy Planner
             </h2>
             <p className="text-muted-foreground max-w-xl">
-              Map out how your high-deductible health plan and health savings account work together. HDHPs typically skip
-              copays and lean on HSA dollars to blunt the impact of higher deductibles—plan your funding so premiums and
-              reserves both pull their weight.
+              Use this guide to see how a high-deductible health plan (HDHP) works with a health savings account (HSA).
+              HDHPs usually skip copays, so you pay the early bills out of pocket. We will show how premiums, payroll
+              deposits, and any employer help can build an HSA cushion before those bills arrive.
             </p>
           </div>
         </div>
@@ -98,19 +98,20 @@ export default function HSACalculator() {
           <GlassCard className="space-y-6">
             <div className="flex items-start justify-between gap-4">
               <div>
-                <h3 className="text-xl font-semibold text-foreground">HDHP fit check</h3>
+                <h3 className="text-xl font-semibold text-foreground">Confirm HDHP eligibility</h3>
                 <p className="text-sm text-muted-foreground mt-2 leading-relaxed">
-                  Confirm the HDHP you are considering qualifies you for HSA access and captures your household needs.
-                  HDHPs trade predictable copays for lower premiums, so you want to size your HSA to catch the surprise
-                  bills.
+                  Make sure the plan you are choosing counts as an HDHP so you can fund an HSA. These plans trade
+                  predictable copays for lower premiums, so double-check that the coverage fits your household and that
+                  your HSA can handle unexpected bills.
                 </p>
               </div>
               <Tooltip
                 title="Why eligibility matters"
                 content={
                   <p>
-                    You can only fund an HSA while covered by a qualified high-deductible health plan. Coverage level and
-                    age determine your annual limit, and catch-up dollars unlock at age 55.
+                    You can only add money to an HSA while you have a qualified high-deductible health plan. The IRS sets
+                    your yearly limit by your coverage level and age, and people 55 or older can contribute an extra
+                    $1,000 catch-up amount.
                   </p>
                 }
               />
@@ -138,7 +139,7 @@ export default function HSACalculator() {
                       <div className="text-center">
                         <div className="text-primary text-xl mb-2">👤</div>
                         <div className="font-medium text-foreground">Individual</div>
-                        <div className="text-xs text-muted-foreground">Self-only HDHP</div>
+                        <div className="text-xs text-muted-foreground">Self-only HDHP coverage</div>
                       </div>
                     </Label>
                   </div>
@@ -154,7 +155,7 @@ export default function HSACalculator() {
                       <div className="text-center">
                         <div className="text-primary text-xl mb-2">👨‍👩‍👧‍👦</div>
                         <div className="font-medium text-foreground">Family</div>
-                        <div className="text-xs text-muted-foreground">Spouse and/or dependents</div>
+                        <div className="text-xs text-muted-foreground">Includes spouse and/or dependents</div>
                       </div>
                     </Label>
                   </div>
@@ -217,8 +218,8 @@ export default function HSACalculator() {
                 2025 contribution room: {formatCurrency(contributionLimit)}
               </p>
               <p className="text-muted-foreground mt-1">
-                Base limit of {formatCurrency(inputs.coverage === "family" ? HSA_LIMITS.family : HSA_LIMITS.individual)} plus
-                {inputs.age >= 55 ? "a $1,000 catch-up allowance." : "optional $1,000 catch-up once you turn 55."}
+                This includes the base limit of {formatCurrency(inputs.coverage === "family" ? HSA_LIMITS.family : HSA_LIMITS.individual)}
+                and {inputs.age >= 55 ? "a $1,000 catch-up contribution available after age 55." : "an extra $1,000 catch-up contribution once you reach age 55."}
               </p>
             </div>
           </GlassCard>
@@ -226,18 +227,18 @@ export default function HSACalculator() {
           <GlassCard className="space-y-8">
             <div className="flex items-start justify-between gap-4">
               <div>
-                <h3 className="text-xl font-semibold text-foreground">Fund your safety net</h3>
+                <h3 className="text-xl font-semibold text-foreground">Plan your HSA deposits</h3>
                 <p className="text-sm text-muted-foreground mt-2 leading-relaxed">
-                  Decide how many of your HSA dollars come from payroll vs. employer seed money. Your goal is to build a
-                  cushion that can handle the plan deductible without wrecking your cash flow.
+                  Decide how much to send from your paycheck and how much your employer adds. Together these deposits
+                  should build a cushion that can handle the plan deductible without wrecking your monthly budget.
                 </p>
               </div>
               <Tooltip
                 title="Why the slider matters"
                 content={
                   <p>
-                    Every pre-tax dollar you contribute shields income from taxes and builds the reserve you will lean on when
-                    a large bill arrives. Adjust the slider to balance take-home pay with peace of mind.
+                    Every pre-tax dollar you contribute avoids taxes today and grows the reserve you can tap when a large
+                    medical bill arrives. Adjust the slider to balance take-home pay with peace of mind.
                   </p>
                 }
               />
@@ -270,7 +271,8 @@ export default function HSACalculator() {
                   onChange={(event) => updateInput("employerSeed", Number(event.target.value) || 0)}
                 />
                 <p className="text-xs text-muted-foreground mt-2">
-                  Include any upfront seed or matching dollars that land in your HSA.
+                  Add any money your employer places in the HSA, whether it shows up at the start of the year or in
+                  matching deposits.
                 </p>
               </div>
               <div>
@@ -285,7 +287,7 @@ export default function HSACalculator() {
                   onChange={(event) => updateInput("targetReserve", Number(event.target.value) || 0)}
                 />
                 <p className="text-xs text-muted-foreground mt-2">
-                  Aim for your HDHP deductible or the amount that lets you sleep at night.
+                  Aim for an amount that covers your HDHP deductible or whatever balance would let you sleep at night.
                 </p>
               </div>
             </div>
@@ -294,18 +296,18 @@ export default function HSACalculator() {
           <GlassCard className="space-y-6">
             <div className="flex items-start justify-between gap-4">
               <div>
-                <h3 className="text-xl font-semibold text-foreground">Compare premiums</h3>
+                <h3 className="text-xl font-semibold text-foreground">Compare monthly premiums</h3>
                 <p className="text-sm text-muted-foreground mt-2 leading-relaxed">
-                  Stack the HDHP premium against the copay-friendly plan you are replacing. Premium savings are the cash
-                  stream you redirect toward funding the higher deductible.
+                  Stack the HDHP premium against the copay-friendly plan you are replacing. The monthly difference becomes
+                  the cash you can redirect into the HSA for future medical bills.
                 </p>
               </div>
               <Tooltip
                 title="Premium comparison"
                 content={
                   <p>
-                    HDHP premiums are typically lower each month. Multiply that gap by twelve to see how much budget you free
-                    up to send into your HSA.
+                    HDHP premiums are typically lower each month. Multiply that gap by twelve to see how much money you free
+                    up to send into your HSA for medical expenses.
                   </p>
                 }
               />
@@ -354,21 +356,22 @@ export default function HSACalculator() {
                 <p className="text-sm text-muted-foreground">Annual premium savings redirected</p>
                 <p className="text-2xl font-bold text-primary">{formatCurrency(premiumDifference)}</p>
                 <p className="text-xs text-muted-foreground mt-1">
-                  Difference between your HDHP and alternative plan premiums for the full year.
+                  Total yearly difference between your HDHP premium and the alternative plan premium.
                 </p>
               </div>
               <div className="rounded-xl border border-emerald-300/40 bg-emerald-500/10 p-4">
                 <p className="text-sm text-muted-foreground">Projected HSA reserve after contributions</p>
                 <p className="text-2xl font-bold text-emerald-500">{formatCurrency(reserveProgress)}</p>
                 <p className="text-xs text-muted-foreground mt-1">
-                  Employer dollars plus your pre-tax contributions available for medical surprises.
+                  Employer contributions plus your pre-tax deposits available to handle medical surprises.
                 </p>
               </div>
               <div className="rounded-xl border border-border p-4">
                 <p className="text-sm text-muted-foreground">Net cashflow advantage</p>
                 <p className="text-2xl font-bold text-foreground">{formatCurrency(results.netCashflowAdvantage)}</p>
                 <p className="text-xs text-muted-foreground mt-1">
-                  Premium savings + employer seed + tax savings − your payroll contributions.
+                  The amount you keep after combining premium savings, employer contributions, and tax savings, then
+                  subtracting your payroll deposits.
                 </p>
               </div>
             </div>
@@ -388,7 +391,7 @@ export default function HSACalculator() {
           <ShowMathSection
             title="See how the dollars work"
             focusLabel="Premium savings vs. deductible readiness"
-            description="Trace how lower premiums, tax savings, and employer seed money come together to keep your HDHP affordable while you stockpile a deductible-sized buffer."
+            description="Trace how lower premiums, tax savings, and employer contributions come together to keep your HDHP affordable while you build a deductible-sized buffer."
             items={[
               {
                 label: "Annual premium gap",
@@ -405,7 +408,7 @@ export default function HSACalculator() {
               {
                 label: "Employer dollars",
                 value: formatCurrency(results.employerContribution),
-                helperText: "Seed money that immediately boosts your medical safety net.",
+                helperText: "Money your employer adds to the HSA to boost your medical safety net.",
               },
               {
                 label: "Projected reserve vs. goal",
@@ -436,7 +439,7 @@ export default function HSACalculator() {
             <p className="text-sm text-muted-foreground leading-relaxed">
               Remember: HDHPs rarely include copays for office visits or prescriptions. Expect to pay the negotiated rate
               until you hit the deductible, then lean on your HSA balance. Revisit this plan after open enrollment or if
-              your medical usage spikes mid-year.
+              your medical usage changes during the year.
             </p>
           </GlassCard>
         </div>

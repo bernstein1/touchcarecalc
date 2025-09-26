@@ -37,9 +37,9 @@ const normaliseCalculatorId = (id: CalculatorType): CalculatorId => {
 const calculatorTypes = [
   {
     id: 'hsa' as const,
-    name: 'HSA Strategy',
+    name: 'Health Savings Account (HSA)',
     icon: HeartPulse,
-    description: 'Compare HDHP premium savings and HSA reserve strategies'
+    description: 'Compare high-deductible health plan (HDHP) premiums and HSA contributions in plain dollars'
   },
   {
     id: 'fsa' as const,

@@ -32,32 +32,32 @@ export const HSAReport: React.FC<HSAReportProps> = ({ data }) => {
             title="Annual Premium Savings"
             value={results.annualPremiumSavings}
             currency
-            description="Budget freed by choosing the HDHP"
+            description="Money saved on premiums by choosing the HDHP"
           />
           <MetricCard
             title="Tax Savings"
             value={results.taxSavings}
             currency
-            description="Pre-tax payroll reduction"
+            description="Taxes avoided because HSA deposits come out before tax"
           />
           <MetricCard
             title="Total HSA Funding"
             value={results.totalContribution}
             currency
-            description="Employee and employer dollars combined"
+            description="Total HSA deposits from you and your employer"
           />
           <MetricCard
             title="Net Cashflow Advantage"
             value={results.netCashflowAdvantage}
             currency
-            description="Premium gap + seed + tax savings − payroll"
+            description="Premium savings plus employer contributions and tax savings minus your deposits"
           />
         </MetricGrid>
       </Section>
 
       <Divider />
 
-      <Section title="HDHP & Contribution Details">
+      <Section title="Plan and contribution details">
         <ValueRow label="Coverage Level" value={coverageText} />
         <ValueRow label="Participant Age" value={inputs.age} />
         <ValueRow label="Household Annual Income" value={inputs.annualIncome} currency />
@@ -70,16 +70,16 @@ export const HSAReport: React.FC<HSAReportProps> = ({ data }) => {
 
       <Divider />
 
-      <Section title="Premium Comparison & Cashflow">
+      <Section title="Premium comparison and cash flow">
         <Text style={{ fontSize: 10, marginBottom: 10, color: '#374151' }}>
-          HDHPs swap predictable copays for lower premiums. Redirect the premium gap and tax savings into the HSA so the
-          deductible is covered when claims arrive.
+          A high-deductible health plan (HDHP) trades copays for lower premiums. Redirect the premium difference and tax
+          savings into the health savings account (HSA) so the deductible is ready when medical bills show up.
         </Text>
         <ValueRow label="HDHP Monthly Premium" value={inputs.hdhpMonthlyPremium} currency />
         <ValueRow label="Alternative Plan Premium" value={inputs.altPlanMonthlyPremium} currency />
         <ValueRow label="Annual Premium Savings" value={results.annualPremiumSavings} currency primary />
         <ValueRow label="Tax Savings" value={results.taxSavings} currency />
-        <ValueRow label="Employer Seed" value={results.employerContribution} currency />
+        <ValueRow label="Employer Contribution" value={results.employerContribution} currency />
         <ValueRow label="Net Cashflow Advantage" value={results.netCashflowAdvantage} currency highlight />
       </Section>
 
@@ -87,7 +87,7 @@ export const HSAReport: React.FC<HSAReportProps> = ({ data }) => {
         <>
           <Divider />
 
-          <Section title="HDHP Narrative Highlights">
+          <Section title="Plain-language highlights">
             {talkingPoints.compatibility && (
               <Text style={{ fontSize: 9, marginBottom: 6, color: '#374151' }}>{`• ${talkingPoints.compatibility}`}</Text>
             )}
@@ -112,7 +112,7 @@ export const HSAReport: React.FC<HSAReportProps> = ({ data }) => {
         <ValueRow label="Reserve Shortfall" value={results.reserveShortfall} currency highlight />
         <Note>
           HDHPs depend on a stocked HSA to offset surprise bills. Direct premium savings into the account until the reserve
-          matches your deductible, then invest additional dollars for future medical needs.
+          matches your deductible, then invest extra dollars for future medical needs.
         </Note>
       </Section>
 

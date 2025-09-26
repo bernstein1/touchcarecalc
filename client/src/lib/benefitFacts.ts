@@ -10,9 +10,18 @@ const formatCurrency = (amount: number) => `$${amount.toLocaleString()}`;
 
 export const BENEFIT_FACTS: Record<CalculatorId, BenefitFact[]> = {
   hsa: [
-    { label: "HSA Individual Limit:", value: formatCurrency(CONTRIBUTION_LIMITS.HSA_INDIVIDUAL) },
-    { label: "HSA Family Limit:", value: formatCurrency(CONTRIBUTION_LIMITS.HSA_FAMILY) },
-    { label: "Employer seed allowed:", value: "Yes — contributions stack with payroll" },
+    {
+      label: "Individual contribution limit (2025):",
+      value: `${formatCurrency(CONTRIBUTION_LIMITS.HSA_INDIVIDUAL)} plus an extra $1,000 once you turn 55`,
+    },
+    {
+      label: "Family contribution limit (2025):",
+      value: `${formatCurrency(CONTRIBUTION_LIMITS.HSA_FAMILY)} plus the $1,000 age-55 catch-up allowance`,
+    },
+    {
+      label: "Employer contributions:",
+      value: "Allowed on top of your deposits—confirm whether the money arrives upfront or through matching",
+    },
   ],
   fsa: [
     { label: "Health FSA Limit:", value: formatCurrency(CONTRIBUTION_LIMITS.FSA) },
