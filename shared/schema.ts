@@ -20,6 +20,8 @@ export type InsertCalculationSession = z.infer<typeof insertCalculationSessionSc
 export type CalculationSession = typeof calculationSessions.$inferSelect;
 
 // Type definitions for calculator inputs and results
+export type FilingStatus = 'single' | 'marriedJoint' | 'marriedSeparate' | 'headOfHousehold';
+
 export interface HSAInputs {
   coverage: 'individual' | 'family';
   age: number;
@@ -28,11 +30,14 @@ export interface HSAInputs {
   altPlanMonthlyPremium: number;
   employerSeed: number;
   targetReserve: number;
-  taxBracket: number;
+  annualIncome: number;
+  filingStatus?: FilingStatus;
   // Legacy fields supported for backward compatibility with existing UI state
   accountType?: 'hsa' | 'fsa';
   income?: number;
   contribution?: number;
+  /** @deprecated */
+  taxBracket?: number;
 }
 
 export interface HSAResults {
@@ -46,6 +51,7 @@ export interface HSAResults {
   netCashflowAdvantage: number;
   projectedReserve: number;
   reserveShortfall: number;
+  marginalRate: number;
   // Legacy fields still consumed by the UI and reports
   actualContribution?: number;
   contributionLimit?: number;
@@ -61,7 +67,10 @@ export interface FSAInputs {
   includeDependentCare: boolean;
   dependentCareElection: number;
   expectedDependentCareExpenses: number;
-  taxBracket: number;
+  annualIncome: number;
+  filingStatus?: FilingStatus;
+  /** @deprecated */
+  taxBracket?: number;
 }
 
 export interface FSAResults {
@@ -73,12 +82,16 @@ export interface FSAResults {
   netBenefit: number;
   dependentCareTaxSavings: number;
   dependentCareForfeitureRisk: number;
+  marginalRate: number;
 }
 
 export interface CommuterInputs {
   transitCost: number;
   parkingCost: number;
-  taxBracket: number;
+  annualIncome: number;
+  filingStatus?: FilingStatus;
+  /** @deprecated */
+  taxBracket?: number;
 }
 
 export interface CommuterResults {
@@ -88,6 +101,7 @@ export interface CommuterResults {
   annualTransit: number;
   annualParking: number;
   annualTotal: number;
+  marginalRate: number;
 }
 
 export interface LifeInsuranceInputs {

@@ -106,7 +106,8 @@ export default function ComparisonTool() {
           altPlanMonthlyPremium: 520,
           employerSeed: 500,
           targetReserve: 4000,
-          taxBracket: 22
+          annualIncome: 95000,
+          filingStatus: 'single'
         };
       case 'fsa':
         return {
@@ -117,7 +118,8 @@ export default function ComparisonTool() {
           includeDependentCare: true,
           dependentCareElection: 4000,
           expectedDependentCareExpenses: 3600,
-          taxBracket: 22,
+          annualIncome: 95000,
+          filingStatus: 'single',
           expenseBuckets: {
             routineCare: 900,
             plannedProcedures: 1000,
@@ -128,7 +130,8 @@ export default function ComparisonTool() {
         return {
           transitCost: 200,
           parkingCost: 150,
-          taxBracket: 22
+          annualIncome: 95000,
+          filingStatus: 'single'
         };
       case 'life-insurance':
         return {

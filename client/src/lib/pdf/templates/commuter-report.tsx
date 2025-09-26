@@ -58,7 +58,8 @@ export const CommuterReport: React.FC<CommuterReportProps> = ({ data }) => {
         <ValueRow label="Monthly Transit Costs" value={inputs.transitCost} currency />
         <ValueRow label="Monthly Parking Costs" value={inputs.parkingCost} currency />
         <ValueRow label="Total Monthly Commute" value={inputs.transitCost + inputs.parkingCost} currency highlight />
-        <ValueRow label="Tax Bracket" value={`${inputs.taxBracket}%`} />
+        <ValueRow label="Household Annual Income" value={inputs.annualIncome} currency />
+        <ValueRow label="Marginal Tax Rate" value={`${results.marginalRate}%`} />
       </Section>
 
       <Divider />
@@ -82,11 +83,11 @@ export const CommuterReport: React.FC<CommuterReportProps> = ({ data }) => {
             primary 
           />
           <ValueRow label="Annual Transit Benefit" value={results.annualTransit} currency />
-          <ValueRow 
-            label="Annual Tax Savings ({inputs.taxBracket}%)" 
-            value={results.transitSavings} 
-            currency 
-            success 
+          <ValueRow
+            label={`Annual Tax Savings (${results.marginalRate}%)`}
+            value={results.transitSavings}
+            currency
+            success
           />
         </View>
 
@@ -103,11 +104,11 @@ export const CommuterReport: React.FC<CommuterReportProps> = ({ data }) => {
             primary 
           />
           <ValueRow label="Annual Parking Benefit" value={results.annualParking} currency />
-          <ValueRow 
-            label="Annual Tax Savings ({inputs.taxBracket}%)" 
-            value={results.parkingSavings} 
-            currency 
-            success 
+          <ValueRow
+            label={`Annual Tax Savings (${results.marginalRate}%)`}
+            value={results.parkingSavings}
+            currency
+            success
           />
         </View>
 
@@ -200,7 +201,7 @@ export const CommuterReport: React.FC<CommuterReportProps> = ({ data }) => {
         {inputs.parkingCost > 315 && (
           <Text style={{ fontSize: 9, marginBottom: 5, color: '#374151' }}>
             • Your parking costs ({formatCurrency(inputs.parkingCost)}) exceed the monthly limit. 
-            You'll save the maximum {formatCurrency((315 * (inputs.taxBracket / 100)) * 12)} annually on parking.
+            You'll save the maximum {formatCurrency((315 * (results.marginalRate / 100)) * 12)} annually on parking.
           </Text>
         )}
         

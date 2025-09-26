@@ -1,4 +1,5 @@
 import { HSAInputs, HSAResults, FSAInputs, FSAResults, CommuterInputs, CommuterResults, LifeInsuranceInputs, LifeInsuranceResults } from "@shared/schema";
+import { getMarginalTaxRate } from "@/lib/tax/brackets";
 
 // 2025 limits and thresholds
 export const HSA_LIMITS = {
@@ -35,11 +36,14 @@ export function calculateHSA(inputs: HSAInputs): HSAResults {
     altPlanMonthlyPremium,
     employerSeed,
     targetReserve,
-    taxBracket,
+    annualIncome,
+    filingStatus,
   } = inputs;
 
   const coverageLevel = coverage ?? 'individual';
   const ageValue = age ?? 0;
+
+  const marginalRate = inputs.taxBracket ?? getMarginalTaxRate(annualIncome, filingStatus);
 
   const baseLimit = coverageLevel === 'family' ? HSA_LIMITS.family : HSA_LIMITS.individual;
   const catchUpAllowance = ageValue >= 55 ? HSA_LIMITS.catchUp : 0;
@@ -56,7 +60,7 @@ export function calculateHSA(inputs: HSAInputs): HSAResults {
 
   const catchUpContribution = Math.max(Math.min(totalContribution - baseLimit, catchUpAllowance), 0);
 
-  const taxSavings = employeeContributionUsed * (taxBracket / 100);
+  const taxSavings = employeeContributionUsed * (marginalRate / 100);
   const hdhpPremium = hdhpMonthlyPremium ?? 0;
   const altPremium = altPlanMonthlyPremium ?? hdhpPremium;
   const annualPremiumSavings = (altPremium - hdhpPremium) * 12;
@@ -77,6 +81,7 @@ export function calculateHSA(inputs: HSAInputs): HSAResults {
     netCashflowAdvantage,
     projectedReserve,
     reserveShortfall,
+    marginalRate,
     actualContribution: totalContribution,
     contributionLimit: annualContributionLimit,
     effectiveCost: employeeContributionUsed - taxSavings,
@@ -93,8 +98,11 @@ export function calculateFSA(inputs: FSAInputs): FSAResults {
     includeDependentCare,
     dependentCareElection,
     expectedDependentCareExpenses,
-    taxBracket,
+    annualIncome,
+    filingStatus,
   } = inputs;
+
+  const marginalRate = inputs.taxBracket ?? getMarginalTaxRate(annualIncome, filingStatus);
 
   const cappedHealthElection = Math.min(Math.max(healthElection, 0), FSA_LIMITS.health);
 
@@ -108,7 +116,7 @@ export function calculateFSA(inputs: FSAInputs): FSAResults {
   const carryoverProtected = Math.min(Math.max(planCarryover, 0), Math.max(cappedHealthElection - expectedUtilization, 0));
   const forfeitureRisk = Math.max(cappedHealthElection - expectedUtilization - carryoverProtected, 0);
 
-  const taxSavings = cappedHealthElection * (taxBracket / 100);
+  const taxSavings = cappedHealthElection * (marginalRate / 100);
   const netBenefit = taxSavings - forfeitureRisk;
 
   let dependentCareTaxSavings = 0;
@@ -118,7 +126,7 @@ export function calculateFSA(inputs: FSAInputs): FSAResults {
     const cappedDependentCareElection = Math.min(Math.max(dependentCareElection, 0), FSA_LIMITS.dependentCare);
     const dependentCareUtilization = Math.min(cappedDependentCareElection, Math.max(expectedDependentCareExpenses, 0));
     dependentCareForfeitureRisk = Math.max(cappedDependentCareElection - dependentCareUtilization, 0);
-    dependentCareTaxSavings = cappedDependentCareElection * (taxBracket / 100);
+    dependentCareTaxSavings = cappedDependentCareElection * (marginalRate / 100);
   }
 
   return {
@@ -130,23 +138,26 @@ export function calculateFSA(inputs: FSAInputs): FSAResults {
     netBenefit,
     dependentCareTaxSavings,
     dependentCareForfeitureRisk,
+    marginalRate,
   };
 }
 
 export function calculateCommuter(inputs: CommuterInputs): CommuterResults {
-  const { transitCost, parkingCost, taxBracket } = inputs;
+  const { transitCost, parkingCost, annualIncome, filingStatus } = inputs;
+
+  const marginalRate = inputs.taxBracket ?? getMarginalTaxRate(annualIncome, filingStatus);
 
   const actualTransit = Math.min(transitCost, COMMUTER_LIMITS.transit);
   const actualParking = Math.min(parkingCost, COMMUTER_LIMITS.parking);
-  
+
   const annualTransit = actualTransit * 12;
   const annualParking = actualParking * 12;
   const annualTotal = annualTransit + annualParking;
-  
-  const transitSavings = annualTransit * (taxBracket / 100);
-  const parkingSavings = annualParking * (taxBracket / 100);
+
+  const transitSavings = annualTransit * (marginalRate / 100);
+  const parkingSavings = annualParking * (marginalRate / 100);
   const totalSavings = transitSavings + parkingSavings;
-  
+
   return {
     transitSavings,
     parkingSavings,
@@ -154,6 +165,7 @@ export function calculateCommuter(inputs: CommuterInputs): CommuterResults {
     annualTransit,
     annualParking,
     annualTotal,
+    marginalRate,
   };
 }
 

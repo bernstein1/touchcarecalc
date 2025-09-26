@@ -60,7 +60,8 @@ export const FSAReport: React.FC<FSAReportProps> = ({ data }) => {
         <ValueRow label="Expected Eligible Expenses" value={inputs.expectedEligibleExpenses} currency />
         <ValueRow label="Carryover Allowance" value={inputs.planCarryover} currency />
         <ValueRow label="Grace Period" value={`${inputs.gracePeriodMonths.toFixed(1)} months`} />
-        <ValueRow label="Marginal Tax Rate" value={`${inputs.taxBracket}%`} />
+        <ValueRow label="Household Annual Income" value={inputs.annualIncome} currency />
+        <ValueRow label="Marginal Tax Rate" value={`${results.marginalRate}%`} />
         <ValueRow label="Dependent-care Included" value={inputs.includeDependentCare ? 'Yes' : 'No'} />
         {inputs.includeDependentCare ? (
           <>

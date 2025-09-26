@@ -5,12 +5,14 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import GlassCard from "@/components/glass-card";
 import Tooltip from "@/components/tooltip";
 import DecisionSlider from "@/components/calculators/decision-slider";
 import ShowMathSection from "@/components/calculators/show-math";
 import { calculateFSA, FSA_LIMITS } from "@/lib/calculations";
-import { FSAInputs, FSAResults } from "@shared/schema";
+import { getMarginalTaxRate, describeFilingStatus } from "@/lib/tax/brackets";
+import { FSAInputs, FSAResults, FilingStatus } from "@shared/schema";
 import { usePDFExport } from "@/lib/pdf/use-pdf-export";
 
 const DEFAULT_INPUTS: FSAInputs = {
@@ -21,8 +23,16 @@ const DEFAULT_INPUTS: FSAInputs = {
   includeDependentCare: true,
   dependentCareElection: 4000,
   expectedDependentCareExpenses: 3600,
-  taxBracket: 22,
+  annualIncome: 85000,
+  filingStatus: "single",
 };
+
+const FILING_STATUS_OPTIONS: { value: FilingStatus; label: string }[] = [
+  { value: "single", label: describeFilingStatus("single") },
+  { value: "marriedJoint", label: describeFilingStatus("marriedJoint") },
+  { value: "marriedSeparate", label: describeFilingStatus("marriedSeparate") },
+  { value: "headOfHousehold", label: describeFilingStatus("headOfHousehold") },
+];
 
 const currency = (value: number) => `$${Math.round(value).toLocaleString()}`;
 
@@ -38,6 +48,7 @@ export default function FSACalculator() {
   }, [inputs]);
 
   const carryoverCeiling = useMemo(() => Math.min(inputs.planCarryover, inputs.healthElection), [inputs.planCarryover, inputs.healthElection]);
+  const marginalRate = results.marginalRate ?? getMarginalTaxRate(inputs.annualIncome, inputs.filingStatus);
 
   const updateInput = <K extends keyof FSAInputs>(key: K, value: FSAInputs[K]) => {
     setInputs(prev => ({ ...prev, [key]: value }));
@@ -127,18 +138,40 @@ export default function FSACalculator() {
 
               <div className="space-y-4">
                 <div>
-                  <Label htmlFor="tax-rate" className="text-sm font-medium text-foreground mb-2">
-                    Marginal tax rate (%)
+                  <Label htmlFor="annual-income" className="text-sm font-medium text-foreground mb-2">
+                    Household annual income
                   </Label>
                   <Input
-                    id="tax-rate"
+                    id="annual-income"
                     type="number"
                     min={0}
-                    max={50}
-                    value={inputs.taxBracket}
-                    onChange={(event) => updateInput("taxBracket", Number(event.target.value) || 0)}
+                    value={inputs.annualIncome}
+                    onChange={(event) => updateInput("annualIncome", Number(event.target.value) || 0)}
                   />
                 </div>
+
+                <div>
+                  <Label className="text-sm font-medium text-foreground mb-2">Filing status</Label>
+                  <Select
+                    value={inputs.filingStatus ?? "single"}
+                    onValueChange={(value: FilingStatus) => updateInput("filingStatus", value)}
+                  >
+                    <SelectTrigger className="glass-input">
+                      <SelectValue placeholder="Select filing status" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {FILING_STATUS_OPTIONS.map(option => (
+                        <SelectItem key={option.value} value={option.value}>
+                          {option.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <p className="text-xs text-muted-foreground">
+                  Estimated marginal tax rate: <span className="font-semibold text-foreground">{marginalRate}%</span>
+                </p>
 
                 <div>
                   <Label className="text-sm font-medium text-foreground mb-2">Carryover or grace period</Label>

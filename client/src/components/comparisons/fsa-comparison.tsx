@@ -9,9 +9,17 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import GlassCard from "@/components/glass-card";
 import Tooltip from "@/components/tooltip";
 import { calculateFSA, FSA_LIMITS } from "@/lib/calculations";
-import type { FSAInputs, FSAResults } from "@shared/schema";
+import { describeFilingStatus } from "@/lib/tax/brackets";
+import type { FilingStatus, FSAInputs, FSAResults } from "@shared/schema";
 
 const currency = (value: number) => `$${Math.round(value).toLocaleString()}`;
+
+const FILING_STATUS_OPTIONS: { value: FilingStatus; label: string }[] = [
+  { value: "single", label: describeFilingStatus("single") },
+  { value: "marriedJoint", label: describeFilingStatus("marriedJoint") },
+  { value: "marriedSeparate", label: describeFilingStatus("marriedSeparate") },
+  { value: "headOfHousehold", label: describeFilingStatus("headOfHousehold") },
+];
 
 type ExpenseBucketKey = "routineCare" | "plannedProcedures" | "pharmacy";
 
@@ -351,25 +359,37 @@ export default function FSAComparison({ scenarios, onUpdateScenario, onRemoveSce
                 </div>
 
                 <div className="grid gap-4">
-                  <div>
-                    <Label className="text-sm font-medium text-foreground">Marginal tax rate</Label>
-                    <Select
-                      value={scenario.data.taxBracket.toString()}
-                      onValueChange={(value) => updateScenario(scenario.id, { taxBracket: parseFloat(value) })}
-                    >
-                      <SelectTrigger className="glass-input">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="10">10% - Income up to $11,000</SelectItem>
-                        <SelectItem value="12">12% - Income $11,000 - $44,725</SelectItem>
-                        <SelectItem value="22">22% - Income $44,725 - $95,375</SelectItem>
-                        <SelectItem value="24">24% - Income $95,375 - $182,050</SelectItem>
-                        <SelectItem value="32">32% - Income $182,050 - $231,250</SelectItem>
-                        <SelectItem value="35">35% - Income $231,250 - $578,125</SelectItem>
-                        <SelectItem value="37">37% - Income over $578,125</SelectItem>
-                      </SelectContent>
-                    </Select>
+                  <div className="space-y-3">
+                    <div>
+                      <Label className="text-sm font-medium text-foreground">Household annual income</Label>
+                      <Input
+                        type="number"
+                        min={0}
+                        value={scenario.data.annualIncome}
+                        onChange={(event) => updateScenario(scenario.id, { annualIncome: Number(event.target.value) || 0 })}
+                      />
+                    </div>
+                    <div>
+                      <Label className="text-sm font-medium text-foreground">Filing status</Label>
+                      <Select
+                        value={scenario.data.filingStatus ?? 'single'}
+                        onValueChange={(value: FilingStatus) => updateScenario(scenario.id, { filingStatus: value })}
+                      >
+                        <SelectTrigger className="glass-input">
+                          <SelectValue placeholder="Select filing status" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {FILING_STATUS_OPTIONS.map(option => (
+                            <SelectItem key={option.value} value={option.value}>
+                              {option.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      Estimated marginal tax rate: <span className="font-semibold text-foreground">{scenarioResults[scenario.id]?.marginalRate ?? 0}%</span>
+                    </p>
                   </div>
 
                   <div className="rounded-xl border border-border/60 p-4 space-y-3">

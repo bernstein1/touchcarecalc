@@ -60,7 +60,8 @@ export const HSAReport: React.FC<HSAReportProps> = ({ data }) => {
       <Section title="HDHP & Contribution Details">
         <ValueRow label="Coverage Level" value={coverageText} />
         <ValueRow label="Participant Age" value={inputs.age} />
-        <ValueRow label="Marginal Tax Rate" value={`${inputs.taxBracket}%`} />
+        <ValueRow label="Household Annual Income" value={inputs.annualIncome} currency />
+        <ValueRow label="Marginal Tax Rate" value={`${results.marginalRate}%`} />
         <ValueRow label="2025 Contribution Limit" value={results.annualContributionLimit} currency highlight />
         <ValueRow label="Employee Contribution" value={results.employeeContribution} currency />
         <ValueRow label="Employer Contribution" value={results.employerContribution} currency />
