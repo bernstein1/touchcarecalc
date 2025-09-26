@@ -40,11 +40,11 @@ export const BENEFIT_FACTS: Record<CalculatorId, BenefitFact[]> = {
   commuter: [
     {
       label: "Transit limit (2025):",
-      value: `You can set aside up to ${formatCurrency(CONTRIBUTION_LIMITS.COMMUTER_TRANSIT)} each month before taxes for transit fares, passes, and vanpools tied to your commute`,
+      value: `Set aside up to ${formatCurrency(CONTRIBUTION_LIMITS.COMMUTER_TRANSIT)} per month pre-tax for transit fares, passes, or vanpools tied to your commute`,
     },
     {
       label: "Parking limit (2025):",
-      value: `You can also save up to ${formatCurrency(CONTRIBUTION_LIMITS.COMMUTER_PARKING)} per month before taxes for parking next to work or a transit station`,
+      value: `Save up to ${formatCurrency(CONTRIBUTION_LIMITS.COMMUTER_PARKING)} per month pre-tax for parking next to work or your transit station`,
     },
   ],
   life: [
