@@ -1,4 +1,4 @@
-import { HSAInputs, HSAResults, FSAInputs, FSAResults, CommuterInputs, CommuterResults, LifeInsuranceInputs, LifeInsuranceResults, RetirementInputs, RetirementResults } from "@shared/schema";
+import { HSAInputs, HSAResults, FSAInputs, FSAResults, CommuterInputs, CommuterResults, LifeInsuranceInputs, LifeInsuranceResults } from "@shared/schema";
 
 // 2025 limits and thresholds
 export const HSA_LIMITS = {
@@ -17,11 +17,6 @@ export const COMMUTER_LIMITS = {
   parking: 315,
 } as const;
 
-export const RETIREMENT_LIMITS = {
-  employee: 23000,
-  catchUp: 7500,
-} as const;
-
 // Backward-compatible map used by portions of the UI that still reference the consolidated constants object.
 export const CONTRIBUTION_LIMITS = {
   HSA_INDIVIDUAL: HSA_LIMITS.individual,
@@ -29,9 +24,6 @@ export const CONTRIBUTION_LIMITS = {
   FSA: FSA_LIMITS.health,
   COMMUTER_TRANSIT: COMMUTER_LIMITS.transit,
   COMMUTER_PARKING: COMMUTER_LIMITS.parking,
-  RETIREMENT_401K: RETIREMENT_LIMITS.employee,
-  RETIREMENT_401K_CATCHUP: RETIREMENT_LIMITS.catchUp,
-  RETIREMENT_TOTAL_WITH_CATCHUP: RETIREMENT_LIMITS.employee + RETIREMENT_LIMITS.catchUp,
 } as const;
 
 export function calculateHSA(inputs: HSAInputs): HSAResults {
@@ -179,120 +171,3 @@ export function calculateLifeInsurance(inputs: LifeInsuranceInputs): LifeInsuran
   };
 }
 
-export function calculateRetirement(inputs: RetirementInputs): RetirementResults {
-  const {
-    currentAge,
-    retirementAge,
-    currentSalary,
-    currentSavings,
-    employeeContribution,
-    employerMatch,
-    employerMatchCap,
-    expectedReturn,
-    salaryGrowth,
-    contributionType,
-    taxBracket,
-    bothSplitTraditional = 50
-  } = inputs;
-
-  const yearsToRetirement = retirementAge - currentAge;
-  const monthlyReturn = expectedReturn / 100 / 12;
-  // Check contribution limits
-  const baseContributionLimit = RETIREMENT_LIMITS.employee;
-  const catchUpAllowance = currentAge >= 50 ? RETIREMENT_LIMITS.catchUp : 0;
-  const contributionLimit = baseContributionLimit + catchUpAllowance;
-
-  const clampedTraditionalSplit = Math.min(Math.max(bothSplitTraditional, 0), 100) / 100;
-
-  let balance = currentSavings;
-  let totalEmployeeContributions = 0;
-  let totalEmployerContributions = 0;
-  let totalTraditionalContributions = 0;
-  let totalRothContributions = 0;
-  const yearlyProjections = [];
-
-  let currentSalaryWorking = currentSalary;
-
-  for (let year = 1; year <= yearsToRetirement; year++) {
-    // Calculate annual salary for this year
-    const yearlyGrowthRate = salaryGrowth / 100;
-    currentSalaryWorking = currentSalaryWorking * (1 + yearlyGrowthRate);
-    
-    // Calculate employee contribution
-    const employeeContribAnnual = Math.min(
-      (employeeContribution / 100) * currentSalaryWorking,
-      contributionLimit
-    );
-
-    let traditionalContribution = 0;
-    let rothContribution = 0;
-
-    if (contributionType === 'traditional') {
-      traditionalContribution = employeeContribAnnual;
-    } else if (contributionType === 'roth') {
-      rothContribution = employeeContribAnnual;
-    } else {
-      const basePortion = Math.min(employeeContribAnnual, baseContributionLimit);
-      const catchUpPortion = Math.min(Math.max(employeeContribAnnual - baseContributionLimit, 0), catchUpAllowance);
-      const baseTraditional = basePortion * clampedTraditionalSplit;
-      traditionalContribution = baseTraditional + catchUpPortion;
-      rothContribution = Math.max(employeeContribAnnual - traditionalContribution, 0);
-    }
-
-    // Calculate employer match
-    const matchPercentage = Math.min(employeeContribution, employerMatchCap);
-    const employerContribAnnual = (matchPercentage / 100) * currentSalaryWorking * (employerMatch / 100);
-
-    const totalAnnualContrib = employeeContribAnnual + employerContribAnnual;
-    
-    // Calculate tax savings for traditional contributions
-    const annualTaxSavings = traditionalContribution > 0
-      ? traditionalContribution * (taxBracket / 100)
-      : 0;
-
-    // Calculate balance growth with monthly compounding
-    let yearEndBalance = balance;
-    const monthlyContrib = totalAnnualContrib / 12;
-
-    for (let month = 1; month <= 12; month++) {
-      yearEndBalance = yearEndBalance * (1 + monthlyReturn) + monthlyContrib;
-    }
-    
-    balance = yearEndBalance;
-    totalEmployeeContributions += employeeContribAnnual;
-    totalEmployerContributions += employerContribAnnual;
-    totalTraditionalContributions += traditionalContribution;
-    totalRothContributions += rothContribution;
-
-    yearlyProjections.push({
-      year,
-      age: currentAge + year,
-      salary: Math.round(currentSalaryWorking),
-      employeeContribution: Math.round(employeeContribAnnual),
-      employerContribution: Math.round(employerContribAnnual),
-      totalContribution: Math.round(totalAnnualContrib),
-      balance: Math.round(balance),
-      taxSavings: Math.round(annualTaxSavings),
-      traditionalContribution: Math.round(traditionalContribution),
-      rothContribution: Math.round(rothContribution)
-    });
-  }
-
-  const totalTaxSavings = yearlyProjections.reduce((sum, projection) => sum + projection.taxSavings, 0);
-  const investmentGrowth = balance - currentSavings - totalEmployeeContributions - totalEmployerContributions;
-  const monthlyContribution = yearsToRetirement > 0
-    ? totalEmployeeContributions / 12 / yearsToRetirement
-    : 0;
-  
-  return {
-    finalBalance: Math.round(balance),
-    totalContributions: Math.round(totalEmployeeContributions),
-    employerContributions: Math.round(totalEmployerContributions),
-    totalTraditionalContributions: Math.round(totalTraditionalContributions),
-    totalRothContributions: Math.round(totalRothContributions),
-    investmentGrowth: Math.round(investmentGrowth),
-    monthlyContribution: Math.round(monthlyContribution),
-    yearlyProjections,
-    taxSavings: Math.round(totalTaxSavings)
-  };
-}

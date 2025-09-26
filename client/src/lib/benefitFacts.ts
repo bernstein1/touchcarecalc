@@ -27,8 +27,4 @@ export const BENEFIT_FACTS: Record<CalculatorId, BenefitFact[]> = {
     { label: "Income Replacement:", value: "10-15x Annual" },
     { label: "Method:", value: "DIME Analysis" },
   ],
-  retirement: [
-    { label: "2025 Limit:", value: formatCurrency(CONTRIBUTION_LIMITS.RETIREMENT_401K) },
-    { label: "50+ Catch-up:", value: formatCurrency(CONTRIBUTION_LIMITS.RETIREMENT_TOTAL_WITH_CATCHUP) },
-  ],
 };

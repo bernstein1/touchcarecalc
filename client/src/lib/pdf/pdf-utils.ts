@@ -8,12 +8,10 @@ import {
   CommuterInputs,
   CommuterResults,
   LifeInsuranceInputs,
-  LifeInsuranceResults,
-  RetirementInputs,
-  RetirementResults
+  LifeInsuranceResults
 } from '@shared/schema';
 
-export type ReportType = 'hsa' | 'fsa' | 'commuter' | 'life-insurance' | 'retirement' | 'comparison';
+export type ReportType = 'hsa' | 'fsa' | 'commuter' | 'life-insurance' | 'comparison';
 
 export interface PDFReportData {
   type: ReportType;
@@ -28,7 +26,7 @@ export interface ComparisonReportData {
   type: 'comparison';
   title: string;
   generatedAt: Date;
-  calculatorType: string;
+  calculatorType: 'hsa' | 'fsa' | 'commuter' | 'life-insurance';
   scenarios: Array<{
     name: string;
     inputs: any;

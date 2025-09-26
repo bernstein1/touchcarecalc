@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ArrowLeft, Plus, GitCompare, HeartPulse, ClipboardList, Bus, Shield, TrendingUp, Download } from "lucide-react";
+import { ArrowLeft, Plus, GitCompare, HeartPulse, ClipboardList, Bus, Shield, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
@@ -9,12 +9,11 @@ import HSAComparison from "@/components/comparisons/hsa-comparison";
 import FSAComparison from "@/components/comparisons/fsa-comparison";
 import CommuterComparison from "@/components/comparisons/commuter-comparison";
 import LifeInsuranceComparison from "@/components/comparisons/life-insurance-comparison";
-import RetirementComparison from "@/components/comparisons/retirement-comparison";
 import { useLocation } from "wouter";
 import { usePDFExport } from "@/lib/pdf/use-pdf-export";
 import { CALCULATOR_THEME, type CalculatorId } from "@/lib/calculatorTheme";
 
-type CalculatorType = 'hsa' | 'fsa' | 'commuter' | 'life-insurance' | 'retirement';
+type CalculatorType = 'hsa' | 'fsa' | 'commuter' | 'life-insurance';
 type Scenario = {
   id: string;
   name: string;
@@ -32,8 +31,6 @@ const normaliseCalculatorId = (id: CalculatorType): CalculatorId => {
       return "fsa";
     case "commuter":
       return "commuter";
-    case "retirement":
-      return "retirement";
   }
 };
 
@@ -61,12 +58,6 @@ const calculatorTypes = [
     name: 'Life Insurance',
     icon: Shield,
     description: 'Compare life insurance coverage need scenarios'
-  },
-  {
-    id: 'retirement' as const,
-    name: '401(k) Retirement',
-    icon: TrendingUp,
-    description: 'Compare retirement planning scenarios'
   }
 ];
 
@@ -147,21 +138,6 @@ export default function ComparisonTool() {
           educationCosts: 100000,
           incomeYears: 10,
           currentInsurance: 100000
-        };
-      case 'retirement':
-        return {
-          currentAge: 30,
-          retirementAge: 65,
-          currentSalary: 75000,
-          currentSavings: 25000,
-          employeeContribution: 10,
-          employerMatch: 100,
-          employerMatchCap: 6,
-          expectedReturn: 7,
-          salaryGrowth: 3,
-          contributionType: 'traditional',
-          taxBracket: 22,
-          bothSplitTraditional: 50
         };
       default:
         return {};
@@ -364,16 +340,8 @@ export default function ComparisonTool() {
               )}
               
               {selectedCalculator === 'life-insurance' && (
-                <LifeInsuranceComparison 
-                  scenarios={scenarios} 
-                  onUpdateScenario={handleUpdateScenario}
-                  onRemoveScenario={handleRemoveScenario}
-                />
-              )}
-              
-              {selectedCalculator === 'retirement' && (
-                <RetirementComparison 
-                  scenarios={scenarios} 
+                <LifeInsuranceComparison
+                  scenarios={scenarios}
                   onUpdateScenario={handleUpdateScenario}
                   onRemoveScenario={handleRemoveScenario}
                 />

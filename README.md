@@ -1,6 +1,6 @@
 # TouchCare Benefits Calculator
 
-A marketing-ready web experience for TouchCare clients and prospects to explore HSA/FSA, commuter, life insurance, and retirement benefits. The project runs as a Vite-powered React SPA with optional serverless endpoints for persisting calculator sessions.
+A marketing-ready web experience for TouchCare clients and prospects to explore HSA/FSA, commuter, and life insurance benefits. The project runs as a Vite-powered React SPA with optional serverless endpoints for persisting calculator sessions.
 
 ## Features
 

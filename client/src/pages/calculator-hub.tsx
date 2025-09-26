@@ -1,4 +1,4 @@
-import { HeartPulse, ClipboardList, Bus, Shield, TrendingUp } from "lucide-react";
+import { HeartPulse, ClipboardList, Bus, Shield } from "lucide-react";
 import GlassCard from "@/components/glass-card";
 import { useLocation } from "wouter";
 import { CALCULATOR_THEME, type CalculatorId } from "@/lib/calculatorTheme";
@@ -46,14 +46,6 @@ export default function CalculatorHub() {
       icon: Shield,
       route: "/life-insurance",
       analyticsId: "calculator-life-entry",
-    },
-    {
-      id: "retirement",
-      title: "401(k) Retirement",
-      description: "Plan your retirement with compound interest projections and employer matching calculations.",
-      icon: TrendingUp,
-      route: "/retirement",
-      analyticsId: "calculator-retirement-entry",
     },
   ];
 
