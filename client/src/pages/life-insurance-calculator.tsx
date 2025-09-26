@@ -78,7 +78,7 @@ export default function LifeInsuranceCalculator() {
                   <Slider
                     value={[inputs.totalDebt]}
                     onValueChange={(value) => updateInput('totalDebt', value[0])}
-                    max={2000000}
+                    max={5000000}
                     min={0}
                     step={5000}
                     className="w-full"
@@ -117,7 +117,7 @@ export default function LifeInsuranceCalculator() {
                   <Slider
                     value={[inputs.mortgageBalance]}
                     onValueChange={(value) => updateInput('mortgageBalance', value[0])}
-                    max={2000000}
+                    max={5000000}
                     min={0}
                     step={5000}
                     className="w-full"

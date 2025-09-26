@@ -68,4 +68,21 @@ describe("calculator math", () => {
     expect(result.additionalNeeded).toBeGreaterThan(0);
   });
 
+  it("handles high debt and mortgage balances up to $5M", () => {
+    const result = calculateLifeInsurance({
+      totalDebt: 5_000_000,
+      income: 120000,
+      mortgageBalance: 5_000_000,
+      educationCosts: 250000,
+      incomeYears: 15,
+      currentInsurance: 500000,
+    });
+
+    const expectedIncomeReplacement = 120000 * 15;
+    const expectedDimeTotal = 5_000_000 + expectedIncomeReplacement + 5_000_000 + 250000;
+
+    expect(result.dimeTotal).toBe(expectedDimeTotal);
+    expect(result.additionalNeeded).toBe(expectedDimeTotal - 500000);
+  });
+
 });
