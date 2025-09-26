@@ -77,6 +77,21 @@ export const ComparisonReport: React.FC<ComparisonReportProps> = ({ data }) => {
                 <ValueRow label="Annual Contribution" value={hsaResults.totalContribution ?? hsaResults.actualContribution ?? 0} currency />
                 <ValueRow label="Tax Savings" value={hsaResults.taxSavings} currency success />
                 <ValueRow label="Effective Cost" value={hsaResults.effectiveCost ?? 0} currency primary />
+                <ValueRow label="Current HSA Balance" value={hsaResults.startingBalance ?? 0} currency />
+                <ValueRow label="Balance Counted Toward Reserve" value={hsaResults.appliedCurrentBalance ?? 0} currency />
+                <ValueRow
+                  label="Applying Existing Balance"
+                  value={(scenario.inputs.useCurrentBalance ?? true) ? 'Yes' : 'No'}
+                  highlight={!(scenario.inputs.useCurrentBalance ?? true) && (hsaResults.startingBalance ?? 0) > 0}
+                />
+                <ValueRow label="Projected Reserve (with current balance)" value={hsaResults.projectedReserve} currency />
+                <ValueRow
+                  label={hsaResults.reserveShortfall === 0 && (scenario.inputs.targetReserve ?? 0) > 0 ? 'Reserve Status' : 'Reserve Shortfall'}
+                  value={hsaResults.reserveShortfall === 0 && (scenario.inputs.targetReserve ?? 0) > 0 ? 'Goal met' : hsaResults.reserveShortfall}
+                  currency={!(hsaResults.reserveShortfall === 0 && (scenario.inputs.targetReserve ?? 0) > 0)}
+                  success={hsaResults.reserveShortfall === 0 && (scenario.inputs.targetReserve ?? 0) > 0}
+                  highlight={hsaResults.reserveShortfall > 0}
+                />
               </View>
             );
           })}

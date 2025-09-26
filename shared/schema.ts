@@ -30,6 +30,8 @@ export interface HSAInputs {
   altPlanMonthlyPremium: number;
   employerSeed: number;
   targetReserve: number;
+  currentBalance: number;
+  useCurrentBalance?: boolean;
   annualIncome: number;
   filingStatus?: FilingStatus;
   // Legacy fields supported for backward compatibility with existing UI state
@@ -51,6 +53,8 @@ export interface HSAResults {
   netCashflowAdvantage: number;
   projectedReserve: number;
   reserveShortfall: number;
+  startingBalance: number;
+  appliedCurrentBalance: number;
   marginalRate: number;
   // Legacy fields still consumed by the UI and reports
   actualContribution?: number;
