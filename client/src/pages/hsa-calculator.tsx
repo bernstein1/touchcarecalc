@@ -3,6 +3,7 @@ import { ArrowLeft, Calculator, Download, PiggyBank } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import GlassCard from "@/components/glass-card";
@@ -24,6 +25,8 @@ const DEFAULT_INPUTS: HSAInputs = {
   altPlanMonthlyPremium: 515,
   employerSeed: 750,
   targetReserve: 4000,
+  currentBalance: 1200,
+  useCurrentBalance: true,
   annualIncome: 85000,
   filingStatus: "single",
 };
@@ -63,6 +66,9 @@ export default function HSACalculator() {
 
   const premiumDifference = results.annualPremiumSavings;
   const reserveProgress = results.projectedReserve;
+  const balanceApplied = results.appliedCurrentBalance ?? 0;
+  const usingCurrentBalance = inputs.useCurrentBalance ?? true;
+  const reserveSatisfied = (inputs.targetReserve ?? 0) > 0 && results.reserveShortfall === 0;
 
   return (
     <div className="space-y-8" data-analytics-id="page-hsa-calculator">
@@ -290,6 +296,33 @@ export default function HSACalculator() {
                   Aim for an amount that covers your HDHP deductible or whatever balance would let you sleep at night.
                 </p>
               </div>
+              <div className="md:col-span-2 space-y-3">
+                <div>
+                  <Label htmlFor="current-balance" className="text-sm font-medium text-foreground mb-2">
+                    Current HSA balance available today
+                  </Label>
+                  <Input
+                    id="current-balance"
+                    type="number"
+                    min={0}
+                    value={inputs.currentBalance}
+                    onChange={(event) => updateInput("currentBalance", Number(event.target.value) || 0)}
+                  />
+                </div>
+                <div className="flex items-center justify-between gap-3 rounded-lg border border-border/60 bg-muted/20 px-4 py-3">
+                  <div>
+                    <p className="text-sm font-medium text-foreground">Count existing balance toward the reserve?</p>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Turn this off if you want to keep current HSA dollars invested or earmarked for other expenses.
+                    </p>
+                  </div>
+                  <Switch
+                    checked={usingCurrentBalance}
+                    onCheckedChange={(checked) => updateInput("useCurrentBalance", checked)}
+                    aria-label="Toggle applying current HSA balance"
+                  />
+                </div>
+              </div>
             </div>
           </GlassCard>
 
@@ -360,10 +393,17 @@ export default function HSACalculator() {
                 </p>
               </div>
               <div className="rounded-xl border border-emerald-300/40 bg-emerald-500/10 p-4">
-                <p className="text-sm text-muted-foreground">Projected HSA reserve after contributions</p>
+                <p className="text-sm text-muted-foreground">Projected HSA reserve ready for claims</p>
                 <p className="text-2xl font-bold text-emerald-500">{formatCurrency(reserveProgress)}</p>
                 <p className="text-xs text-muted-foreground mt-1">
-                  Employer contributions plus your pre-tax deposits available to handle medical surprises.
+                  {balanceApplied > 0
+                    ? `Includes ${formatCurrency(balanceApplied)} already in your HSA plus this year's contributions.`
+                    : !usingCurrentBalance
+                      ? "You are preserving the existing balance, so this projection reflects only new deposits."
+                      : "Builds entirely from this year's contributions."}
+                  {reserveSatisfied
+                    ? ` You already meet your ${formatCurrency(inputs.targetReserve ?? 0)} reserve target.`
+                    : ""}
                 </p>
               </div>
               <div className="rounded-xl border border-border p-4">
@@ -411,13 +451,31 @@ export default function HSACalculator() {
                 helperText: "Money your employer adds to the HSA to boost your medical safety net.",
               },
               {
+                label: "Existing HSA balance applied",
+                value: formatCurrency(balanceApplied),
+                helperText:
+                  results.startingBalance > 0 && !usingCurrentBalance
+                    ? "You chose to keep current HSA dollars untouched; the reserve projection ignores them."
+                    : balanceApplied > 0
+                      ? "These dollars are immediately available to soften a deductible hit."
+                      : "No existing HSA funds are counted toward this year's reserve.",
+                accent:
+                  results.startingBalance > 0 && !usingCurrentBalance
+                    ? "warning"
+                    : balanceApplied > 0
+                      ? "success"
+                      : "muted",
+              },
+              {
                 label: "Projected reserve vs. goal",
                 value: `${formatCurrency(results.projectedReserve)} of ${formatCurrency(inputs.targetReserve)}`,
                 helperText:
-                  results.reserveShortfall > 0
-                    ? `${formatCurrency(results.reserveShortfall)} shy of your target—consider raising contributions or lowering the deductible exposure.`
-                    : "You are on pace to meet or exceed the reserve you want ready for a worst-case bill.",
-                accent: results.reserveShortfall > 0 ? "warning" : "success",
+                  reserveSatisfied
+                    ? `Your starting balance and new deposits cover the ${formatCurrency(inputs.targetReserve ?? 0)} reserve goal.`
+                    : results.reserveShortfall > 0
+                      ? `${formatCurrency(results.reserveShortfall)} shy of your target even after applying today's balance—consider higher contributions or adjusting the reserve goal.`
+                      : "You are on pace to meet or exceed the reserve you want ready for a worst-case bill.",
+                accent: reserveSatisfied ? "success" : results.reserveShortfall > 0 ? "warning" : "success",
               },
               {
                 label: "Net cashflow advantage",

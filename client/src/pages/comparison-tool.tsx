@@ -106,6 +106,8 @@ export default function ComparisonTool() {
           altPlanMonthlyPremium: 520,
           employerSeed: 500,
           targetReserve: 4000,
+          currentBalance: 1000,
+          useCurrentBalance: true,
           annualIncome: 95000,
           filingStatus: 'single'
         };

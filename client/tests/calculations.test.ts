@@ -19,6 +19,7 @@ describe("calculator math", () => {
       hdhpMonthlyPremium: 300,
       altPlanMonthlyPremium: 500,
       targetReserve: 6000,
+      currentBalance: 0,
       annualIncome: 185000,
       filingStatus: "marriedJoint",
     });
@@ -29,6 +30,48 @@ describe("calculator math", () => {
     expect(result.marginalRate).toBeGreaterThan(0);
     expect(result.taxSavings).toBeCloseTo(result.employeeContribution * (result.marginalRate / 100), 2);
     expect(result.annualPremiumSavings).toBeCloseTo((500 - 300) * 12);
+  });
+
+  it("treats an existing HSA balance as part of the reserve when applied", () => {
+    const result = calculateHSA({
+      coverage: "individual",
+      age: 45,
+      employeeContribution: 2000,
+      employerSeed: 500,
+      hdhpMonthlyPremium: 320,
+      altPlanMonthlyPremium: 520,
+      targetReserve: 5000,
+      currentBalance: 3500,
+      useCurrentBalance: true,
+      annualIncome: 95000,
+      filingStatus: "single",
+    });
+
+    expect(result.appliedCurrentBalance).toBe(3500);
+    expect(result.projectedReserve).toBeCloseTo(result.totalContribution + result.appliedCurrentBalance, 5);
+    expect(result.reserveShortfall).toBe(0);
+  });
+
+  it("respects contribution caps even when the HSA already has funds", () => {
+    const result = calculateHSA({
+      coverage: "family",
+      age: 40,
+      employeeContribution: 12000,
+      employerSeed: 2000,
+      hdhpMonthlyPremium: 360,
+      altPlanMonthlyPremium: 640,
+      targetReserve: 8000,
+      currentBalance: 5000,
+      useCurrentBalance: false,
+      annualIncome: 140000,
+      filingStatus: "marriedJoint",
+    });
+
+    expect(result.totalContribution).toBe(result.annualContributionLimit);
+    expect(result.appliedCurrentBalance).toBe(0);
+    expect(result.startingBalance).toBe(5000);
+    expect(result.projectedReserve).toBe(result.totalContribution);
+    expect(result.reserveShortfall).toBe(0);
   });
 
   it("caps commuter transit at $315/mo", () => {
