@@ -23,6 +23,11 @@ export const HSAReport: React.FC<HSAReportProps> = ({ data }) => {
       }
     | undefined;
   const coverageText = inputs.coverage === 'family' ? 'Family' : 'Individual';
+  const usingCurrentBalance = inputs.useCurrentBalance ?? true;
+  const reserveTarget = inputs.targetReserve ?? 0;
+  const reserveSatisfied = reserveTarget > 0 && results.reserveShortfall === 0;
+  const appliedBalance = results.appliedCurrentBalance ?? 0;
+  const startingBalance = results.startingBalance ?? 0;
 
   return (
     <BaseDocument title="HSA Strategy Analysis" subtitle={`${coverageText} HDHP Coverage - Tax Year 2025`} generatedAt={generatedAt}>
@@ -66,6 +71,12 @@ export const HSAReport: React.FC<HSAReportProps> = ({ data }) => {
         <ValueRow label="Employee Contribution" value={results.employeeContribution} currency />
         <ValueRow label="Employer Contribution" value={results.employerContribution} currency />
         <ValueRow label="Target Reserve" value={inputs.targetReserve} currency />
+        <ValueRow label="Current HSA Balance" value={startingBalance} currency />
+        <ValueRow
+          label="Applying Existing Balance"
+          value={usingCurrentBalance ? 'Yes' : 'No'}
+          highlight={!usingCurrentBalance && startingBalance > 0}
+        />
       </Section>
 
       <Divider />
@@ -107,12 +118,22 @@ export const HSAReport: React.FC<HSAReportProps> = ({ data }) => {
       <Divider />
 
       <Section title="HSA Reserve Outlook">
-        <ValueRow label="Projected Reserve" value={results.projectedReserve} currency primary />
+        <ValueRow label="Balance Counted Toward Reserve" value={appliedBalance} currency />
+        <ValueRow label="Projected Reserve (with current balance)" value={results.projectedReserve} currency primary />
         <ValueRow label="Target Reserve" value={inputs.targetReserve} currency />
-        <ValueRow label="Reserve Shortfall" value={results.reserveShortfall} currency highlight />
+        <ValueRow
+          label={reserveSatisfied ? 'Reserve Status' : 'Reserve Shortfall'}
+          value={reserveSatisfied ? 'On target' : results.reserveShortfall}
+          currency={!reserveSatisfied}
+          success={reserveSatisfied}
+          highlight={!reserveSatisfied && results.reserveShortfall > 0}
+        />
         <Note>
-          HDHPs depend on a stocked HSA to offset surprise bills. Direct premium savings into the account until the reserve
-          matches your deductible, then invest extra dollars for future medical needs.
+          {reserveSatisfied
+            ? 'Your existing HSA balance and planned deposits already cover the deductible goal. Future contributions can focus on upcoming care or long-term investing.'
+            : !usingCurrentBalance && startingBalance > 0
+              ? 'You chose not to apply the current HSA balance to this reserve. If claims arrive early, consider tapping part of that balance or increasing contributions temporarily.'
+              : 'HDHPs depend on a stocked HSA to offset surprise bills. Direct premium savings into the account until the reserve matches your deductible, then invest extra dollars for future medical needs.'}
         </Note>
       </Section>
 

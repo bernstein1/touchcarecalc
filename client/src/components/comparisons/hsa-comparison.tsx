@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Slider } from "@/components/ui/slider";
+import { Switch } from "@/components/ui/switch";
 import GlassCard from "@/components/glass-card";
 import Tooltip from "@/components/tooltip";
 import { calculateHSA, HSA_LIMITS } from "@/lib/calculations";
@@ -93,6 +94,7 @@ export default function HSAComparison({ scenarios, onUpdateScenario, onRemoveSce
       employerSeed: results?.employerContribution ?? 0,
       projectedReserve: results?.projectedReserve ?? 0,
       reserveGap: results?.reserveShortfall ?? 0,
+      currentBalanceApplied: results?.appliedCurrentBalance ?? 0,
       netAdvantage: results?.netCashflowAdvantage ?? 0,
       employeeContribution: results?.employeeContribution ?? 0,
     };
@@ -101,6 +103,7 @@ export default function HSAComparison({ scenarios, onUpdateScenario, onRemoveSce
   const bestPremium = Math.max(...summary.map((item) => item.premiumSavings));
   const bestSeed = Math.max(...summary.map((item) => item.employerSeed));
   const bestReserve = Math.max(...summary.map((item) => item.projectedReserve));
+  const bestExistingBalance = Math.max(...summary.map((item) => item.currentBalanceApplied));
   const lowestGap = Math.min(...summary.map((item) => item.reserveGap));
   const bestAdvantage = Math.max(...summary.map((item) => item.netAdvantage));
 
@@ -144,6 +147,17 @@ export default function HSAComparison({ scenarios, onUpdateScenario, onRemoveSce
                 ))}
               </tr>
               <tr className="border-b border-border">
+                <td className="p-3 font-medium text-foreground">Existing HSA dollars applied</td>
+                {summary.map((scenario) => (
+                  <td key={`current-${scenario.id}`} className="p-3 text-center">
+                    <div className="flex items-center justify-center">
+                      <span className="text-lg font-semibold text-foreground">{currency(scenario.currentBalanceApplied)}</span>
+                      {getIndicator(scenario.currentBalanceApplied, bestExistingBalance)}
+                    </div>
+                  </td>
+                ))}
+              </tr>
+              <tr className="border-b border-border">
                 <td className="p-3 font-medium text-foreground">Estimated HSA balance after contributions</td>
                 {summary.map((scenario) => (
                   <td key={`reserve-${scenario.id}`} className="p-3 text-center">
@@ -159,7 +173,11 @@ export default function HSAComparison({ scenarios, onUpdateScenario, onRemoveSce
                 {summary.map((scenario) => (
                   <td key={`gap-${scenario.id}`} className="p-3 text-center">
                     <div className="flex items-center justify-center">
-                      <span className="text-lg font-semibold text-destructive">{currency(scenario.reserveGap)}</span>
+                      <span
+                        className={`text-lg font-semibold ${scenario.reserveGap === 0 ? "text-emerald-600" : "text-destructive"}`}
+                      >
+                        {scenario.reserveGap === 0 ? "Goal met" : currency(scenario.reserveGap)}
+                      </span>
                       {getIndicator(scenario.reserveGap, lowestGap, true)}
                     </div>
                   </td>
@@ -321,7 +339,7 @@ export default function HSAComparison({ scenarios, onUpdateScenario, onRemoveSce
                       }
                     />
                   </div>
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <Label className="text-xs uppercase text-muted-foreground">Employer contribution</Label>
                       <Input
@@ -339,6 +357,30 @@ export default function HSAComparison({ scenarios, onUpdateScenario, onRemoveSce
                         value={scenario.data.targetReserve}
                         onChange={(event) => updateScenario(scenario.id, { targetReserve: Number(event.target.value) || 0 })}
                       />
+                    </div>
+                    <div className="md:col-span-2 space-y-3">
+                      <div>
+                        <Label className="text-xs uppercase text-muted-foreground">Current HSA balance</Label>
+                        <Input
+                          type="number"
+                          min={0}
+                          value={scenario.data.currentBalance ?? 0}
+                          onChange={(event) => updateScenario(scenario.id, { currentBalance: Number(event.target.value) || 0 })}
+                        />
+                      </div>
+                      <div className="flex items-center justify-between gap-3 rounded-lg border border-border/60 bg-muted/20 px-3 py-2">
+                        <div>
+                          <p className="text-xs font-semibold text-foreground uppercase tracking-wide">Apply existing balance</p>
+                          <p className="text-[11px] text-muted-foreground">
+                            Turn off if you want to keep invested HSA dollars out of this year's deductible plan.
+                          </p>
+                        </div>
+                        <Switch
+                          checked={scenario.data.useCurrentBalance ?? true}
+                          onCheckedChange={(checked) => updateScenario(scenario.id, { useCurrentBalance: checked })}
+                          aria-label="Toggle applying current HSA balance"
+                        />
+                      </div>
                     </div>
                   </div>
                   <div>
@@ -360,9 +402,14 @@ export default function HSAComparison({ scenarios, onUpdateScenario, onRemoveSce
                       {currency(results?.employerContribution ?? 0)}
                     </p>
                     <p className="text-xs text-muted-foreground">
-                      Projected HSA balance: {currency(results?.projectedReserve ?? 0)} • Difference from your goal:
+                      Projected reserve (incl. current balance): {currency(results?.projectedReserve ?? 0)} • Applied today:
                       {" "}
-                      {currency(results?.reserveShortfall ?? 0)}
+                      {currency(results?.appliedCurrentBalance ?? 0)}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      {results?.reserveShortfall === 0 && (scenario.data.targetReserve ?? 0) > 0
+                        ? `Goal met—you're already at ${currency(scenario.data.targetReserve ?? 0)}.`
+                        : `Difference from your goal: ${currency(results?.reserveShortfall ?? 0)}`}
                     </p>
                   </div>
                 </div>

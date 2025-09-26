@@ -29,6 +29,28 @@ export const usePDFExport = () => {
     
     try {
       const coverageText = inputs.coverage === 'family' ? 'family' : 'individual';
+      const usingCurrentBalance = inputs.useCurrentBalance ?? true;
+      const reserveTarget = inputs.targetReserve ?? 0;
+      const reserveTargetText = formatCurrency(reserveTarget);
+      const reserveSatisfied = reserveTarget > 0 && results.reserveShortfall === 0;
+      const appliedBalance = results.appliedCurrentBalance ?? 0;
+      const appliedBalanceText = formatCurrency(appliedBalance);
+      const startingBalance = results.startingBalance ?? 0;
+      const startingBalanceText = formatCurrency(startingBalance);
+      const employerContributionText = formatCurrency(results.employerContribution);
+      const employeeContributionText = formatCurrency(results.employeeContribution);
+      const reserveShortfallText = formatCurrency(results.reserveShortfall);
+
+      let employerSupportNarrative: string;
+      if (!usingCurrentBalance && startingBalance > 0) {
+        employerSupportNarrative = `Employer contributions of ${employerContributionText} pair with your ${employeeContributionText} payroll deposits while you keep the existing ${startingBalanceText} balance invested. That leaves ${reserveShortfallText} to reach the ${reserveTargetText} reserve target.`;
+      } else if (reserveSatisfied) {
+        employerSupportNarrative = `Employer contributions of ${employerContributionText} plus your ${employeeContributionText} payroll deposits, layered on top of the ${appliedBalanceText} already saved, fully fund the ${reserveTargetText} reserve.`;
+      } else if (appliedBalance > 0) {
+        employerSupportNarrative = `Bringing ${appliedBalanceText} into the year alongside ${employerContributionText} in employer dollars and ${employeeContributionText} from paychecks gets you within ${reserveShortfallText} of the ${reserveTargetText} cushion.`;
+      } else {
+        employerSupportNarrative = `Employer contributions of ${employerContributionText} and your ${employeeContributionText} payroll deposits are building the ${reserveTargetText} reserve from scratch, leaving ${reserveShortfallText} still to accumulate.`;
+      }
       const data: PDFReportData = {
         type: 'hsa',
         title: 'HSA Strategy Analysis',
@@ -38,9 +60,11 @@ export const usePDFExport = () => {
         additionalData: {
           narrative: {
             compatibility: `Qualified ${coverageText} high-deductible health plan (HDHP) coverage opens ${formatCurrency(results.annualContributionLimit)} of health savings account (HSA) room, including ${formatCurrency(results.catchUpContribution ?? 0)} in catch-up space once you turn 55.`,
-            employerSupport: `Employer contributions of ${formatCurrency(results.employerContribution)} combine with your paycheck deposits to build the ${formatCurrency(inputs.targetReserve)} safety cushion.`,
+            employerSupport: employerSupportNarrative,
             premiumOffsets: `Switching plans frees ${formatCurrency(results.annualPremiumSavings)} in yearly premiums that can move straight into the HSA.`,
-            cashflow: `After premium savings, employer help, and tax savings, you keep ${formatCurrency(results.netCashflowAdvantage)} more than the payroll contributions going out.`,
+            cashflow: reserveSatisfied
+              ? `After premium savings, employer help, and tax savings, you keep ${formatCurrency(results.netCashflowAdvantage)} more than the payroll contributions going out while already satisfying the reserve goal.`
+              : `After premium savings, employer help, and tax savings, you keep ${formatCurrency(results.netCashflowAdvantage)} more than the payroll contributions going out with ${reserveShortfallText} still to build for the reserve.`,
           }
         }
       };
