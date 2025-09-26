@@ -23,6 +23,7 @@ export const HSAReport: React.FC<HSAReportProps> = ({ data }) => {
       }
     | undefined;
   const coverageText = inputs.coverage === 'family' ? 'Family' : 'Individual';
+  const hasShortfall = results.reserveShortfall > 0;
 
   return (
     <BaseDocument title="HSA Strategy Analysis" subtitle={`${coverageText} HDHP Coverage - Tax Year 2025`} generatedAt={generatedAt}>
@@ -65,6 +66,7 @@ export const HSAReport: React.FC<HSAReportProps> = ({ data }) => {
         <ValueRow label="2025 Contribution Limit" value={results.annualContributionLimit} currency highlight />
         <ValueRow label="Employee Contribution" value={results.employeeContribution} currency />
         <ValueRow label="Employer Contribution" value={results.employerContribution} currency />
+        <ValueRow label="Current HSA Balance" value={results.currentHSABalance} currency />
         <ValueRow label="Target Reserve" value={inputs.targetReserve} currency />
       </Section>
 
@@ -111,8 +113,9 @@ export const HSAReport: React.FC<HSAReportProps> = ({ data }) => {
         <ValueRow label="Target Reserve" value={inputs.targetReserve} currency />
         <ValueRow label="Reserve Shortfall" value={results.reserveShortfall} currency highlight />
         <Note>
-          HDHPs depend on a stocked HSA to offset surprise bills. Direct premium savings into the account until the reserve
-          matches your deductible, then invest extra dollars for future medical needs.
+          {hasShortfall
+            ? 'HDHPs depend on a stocked HSA to offset surprise bills. Direct premium savings and employer dollars into the account until the reserve matches your deductible, then invest extra dollars for future medical needs.'
+            : 'Your current HSA dollars plus planned contributions already cover the reserve target. You can slow new deposits or start investing future dollars for longer-term medical needs.'}
         </Note>
       </Section>
 

@@ -91,6 +91,7 @@ export default function HSAComparison({ scenarios, onUpdateScenario, onRemoveSce
       name: scenario.name,
       premiumSavings: results?.annualPremiumSavings ?? 0,
       employerSeed: results?.employerContribution ?? 0,
+      startingBalance: results?.currentHSABalance ?? scenario.data.currentHSABalance ?? 0,
       projectedReserve: results?.projectedReserve ?? 0,
       reserveGap: results?.reserveShortfall ?? 0,
       netAdvantage: results?.netCashflowAdvantage ?? 0,
@@ -100,6 +101,7 @@ export default function HSAComparison({ scenarios, onUpdateScenario, onRemoveSce
 
   const bestPremium = Math.max(...summary.map((item) => item.premiumSavings));
   const bestSeed = Math.max(...summary.map((item) => item.employerSeed));
+  const bestStartingBalance = Math.max(...summary.map((item) => item.startingBalance));
   const bestReserve = Math.max(...summary.map((item) => item.projectedReserve));
   const lowestGap = Math.min(...summary.map((item) => item.reserveGap));
   const bestAdvantage = Math.max(...summary.map((item) => item.netAdvantage));
@@ -139,6 +141,17 @@ export default function HSAComparison({ scenarios, onUpdateScenario, onRemoveSce
                     <div className="flex items-center justify-center">
                       <span className="text-lg font-semibold text-emerald-600">{currency(scenario.employerSeed)}</span>
                       {getIndicator(scenario.employerSeed, bestSeed)}
+                    </div>
+                  </td>
+                ))}
+              </tr>
+              <tr className="border-b border-border">
+                <td className="p-3 font-medium text-foreground">Current HSA dollars applied on day one</td>
+                {summary.map((scenario) => (
+                  <td key={`starting-${scenario.id}`} className="p-3 text-center">
+                    <div className="flex items-center justify-center">
+                      <span className="text-lg font-semibold text-foreground">{currency(scenario.startingBalance)}</span>
+                      {getIndicator(scenario.startingBalance, bestStartingBalance)}
                     </div>
                   </td>
                 ))}
@@ -282,7 +295,7 @@ export default function HSAComparison({ scenarios, onUpdateScenario, onRemoveSce
                       }
                     />
                   </div>
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3">
                     <div>
                       <Label className="text-xs uppercase text-muted-foreground">HDHP monthly premium</Label>
                       <Input
@@ -315,8 +328,8 @@ export default function HSAComparison({ scenarios, onUpdateScenario, onRemoveSce
                       title="Employer contributions"
                       content={
                         <p>
-                          Employer contributions can bridge the deductible faster. Combine them with your payroll deposits to
-                          reach the reserve target before high-cost claims appear.
+                          Employer contributions can bridge the deductible faster. Combine them with your payroll deposits and
+                          any balance already sitting in the HSA to reach the reserve target before high-cost claims appear.
                         </p>
                       }
                     />
@@ -329,6 +342,17 @@ export default function HSAComparison({ scenarios, onUpdateScenario, onRemoveSce
                         min={0}
                         value={scenario.data.employerSeed}
                         onChange={(event) => updateScenario(scenario.id, { employerSeed: Number(event.target.value) || 0 })}
+                      />
+                    </div>
+                    <div>
+                      <Label className="text-xs uppercase text-muted-foreground">Current HSA balance</Label>
+                      <Input
+                        type="number"
+                        min={0}
+                        value={scenario.data.currentHSABalance ?? 0}
+                        onChange={(event) =>
+                          updateScenario(scenario.id, { currentHSABalance: Number(event.target.value) || 0 })
+                        }
                       />
                     </div>
                     <div>
@@ -360,7 +384,7 @@ export default function HSAComparison({ scenarios, onUpdateScenario, onRemoveSce
                       {currency(results?.employerContribution ?? 0)}
                     </p>
                     <p className="text-xs text-muted-foreground">
-                      Projected HSA balance: {currency(results?.projectedReserve ?? 0)} • Difference from your goal:
+                      Projected reserve including today's balance: {currency(results?.projectedReserve ?? 0)} • Difference from your goal:
                       {" "}
                       {currency(results?.reserveShortfall ?? 0)}
                     </p>

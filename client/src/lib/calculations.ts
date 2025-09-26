@@ -36,6 +36,7 @@ export function calculateHSA(inputs: HSAInputs): HSAResults {
     altPlanMonthlyPremium,
     employerSeed,
     targetReserve,
+    currentHSABalance,
     annualIncome,
     filingStatus,
   } = inputs;
@@ -65,7 +66,8 @@ export function calculateHSA(inputs: HSAInputs): HSAResults {
   const altPremium = altPlanMonthlyPremium ?? hdhpPremium;
   const annualPremiumSavings = (altPremium - hdhpPremium) * 12;
 
-  const projectedReserve = employerContribution + employeeContributionUsed;
+  const startingBalance = Math.max(currentHSABalance ?? 0, 0);
+  const projectedReserve = startingBalance + employerContribution + employeeContributionUsed;
   const reserveShortfall = Math.max((targetReserve ?? 0) - projectedReserve, 0);
 
   const netCashflowAdvantage = annualPremiumSavings + employerContribution + taxSavings - employeeContributionUsed;
@@ -81,6 +83,7 @@ export function calculateHSA(inputs: HSAInputs): HSAResults {
     netCashflowAdvantage,
     projectedReserve,
     reserveShortfall,
+    currentHSABalance: startingBalance,
     marginalRate,
     actualContribution: totalContribution,
     contributionLimit: annualContributionLimit,

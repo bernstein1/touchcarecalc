@@ -66,7 +66,7 @@ export const ComparisonReport: React.FC<ComparisonReportProps> = ({ data }) => {
       <Section title="Tax Savings Comparison">
         <View style={{ marginBottom: 15 }}>
           <Text style={{ fontSize: 10, marginBottom: 8, color: '#374151' }}>
-            Annual tax savings and effective costs for each scenario:
+            Annual tax savings, existing balances, and reserve outlook for each scenario:
           </Text>
           {scenariosWithResults.map((scenario, index) => {
             const hsaResults = scenario.results as HSAResults;
@@ -82,6 +82,9 @@ export const ComparisonReport: React.FC<ComparisonReportProps> = ({ data }) => {
                 <ValueRow label="Annual Contribution" value={hsaResults.totalContribution ?? hsaResults.actualContribution ?? 0} currency />
                 <ValueRow label="Tax Savings" value={hsaResults.taxSavings} currency success />
                 <ValueRow label="Effective Cost" value={hsaResults.effectiveCost ?? 0} currency primary />
+                <ValueRow label="Current HSA Balance" value={hsaResults.currentHSABalance ?? scenario.inputs.currentHSABalance ?? 0} currency />
+                <ValueRow label="Projected Reserve (with current balance)" value={hsaResults.projectedReserve} currency />
+                <ValueRow label="Reserve Shortfall" value={hsaResults.reserveShortfall} currency highlight />
               </View>
             );
           })}
