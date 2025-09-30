@@ -14,6 +14,10 @@ import { HSAInputs, HSAResults, FilingStatus } from "@shared/schema";
 import { usePDFExport } from "@/lib/pdf/use-pdf-export";
 import DecisionSlider from "@/components/calculators/decision-slider";
 import ShowMathSection from "@/components/calculators/show-math";
+import PreTaxExplainer from "@/components/education/pre-tax-explainer";
+import CollapsibleSection from "@/components/ui/collapsible-section";
+import RecommendationCard from "@/components/recommendations/recommendation-card";
+import { generateHSARecommendations } from "@/lib/recommendations/hsa-recommendations";
 
 const DEFAULT_INPUTS: HSAInputs = {
   accountType: "hsa",
@@ -26,6 +30,15 @@ const DEFAULT_INPUTS: HSAInputs = {
   targetReserve: 4000,
   annualIncome: 85000,
   filingStatus: "single",
+  spouseHasHSA: false,
+  spouseHSAContribution: 0,
+  anticipatedMedicalExpenses: 0,
+  anticipatedDentalExpenses: 0,
+  anticipatedVisionExpenses: 0,
+  planDeductibleIndividual: 0,
+  planDeductibleFamily: 0,
+  monthlyContributionBudget: 0,
+  hsaMotivation: "affordability",
 };
 
 const FILING_STATUS_OPTIONS: { value: FilingStatus; label: string }[] = [
@@ -93,8 +106,32 @@ export default function HSACalculator() {
         </div>
       </div>
 
-      <div className="grid lg:grid-cols-3 gap-8">
-        <div className="lg:col-span-2 space-y-8">
+      <div className="grid md:grid-cols-3 gap-8">
+        <div className="md:col-span-2 space-y-8">
+          <PreTaxExplainer variant="inline" showExamples={true} />
+
+          <CollapsibleSection
+            title="Key HSA Facts"
+            defaultOpen={false}
+          >
+            <GlassCard className="space-y-4">
+              <div className="space-y-3 text-sm text-muted-foreground">
+                <div className="flex items-start gap-2">
+                  <span className="text-primary font-bold">✓</span>
+                  <p><strong className="text-foreground">Unused funds roll over year-over-year:</strong> Unlike FSAs, any unused HSA balance carries forward indefinitely—no use-it-or-lose-it deadlines.</p>
+                </div>
+                <div className="flex items-start gap-2">
+                  <span className="text-primary font-bold">⏱</span>
+                  <p><strong className="text-foreground">Funds availability:</strong> Money you contribute becomes available once it's distributed to your HSA account. Check with your provider for timing.</p>
+                </div>
+                <div className="flex items-start gap-2">
+                  <span className="text-primary font-bold">🏥</span>
+                  <p><strong className="text-foreground">HDHP requirement:</strong> HSAs are only compatible with qualified high-deductible health plans. You cannot contribute to an HSA while also enrolled in a general-purpose medical FSA.</p>
+                </div>
+              </div>
+            </GlassCard>
+          </CollapsibleSection>
+
           <GlassCard className="space-y-6">
             <div className="flex items-start justify-between gap-4">
               <div>
@@ -120,7 +157,7 @@ export default function HSACalculator() {
             <div className="grid md:grid-cols-2 gap-6">
               <div>
                 <Label className="flex items-center text-sm font-medium text-foreground mb-3">
-                  Coverage level
+                  Coverage level <span className="ml-2 text-xs text-primary font-semibold">Required</span>
                 </Label>
                 <RadioGroup
                   value={inputs.coverage}
@@ -186,6 +223,7 @@ export default function HSACalculator() {
                       min={0}
                       value={inputs.annualIncome}
                       onChange={(event) => updateInput("annualIncome", Number(event.target.value) || 0)}
+                      prefix="$"
                     />
                   </div>
                   <div>
@@ -223,6 +261,173 @@ export default function HSACalculator() {
               </p>
             </div>
           </GlassCard>
+
+          {inputs.coverage === "family" && (
+            <CollapsibleSection
+              title="Spousal HSA Coordination"
+              subtitle="Required if your spouse also has an HSA"
+              badge="Important"
+              defaultOpen={true}
+            >
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="spouse-has-hsa" className="text-sm font-medium text-foreground">
+                    Does your spouse also have an HSA through their employer?
+                  </Label>
+                  <input
+                    id="spouse-has-hsa"
+                    type="checkbox"
+                    checked={inputs.spouseHasHSA}
+                    onChange={(e) => updateInput("spouseHasHSA", e.target.checked)}
+                    className="h-4 w-4"
+                  />
+                </div>
+                {inputs.spouseHasHSA && (
+                  <div>
+                    <Label htmlFor="spouse-contribution" className="text-sm font-medium text-foreground mb-2">
+                      Spouse's annual HSA contribution
+                    </Label>
+                    <Input
+                      id="spouse-contribution"
+                      type="number"
+                      min={0}
+                      value={inputs.spouseHSAContribution ?? 0}
+                      onChange={(event) => updateInput("spouseHSAContribution", Number(event.target.value) || 0)}
+                      prefix="$"
+                    />
+                    <p className="text-xs text-muted-foreground mt-2">
+                      Combined household contributions cannot exceed the family maximum of {formatCurrency(HSA_LIMITS.family)}.
+                    </p>
+                  </div>
+                )}
+              </div>
+            </CollapsibleSection>
+          )}
+
+          <CollapsibleSection
+            title="Refine Your Estimate"
+            subtitle="Add anticipated expenses and plan details for more accurate recommendations"
+            badge="Optional"
+            defaultOpen={false}
+          >
+            <GlassCard className="space-y-6">
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <h3 className="text-xl font-semibold text-foreground">Anticipated medical expenses</h3>
+                  <p className="text-sm text-muted-foreground mt-2 leading-relaxed">
+                    Estimate your expected out-of-pocket costs for the plan year across medical, dental, and vision
+                    categories. This helps size your HSA contributions to match real healthcare needs.
+                  </p>
+                </div>
+                <Tooltip
+                  title="Why track expenses?"
+                  content={
+                    <p>
+                      Understanding your anticipated medical costs helps you determine whether your HSA balance will cover
+                      your deductible and everyday healthcare bills before you face a large claim.
+                    </p>
+                  }
+                />
+              </div>
+
+              <div className="grid md:grid-cols-3 gap-4">
+                <div>
+                  <Label htmlFor="medical-expenses" className="text-sm font-medium text-foreground mb-2">
+                    Medical expenses
+                  </Label>
+                  <Input
+                    id="medical-expenses"
+                    type="number"
+                    min={0}
+                    value={inputs.anticipatedMedicalExpenses ?? 0}
+                    onChange={(event) => updateInput("anticipatedMedicalExpenses", Number(event.target.value) || 0)}
+                    prefix="$"
+                  />
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Doctor visits, prescriptions, procedures
+                  </p>
+                </div>
+                <div>
+                  <Label htmlFor="dental-expenses" className="text-sm font-medium text-foreground mb-2">
+                    Dental expenses
+                  </Label>
+                  <Input
+                    id="dental-expenses"
+                    type="number"
+                    min={0}
+                    value={inputs.anticipatedDentalExpenses ?? 0}
+                    onChange={(event) => updateInput("anticipatedDentalExpenses", Number(event.target.value) || 0)}
+                    prefix="$"
+                  />
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Cleanings, fillings, orthodontics
+                  </p>
+                </div>
+                <div>
+                  <Label htmlFor="vision-expenses" className="text-sm font-medium text-foreground mb-2">
+                    Vision expenses
+                  </Label>
+                  <Input
+                    id="vision-expenses"
+                    type="number"
+                    min={0}
+                    value={inputs.anticipatedVisionExpenses ?? 0}
+                    onChange={(event) => updateInput("anticipatedVisionExpenses", Number(event.target.value) || 0)}
+                    prefix="$"
+                  />
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Exams, glasses, contacts
+                  </p>
+                </div>
+              </div>
+
+              {results.totalAnticipatedExpenses && results.totalAnticipatedExpenses > 0 && (
+                <div className="rounded-xl border border-border p-4">
+                  <p className="text-sm text-muted-foreground">Total anticipated expenses</p>
+                  <p className="text-2xl font-bold text-foreground">{formatCurrency(results.totalAnticipatedExpenses)}</p>
+                </div>
+              )}
+
+              <div className="grid md:grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="plan-deductible" className="text-sm font-medium text-foreground mb-2">
+                    {inputs.coverage === "family" ? "Family plan deductible" : "Individual plan deductible"}
+                  </Label>
+                  <Input
+                    id="plan-deductible"
+                    type="number"
+                    min={0}
+                    value={inputs.coverage === "family" ? inputs.planDeductibleFamily ?? 0 : inputs.planDeductibleIndividual ?? 0}
+                    onChange={(event) =>
+                      inputs.coverage === "family"
+                        ? updateInput("planDeductibleFamily", Number(event.target.value) || 0)
+                        : updateInput("planDeductibleIndividual", Number(event.target.value) || 0)
+                    }
+                    prefix="$"
+                  />
+                  <p className="text-xs text-muted-foreground mt-2">
+                    Your HDHP deductible sets the ceiling for out-of-pocket costs before insurance kicks in.
+                  </p>
+                </div>
+                <div>
+                  <Label htmlFor="monthly-budget" className="text-sm font-medium text-foreground mb-2">
+                    Monthly contribution budget (optional)
+                  </Label>
+                  <Input
+                    id="monthly-budget"
+                    type="number"
+                    min={0}
+                    value={inputs.monthlyContributionBudget ?? 0}
+                    onChange={(event) => updateInput("monthlyContributionBudget", Number(event.target.value) || 0)}
+                    prefix="$"
+                  />
+                  <p className="text-xs text-muted-foreground mt-2">
+                    How much can you comfortably contribute per month without straining your budget?
+                  </p>
+                </div>
+              </div>
+            </GlassCard>
+          </CollapsibleSection>
 
           <GlassCard className="space-y-8">
             <div className="flex items-start justify-between gap-4">
@@ -269,6 +474,7 @@ export default function HSACalculator() {
                   min={0}
                   value={inputs.employerSeed}
                   onChange={(event) => updateInput("employerSeed", Number(event.target.value) || 0)}
+                  prefix="$"
                 />
                 <p className="text-xs text-muted-foreground mt-2">
                   Add any money your employer places in the HSA, whether it shows up at the start of the year or in
@@ -285,6 +491,7 @@ export default function HSACalculator() {
                   min={0}
                   value={inputs.targetReserve}
                   onChange={(event) => updateInput("targetReserve", Number(event.target.value) || 0)}
+                  prefix="$"
                 />
                 <p className="text-xs text-muted-foreground mt-2">
                   Aim for an amount that covers your HDHP deductible or whatever balance would let you sleep at night.
@@ -324,6 +531,7 @@ export default function HSACalculator() {
                   min={0}
                   value={inputs.hdhpMonthlyPremium}
                   onChange={(event) => updateInput("hdhpMonthlyPremium", Number(event.target.value) || 0)}
+                  prefix="$"
                 />
               </div>
               <div>
@@ -336,6 +544,7 @@ export default function HSACalculator() {
                   min={0}
                   value={inputs.altPlanMonthlyPremium}
                   onChange={(event) => updateInput("altPlanMonthlyPremium", Number(event.target.value) || 0)}
+                  prefix="$"
                 />
                 <p className="text-xs text-muted-foreground mt-2">
                   Use the PPO or copay-style plan you are weighing against the HDHP.
@@ -345,7 +554,7 @@ export default function HSACalculator() {
           </GlassCard>
         </div>
 
-        <div className="space-y-8">
+        <div className="space-y-8 md:sticky md:top-8 md:self-start">
           <GlassCard className="space-y-6">
             <div className="flex items-center justify-between">
               <h3 className="text-xl font-semibold text-foreground">HSA impact highlights</h3>
@@ -387,6 +596,37 @@ export default function HSACalculator() {
             </Button>
             {error ? <p className="text-xs text-destructive">{error}</p> : null}
           </GlassCard>
+
+          {results.warnings && results.warnings.length > 0 && (
+            <GlassCard className="space-y-4 border-amber-300/40 bg-amber-500/5">
+              <div className="flex items-center gap-2 text-amber-600">
+                <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                </svg>
+                <h3 className="text-lg font-semibold text-foreground">Important Notices</h3>
+              </div>
+              <div className="space-y-3">
+                {results.warnings.map((warning, index) => (
+                  <div key={index} className="rounded-lg bg-white/50 border border-amber-300/40 p-3">
+                    <p className="text-sm text-foreground">{warning}</p>
+                  </div>
+                ))}
+              </div>
+            </GlassCard>
+          )}
+
+          {/* Smart Recommendations */}
+          {(() => {
+            const recommendations = generateHSARecommendations(inputs, results);
+            return recommendations.length > 0 ? (
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold text-foreground">Personalized Recommendations</h3>
+                {recommendations.map((rec, index) => (
+                  <RecommendationCard key={index} recommendation={rec} />
+                ))}
+              </div>
+            ) : null;
+          })()}
 
           <ShowMathSection
             title="See how the dollars work"

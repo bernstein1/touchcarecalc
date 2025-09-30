@@ -16,11 +16,23 @@ export const BENEFIT_FACTS: Record<CalculatorId, BenefitFact[]> = {
     },
     {
       label: "Family contribution limit (2025):",
-      value: `${formatCurrency(CONTRIBUTION_LIMITS.HSA_FAMILY)} when your HDHP covers family members, plus the same $1,000 catch-up after age 55`,
+      value: `${formatCurrency(CONTRIBUTION_LIMITS.HSA_FAMILY)} when your HDHP covers family members, plus the same $1,000 catch-up after age 55. This limit applies to the entire household.`,
+    },
+    {
+      label: "Unused funds roll over year-over-year:",
+      value: "Unlike FSAs, any unused HSA balance carries forward indefinitely—no use-it-or-lose-it deadlines. Build your medical safety net over time.",
+    },
+    {
+      label: "Funds availability:",
+      value: "Money you contribute becomes available once it's distributed to your HSA account. Check with your HSA provider for distribution timing.",
+    },
+    {
+      label: "HDHP requirement:",
+      value: "HSAs are only compatible with qualified high-deductible health plans (HDHPs). You cannot contribute to an HSA while also enrolled in a general-purpose medical FSA.",
     },
     {
       label: "Employer contributions:",
-      value: "Stack on top of your own deposits—confirm whether the money arrives upfront or through paycheck matching",
+      value: "Stack on top of your own deposits (and count toward the household limit)—confirm whether the money arrives upfront or through paycheck matching.",
     },
   ],
   fsa: [
@@ -30,11 +42,19 @@ export const BENEFIT_FACTS: Record<CalculatorId, BenefitFact[]> = {
     },
     {
       label: '"Use-it-or-lose-it" rule:',
-      value: "Only a carryover or grace period saves leftover dollars from the use-it-or-lose-it rule",
+      value: "Only a carryover or grace period saves leftover dollars from the use-it-or-lose-it rule—unlike HSAs, FSA funds don't automatically roll over.",
+    },
+    {
+      label: "Front-loaded but amortized:",
+      value: "Your full election is available on day one, but you pay it back through equal paycheck deductions over the year.",
+    },
+    {
+      label: "Limited Purpose FSA (LPFSA):",
+      value: "If you have an HSA, you can pair it with an LPFSA to cover dental and vision expenses pre-tax without breaking HSA compatibility rules.",
     },
     {
       label: "Dependent-care FSA household limit (2025):",
-      value: `${formatCurrency(FSA_LIMITS.dependentCare)} per household for dependent-care expenses like childcare or elder care`,
+      value: `${formatCurrency(FSA_LIMITS.dependentCare)} per household for dependent-care expenses like childcare or elder care. Reimbursed after care is provided.`,
     },
   ],
   commuter: [

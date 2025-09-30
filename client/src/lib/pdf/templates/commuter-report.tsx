@@ -68,7 +68,7 @@ export const CommuterReport: React.FC<CommuterReportProps> = ({ data }) => {
       <Section title="How the 2025 Limits Work">
         <Text style={{ fontSize: 10, marginBottom: 10, color: '#374151' }}>
           A monthly limit is the most you can move from your paycheck before taxes. For 2025 the IRS lets you set aside up to
-          {` ${formatCurrency(315)}`} for transit and another {` ${formatCurrency(315)}`} for parking each month.
+          {` ${formatCurrency(325)}`} for transit and another {` ${formatCurrency(325)}`} for parking each month.
         </Text>
 
         <View style={{ marginBottom: 15 }}>
@@ -76,10 +76,10 @@ export const CommuterReport: React.FC<CommuterReportProps> = ({ data }) => {
             Transit rides that count (bus, train, subway, ferry, vanpool)
           </Text>
           <ValueRow label="Your Monthly Transit Cost" value={inputs.transitCost} currency />
-          <ValueRow label="2025 monthly limit" value={315} currency />
+          <ValueRow label="2025 monthly limit" value={325} currency />
           <ValueRow
             label="Amount you can set aside before taxes"
-            value={Math.min(inputs.transitCost, 315)}
+            value={Math.min(inputs.transitCost, 325)}
             currency
             primary
           />
@@ -97,10 +97,10 @@ export const CommuterReport: React.FC<CommuterReportProps> = ({ data }) => {
             Parking that counts (garage or lot tied to your commute)
           </Text>
           <ValueRow label="Your Monthly Parking Cost" value={inputs.parkingCost} currency />
-          <ValueRow label="2025 monthly limit" value={315} currency />
+          <ValueRow label="2025 monthly limit" value={325} currency />
           <ValueRow
             label="Amount you can set aside before taxes"
-            value={Math.min(inputs.parkingCost, 315)}
+            value={Math.min(inputs.parkingCost, 325)}
             currency
             primary
           />
@@ -175,7 +175,7 @@ export const CommuterReport: React.FC<CommuterReportProps> = ({ data }) => {
         </Text>
 
         <Text style={{ fontSize: 9, marginBottom: 5, color: '#374151' }}>
-          1. Confirm your monthly transit and parking costs. If they are above {formatCurrency(315)}, you will still get the
+          1. Confirm your monthly transit and parking costs. If they are above {formatCurrency(325)}, you will still get the
           maximum tax-free amount and pay the rest with normal taxed pay.
         </Text>
 

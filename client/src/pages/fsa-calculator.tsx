@@ -14,6 +14,11 @@ import { calculateFSA, FSA_LIMITS } from "@/lib/calculations";
 import { getMarginalTaxRate, describeFilingStatus } from "@/lib/tax/brackets";
 import { FSAInputs, FSAResults, FilingStatus } from "@shared/schema";
 import { usePDFExport } from "@/lib/pdf/use-pdf-export";
+import FSAvsHSAComparison from "@/components/education/fsa-vs-hsa-comparison";
+import PreTaxExplainer from "@/components/education/pre-tax-explainer";
+import CollapsibleSection from "@/components/ui/collapsible-section";
+import RecommendationCard from "@/components/recommendations/recommendation-card";
+import { generateFSARecommendations } from "@/lib/recommendations/fsa-recommendations";
 
 const DEFAULT_INPUTS: FSAInputs = {
   healthElection: 2600,
@@ -25,6 +30,11 @@ const DEFAULT_INPUTS: FSAInputs = {
   expectedDependentCareExpenses: 3600,
   annualIncome: 85000,
   filingStatus: "single",
+  monthlyContributionBudget: 0,
+  payFrequency: "biweekly",
+  includeLimitedPurposeFSA: false,
+  lpfsaElection: 0,
+  lpfsaExpectedExpenses: 0,
 };
 
 const FILING_STATUS_OPTIONS: { value: FilingStatus; label: string }[] = [
@@ -83,8 +93,27 @@ export default function FSACalculator() {
         </div>
       </div>
 
-      <div className="grid lg:grid-cols-3 gap-8">
-        <div className="lg:col-span-2 space-y-8">
+      <div className="grid md:grid-cols-3 gap-8">
+        <div className="md:col-span-2 space-y-8">
+          <CollapsibleSection
+            title="Additional Guidance"
+            defaultOpen={false}
+          >
+            <GlassCard className="space-y-4">
+              <div className="flex items-center gap-3 text-primary">
+                <ClipboardList className="h-5 w-5" />
+                <h3 className="text-lg font-semibold text-foreground">Coordinate with your health plan</h3>
+              </div>
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                Check how your health plan handles deductibles and copays before locking in an election. Track
+                reimbursements during the year so money does not sit unused, and ask HR if carryover or grace rules change
+                before you re-enroll.
+              </p>
+            </GlassCard>
+          </CollapsibleSection>
+
+          <FSAvsHSAComparison variant="inline" />
+
           <GlassCard className="space-y-6">
             <div className="flex items-start justify-between gap-4">
               <div>
@@ -105,6 +134,24 @@ export default function FSACalculator() {
                   </p>
                 }
               />
+            </div>
+
+            <div className="mb-2">
+              <Label className="text-sm font-medium text-foreground mb-2">Pay frequency <span className="text-xs text-muted-foreground">(Optional - for per-paycheck calculation)</span></Label>
+              <Select
+                value={inputs.payFrequency ?? 'biweekly'}
+                onValueChange={(value: 'weekly' | 'biweekly' | 'semimonthly' | 'monthly') => updateInput('payFrequency', value)}
+              >
+                <SelectTrigger className="glass-input">
+                  <SelectValue placeholder="Select pay frequency" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="weekly">Weekly (52 paychecks/year)</SelectItem>
+                  <SelectItem value="biweekly">Bi-weekly (26 paychecks/year)</SelectItem>
+                  <SelectItem value="semimonthly">Semi-monthly (24 paychecks/year)</SelectItem>
+                  <SelectItem value="monthly">Monthly (12 paychecks/year)</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
 
             <DecisionSlider
@@ -130,6 +177,7 @@ export default function FSACalculator() {
                   min={0}
                   value={inputs.expectedEligibleExpenses}
                   onChange={(event) => updateInput("expectedEligibleExpenses", Number(event.target.value) || 0)}
+                  prefix="$"
                 />
                 <p className="text-xs text-muted-foreground mt-2">
                   Add up copays, deductibles, glasses, dental work—any health bill you expect to pay out of pocket this year.
@@ -147,6 +195,7 @@ export default function FSACalculator() {
                     min={0}
                     value={inputs.annualIncome}
                     onChange={(event) => updateInput("annualIncome", Number(event.target.value) || 0)}
+                    prefix="$"
                   />
                 </div>
 
@@ -186,6 +235,7 @@ export default function FSACalculator() {
                       max={FSA_LIMITS.health}
                       value={inputs.planCarryover}
                       onChange={(event) => updateInput("planCarryover", Number(event.target.value) || 0)}
+                      prefix="$"
                     />
                     <p className="text-xs text-muted-foreground">
                       Enter how much your plan lets you roll into the next year. If your plan only offers a grace period,
@@ -268,6 +318,7 @@ export default function FSACalculator() {
                     min={0}
                     value={inputs.expectedDependentCareExpenses}
                     onChange={(event) => updateInput("expectedDependentCareExpenses", Number(event.target.value) || 0)}
+                    prefix="$"
                   />
                   <p className="text-xs text-muted-foreground mt-2">
                     Include daycare, preschool, day camps, after-school programs, or qualified elder care costs for this year.
@@ -276,9 +327,100 @@ export default function FSACalculator() {
               </div>
             ) : null}
           </GlassCard>
+
+          <CollapsibleSection
+            title="Limited Purpose FSA (LPFSA)"
+            subtitle="Pair with HSA for dental & vision coverage"
+            badge="HSA Compatible"
+            defaultOpen={false}
+          >
+            <GlassCard className="space-y-6">
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <p className="text-sm text-muted-foreground mt-2 leading-relaxed">
+                    If you have an HSA, you can also use a Limited Purpose FSA to cover dental and vision expenses pre-tax
+                    without losing HSA eligibility. This strategic pairing gives you the best of both worlds: HSA long-term
+                    savings for medical, and LPFSA front-loaded funds for predictable dental and vision bills.
+                  </p>
+                </div>
+                <Tooltip
+                  title="LPFSA + HSA Compatibility"
+                  content={
+                    <p>
+                      Unlike a general medical FSA, an LPFSA only covers dental and vision expenses, making it compatible with
+                      HSA contributions. This allows you to maximize pre-tax savings across all healthcare categories.
+                    </p>
+                  }
+                />
+              </div>
+
+              <div className="flex items-center justify-between rounded-xl border border-border/60 p-4">
+                <div>
+                  <p className="text-sm font-medium text-foreground">Include Limited Purpose FSA</p>
+                  <p className="text-xs text-muted-foreground">
+                    Only available if you are enrolled in an HDHP with an HSA
+                  </p>
+                </div>
+                <Switch
+                  checked={inputs.includeLimitedPurposeFSA}
+                  onCheckedChange={(checked) => updateInput("includeLimitedPurposeFSA", checked)}
+                />
+              </div>
+
+              {inputs.includeLimitedPurposeFSA ? (
+                <div className="grid md:grid-cols-2 gap-6">
+                  <div>
+                    <Label htmlFor="lpfsa-election" className="text-sm font-medium text-foreground mb-2">
+                      LPFSA election
+                    </Label>
+                    <Input
+                      id="lpfsa-election"
+                      type="number"
+                      min={0}
+                      max={FSA_LIMITS.health}
+                      value={inputs.lpfsaElection ?? 0}
+                      onChange={(event) => updateInput("lpfsaElection", Number(event.target.value) || 0)}
+                      prefix="$"
+                    />
+                    <p className="text-xs text-muted-foreground mt-2">
+                      Up to {currency(FSA_LIMITS.health)} for dental and vision expenses only
+                    </p>
+                  </div>
+                  <div>
+                    <Label htmlFor="lpfsa-expenses" className="text-sm font-medium text-foreground mb-2">
+                      Expected dental & vision expenses
+                    </Label>
+                    <Input
+                      id="lpfsa-expenses"
+                      type="number"
+                      min={0}
+                      value={inputs.lpfsaExpectedExpenses ?? 0}
+                      onChange={(event) => updateInput("lpfsaExpectedExpenses", Number(event.target.value) || 0)}
+                      prefix="$"
+                    />
+                    <p className="text-xs text-muted-foreground mt-2">
+                      Estimate your annual dental cleanings, orthodontics, glasses, contacts, and eye exams
+                    </p>
+                  </div>
+                </div>
+              ) : null}
+
+              {inputs.includeLimitedPurposeFSA && results.lpfsaTaxSavings !== undefined && (
+                <div className="rounded-xl border border-emerald-300/40 bg-emerald-500/10 p-4">
+                  <p className="text-sm text-muted-foreground">LPFSA tax savings</p>
+                  <p className="text-2xl font-bold text-emerald-500">{currency(results.lpfsaTaxSavings)}</p>
+                  {results.lpfsaForfeitureRisk !== undefined && results.lpfsaForfeitureRisk > 0 && (
+                    <p className="text-xs text-amber-600 mt-2">
+                      ⚠ ${results.lpfsaForfeitureRisk.toLocaleString()} at risk if not spent by deadline
+                    </p>
+                  )}
+                </div>
+              )}
+            </GlassCard>
+          </CollapsibleSection>
         </div>
 
-        <div className="space-y-8">
+        <div className="space-y-8 md:sticky md:top-8 md:self-start">
           <GlassCard className="space-y-6">
             <div className="flex items-center justify-between">
               <h3 className="text-xl font-semibold text-foreground">FSA decision dashboard</h3>
@@ -329,6 +471,49 @@ export default function FSACalculator() {
             {error ? <p className="text-xs text-destructive">{error}</p> : null}
           </GlassCard>
 
+          {/* Pay Period Breakdown - Moved to main dashboard */}
+          {results.perPaycheckDeduction !== undefined && results.numberOfPaychecks !== undefined && (
+            <GlassCard className="space-y-4">
+              <div className="flex items-center justify-between">
+                <h3 className="text-xl font-semibold text-foreground">Per-paycheck deduction</h3>
+                <svg className="h-5 w-5 text-primary" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clipRule="evenodd" />
+                </svg>
+              </div>
+              <div className="rounded-xl border border-primary/30 bg-primary/5 p-4">
+                <p className="text-sm text-muted-foreground mb-1">Health FSA per paycheck</p>
+                <p className="text-3xl font-bold text-primary">{currency(results.perPaycheckDeduction)}</p>
+                <p className="text-xs text-muted-foreground mt-2">
+                  Spread across {results.numberOfPaychecks} paychecks ({inputs.payFrequency || 'biweekly'})
+                </p>
+              </div>
+              {inputs.includeDependentCare && (
+                <div className="rounded-xl border border-border/60 bg-muted/20 p-4">
+                  <p className="text-xs text-muted-foreground mb-1">Dependent-care per paycheck:</p>
+                  <p className="text-xl font-semibold text-foreground">
+                    {currency((inputs.dependentCareElection ?? 0) / (results.numberOfPaychecks ?? 1))}
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Reimbursed after care is provided
+                  </p>
+                </div>
+              )}
+            </GlassCard>
+          )}
+
+          {/* Smart Recommendations */}
+          {(() => {
+            const recommendations = generateFSARecommendations(inputs, results);
+            return recommendations.length > 0 ? (
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold text-foreground">Personalized Recommendations</h3>
+                {recommendations.map((rec, index) => (
+                  <RecommendationCard key={index} recommendation={rec} />
+                ))}
+              </div>
+            ) : null;
+          })()}
+
           <ShowMathSection
             title="Show the math"
             focusLabel="Forecast vs. IRS limits"
@@ -374,17 +559,7 @@ export default function FSACalculator() {
             ]}
           />
 
-          <GlassCard className="space-y-4">
-            <div className="flex items-center gap-3 text-primary">
-              <ClipboardList className="h-5 w-5" />
-              <h3 className="text-lg font-semibold text-foreground">Coordinate with your health plan</h3>
-            </div>
-            <p className="text-sm text-muted-foreground leading-relaxed">
-              Check how your health plan handles deductibles and copays before locking in an election. Track
-              reimbursements during the year so money does not sit unused, and ask HR if carryover or grace rules change
-              before you re-enroll.
-            </p>
-          </GlassCard>
+          <PreTaxExplainer variant="inline" showExamples={true} />
         </div>
       </div>
     </div>

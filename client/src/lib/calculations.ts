@@ -1,7 +1,7 @@
 import { HSAInputs, HSAResults, FSAInputs, FSAResults, CommuterInputs, CommuterResults, LifeInsuranceInputs, LifeInsuranceResults } from "@shared/schema";
 import { getMarginalTaxRate } from "@/lib/tax/brackets";
 
-// 2025 limits and thresholds
+// 2025 limits and thresholds (IRS Revenue Procedure 2024-25 & 2024-40)
 export const HSA_LIMITS = {
   individual: 4300,
   family: 8550,
@@ -9,13 +9,13 @@ export const HSA_LIMITS = {
 } as const;
 
 export const FSA_LIMITS = {
-  health: 3200,
+  health: 3300, // Updated for 2025 (was 3200 in 2024)
   dependentCare: 5000,
 } as const;
 
 export const COMMUTER_LIMITS = {
-  transit: 315,
-  parking: 315,
+  transit: 325, // Updated for 2025 (was 315 in 2024)
+  parking: 325, // Updated for 2025 (was 315 in 2024)
 } as const;
 
 // Backward-compatible map used by portions of the UI that still reference the consolidated constants object.
@@ -38,6 +38,14 @@ export function calculateHSA(inputs: HSAInputs): HSAResults {
     targetReserve,
     annualIncome,
     filingStatus,
+    spouseHasHSA,
+    spouseHSAContribution,
+    anticipatedMedicalExpenses,
+    anticipatedDentalExpenses,
+    anticipatedVisionExpenses,
+    planDeductibleIndividual,
+    planDeductibleFamily,
+    monthlyContributionBudget,
   } = inputs;
 
   const coverageLevel = coverage ?? 'individual';
@@ -70,6 +78,47 @@ export function calculateHSA(inputs: HSAInputs): HSAResults {
 
   const netCashflowAdvantage = annualPremiumSavings + employerContribution + taxSavings - employeeContributionUsed;
 
+  // New validation logic
+  const warnings: string[] = [];
+  let spousalLimitWarning: string | undefined;
+
+  // Check spousal HSA contribution limits (family max applies to household)
+  if (spouseHasHSA && spouseHSAContribution && coverageLevel === 'family') {
+    const combinedContributions = totalPlannedFunding + spouseHSAContribution;
+    if (combinedContributions > HSA_LIMITS.family) {
+      const excess = combinedContributions - HSA_LIMITS.family;
+      spousalLimitWarning = `Combined household HSA contributions ($${combinedContributions.toLocaleString()}) exceed the family maximum of $${HSA_LIMITS.family.toLocaleString()} by $${excess.toLocaleString()}. You must reduce contributions to stay compliant.`;
+      warnings.push(spousalLimitWarning);
+    }
+  }
+
+  // Calculate total anticipated expenses
+  const medical = anticipatedMedicalExpenses ?? 0;
+  const dental = anticipatedDentalExpenses ?? 0;
+  const vision = anticipatedVisionExpenses ?? 0;
+  const totalAnticipatedExpenses = medical + dental + vision;
+
+  // Calculate deductible coverage ratio
+  let deductibleCoverageRatio: number | undefined;
+  const relevantDeductible = coverageLevel === 'family' ? planDeductibleFamily : planDeductibleIndividual;
+  if (relevantDeductible && relevantDeductible > 0) {
+    deductibleCoverageRatio = (projectedReserve / relevantDeductible) * 100;
+    if (deductibleCoverageRatio < 100) {
+      warnings.push(`Your projected HSA balance ($${projectedReserve.toLocaleString()}) covers only ${Math.round(deductibleCoverageRatio)}% of your $${relevantDeductible.toLocaleString()} deductible. Consider increasing contributions.`);
+    }
+  }
+
+  // Check monthly budget feasibility
+  let monthlyBudgetFeasible: boolean | undefined;
+  if (monthlyContributionBudget) {
+    const annualBudget = monthlyContributionBudget * 12;
+    monthlyBudgetFeasible = plannedEmployeeContribution <= annualBudget;
+    if (!monthlyBudgetFeasible) {
+      const shortfall = plannedEmployeeContribution - annualBudget;
+      warnings.push(`Your planned contribution ($${plannedEmployeeContribution.toLocaleString()}) exceeds your monthly budget by $${shortfall.toLocaleString()} annually. Adjust to stay within budget.`);
+    }
+  }
+
   return {
     annualContributionLimit,
     catchUpContribution,
@@ -82,6 +131,11 @@ export function calculateHSA(inputs: HSAInputs): HSAResults {
     projectedReserve,
     reserveShortfall,
     marginalRate,
+    totalAnticipatedExpenses,
+    deductibleCoverageRatio,
+    monthlyBudgetFeasible,
+    spousalLimitWarning,
+    warnings: warnings.length > 0 ? warnings : undefined,
     actualContribution: totalContribution,
     contributionLimit: annualContributionLimit,
     effectiveCost: employeeContributionUsed - taxSavings,
@@ -100,6 +154,10 @@ export function calculateFSA(inputs: FSAInputs): FSAResults {
     expectedDependentCareExpenses,
     annualIncome,
     filingStatus,
+    payFrequency,
+    includeLimitedPurposeFSA,
+    lpfsaElection,
+    lpfsaExpectedExpenses,
   } = inputs;
 
   const marginalRate = inputs.taxBracket ?? getMarginalTaxRate(annualIncome, filingStatus);
@@ -129,6 +187,40 @@ export function calculateFSA(inputs: FSAInputs): FSAResults {
     dependentCareTaxSavings = cappedDependentCareElection * (marginalRate / 100);
   }
 
+  // Calculate pay period breakdown
+  let perPaycheckDeduction: number | undefined;
+  let numberOfPaychecks: number | undefined;
+  if (payFrequency) {
+    switch (payFrequency) {
+      case 'weekly':
+        numberOfPaychecks = 52;
+        break;
+      case 'biweekly':
+        numberOfPaychecks = 26;
+        break;
+      case 'semimonthly':
+        numberOfPaychecks = 24;
+        break;
+      case 'monthly':
+        numberOfPaychecks = 12;
+        break;
+    }
+    perPaycheckDeduction = cappedHealthElection / numberOfPaychecks;
+  }
+
+  // Calculate LPFSA (Limited Purpose FSA) results
+  let lpfsaTaxSavings: number | undefined;
+  let lpfsaForfeitureRisk: number | undefined;
+  let lpfsaNetBenefit: number | undefined;
+
+  if (includeLimitedPurposeFSA && lpfsaElection !== undefined) {
+    const cappedLPFSA = Math.min(Math.max(lpfsaElection, 0), FSA_LIMITS.health);
+    const lpfsaUtilization = Math.min(cappedLPFSA, Math.max(lpfsaExpectedExpenses ?? 0, 0));
+    lpfsaForfeitureRisk = Math.max(cappedLPFSA - lpfsaUtilization, 0);
+    lpfsaTaxSavings = cappedLPFSA * (marginalRate / 100);
+    lpfsaNetBenefit = lpfsaTaxSavings - lpfsaForfeitureRisk;
+  }
+
   return {
     cappedHealthElection,
     expectedUtilization,
@@ -139,6 +231,11 @@ export function calculateFSA(inputs: FSAInputs): FSAResults {
     dependentCareTaxSavings,
     dependentCareForfeitureRisk,
     marginalRate,
+    perPaycheckDeduction,
+    numberOfPaychecks,
+    lpfsaTaxSavings,
+    lpfsaForfeitureRisk,
+    lpfsaNetBenefit,
   };
 }
 
@@ -170,16 +267,55 @@ export function calculateCommuter(inputs: CommuterInputs): CommuterResults {
 }
 
 export function calculateLifeInsurance(inputs: LifeInsuranceInputs): LifeInsuranceResults {
-  const { totalDebt, income, mortgageBalance, educationCosts, incomeYears, currentInsurance } = inputs;
-  
-  const incomeReplacement = income * incomeYears;
-  const dimeTotal = totalDebt + incomeReplacement + mortgageBalance + educationCosts;
-  const additionalNeeded = Math.max(0, dimeTotal - currentInsurance);
-  
+  const {
+    totalDebt,
+    income,
+    mortgageBalance,
+    educationCosts,
+    incomeYears,
+    currentInsurance,
+    currentAssets,
+    childrenUnder18,
+    monthlyLivingExpenses,
+  } = inputs;
+
+  // Base DIME calculation
+  let incomeReplacement = income * incomeYears;
+
+  // Adjust for living expenses if provided (more accurate than pure income replacement)
+  let livingExpensesComponent: number | undefined;
+  if (monthlyLivingExpenses && monthlyLivingExpenses > 0) {
+    // Calculate living expenses for the income replacement period
+    livingExpensesComponent = monthlyLivingExpenses * 12 * incomeYears;
+    // Use the greater of income replacement or living expenses
+    incomeReplacement = Math.max(incomeReplacement, livingExpensesComponent);
+  }
+
+  // Apply child education multiplier if children are present
+  let childEducationMultiplier: number | undefined;
+  if (childrenUnder18 && childrenUnder18 > 0) {
+    // Add extra coverage for each child (rough estimate: $50k per child for future needs)
+    childEducationMultiplier = childrenUnder18 * 50000;
+  }
+
+  // Calculate total DIME need
+  const baseEducationCosts = educationCosts + (childEducationMultiplier ?? 0);
+  const dimeTotal = totalDebt + incomeReplacement + mortgageBalance + baseEducationCosts;
+
+  // Subtract current assets (liquid assets can offset insurance need)
+  const assetOffset = currentAssets ?? 0;
+  const adjustedNeed = Math.max(0, dimeTotal - assetOffset);
+
+  // Calculate additional insurance needed
+  const additionalNeeded = Math.max(0, adjustedNeed - currentInsurance);
+
   return {
     dimeTotal,
     additionalNeeded,
     incomeReplacement,
+    adjustedNeed: assetOffset > 0 ? adjustedNeed : undefined,
+    livingExpensesComponent,
+    childEducationMultiplier,
   };
 }
 

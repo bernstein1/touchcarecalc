@@ -11,6 +11,9 @@ import { useLocation } from "wouter";
 import { calculateLifeInsurance } from "@/lib/calculations";
 import { LifeInsuranceInputs, LifeInsuranceResults } from "@shared/schema";
 import { usePDFExport } from "@/lib/pdf/use-pdf-export";
+import RecommendationCard from "@/components/recommendations/recommendation-card";
+import { generateLifeInsuranceRecommendations } from "@/lib/recommendations/life-recommendations";
+import CollapsibleSection from "@/components/ui/collapsible-section";
 
 export default function LifeInsuranceCalculator() {
   const [, navigate] = useLocation();
@@ -23,6 +26,9 @@ export default function LifeInsuranceCalculator() {
     educationCosts: 100000,
     incomeYears: 10,
     currentInsurance: 50000,
+    currentAssets: 0,
+    childrenUnder18: 0,
+    monthlyLivingExpenses: 0,
   });
 
   const [results, setResults] = useState<LifeInsuranceResults>({
@@ -64,24 +70,58 @@ export default function LifeInsuranceCalculator() {
         </div>
       </div>
 
-      <div className="grid lg:grid-cols-3 gap-8">
-        <div className="lg:col-span-2">
+      <div className="grid md:grid-cols-3 gap-8">
+        <div className="md:col-span-2 space-y-6">
+          <CollapsibleSection
+            title="General Life Insurance Guidance"
+            subtitle="Industry best practices"
+            defaultOpen={false}
+          >
+            <GlassCard>
+              <div className="space-y-3 text-sm">
+                <div className="flex items-start space-x-3">
+                  <Lightbulb className="text-accent mt-1" size={16} />
+                  <div>
+                    <div className="font-medium text-foreground">Term vs Whole Life</div>
+                    <div className="text-xs text-muted-foreground">Term life typically offers the most coverage for the lowest cost during the years your family relies on your income.</div>
+                  </div>
+                </div>
+                <div className="flex items-start space-x-3">
+                  <TrendingUp className="text-accent mt-1" size={16} />
+                  <div>
+                    <div className="font-medium text-foreground">Regular Reviews</div>
+                    <div className="text-xs text-muted-foreground">Revisit this calculation every year or after milestones like a home purchase, new child, or job change.</div>
+                  </div>
+                </div>
+                <div className="flex items-start space-x-3">
+                  <Users className="text-accent mt-1" size={16} />
+                  <div>
+                    <div className="font-medium text-foreground">Professional Advice</div>
+                    <div className="text-xs text-muted-foreground">A licensed advisor can help translate these estimates into the right policy type and coverage amount.</div>
+                  </div>
+                </div>
+              </div>
+            </GlassCard>
+          </CollapsibleSection>
+
           <GlassCard>
-            <h3 className="text-xl font-semibold text-foreground mb-6">Financial Information</h3>
+            <h3 className="text-xl font-semibold text-foreground mb-6">Step-by-step DIME calculation</h3>
             <p className="text-sm text-muted-foreground mb-8">
-              Move through each step of the DIME framework. The sliders and fields below translate complex insurance formulas
-              into everyday numbers so you can size coverage that keeps loved ones housed, educated, and financially stable.
+              Follow the DIME method in order: Debt, Income replacement, Mortgage, and Education. Each step builds your total coverage need.
             </p>
 
             <div className="space-y-8">
-              {/* DIME Method Inputs */}
-              <div className="grid md:grid-cols-2 gap-6">
-                {/* Debt */}
-                <div>
-                  <Label className="flex items-center text-sm font-medium text-foreground mb-4">
-                    Total Debt: ${inputs.totalDebt.toLocaleString()}
-                    <Tooltip content="Add up every debt your household would still owe if you passed away today—credit cards, auto loans, student loans, personal loans, and any other balances that do not disappear at death. Life insurance proceeds can pay these off so your family isn’t forced to sell assets or dip into savings." />
-                  </Label>
+              {/* DIME Method Inputs - Now Sequential */}
+              <div className="space-y-6">
+                {/* D - Debt */}
+                <div className="border-l-4 border-primary pl-4">
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="text-2xl font-bold text-primary">D</span>
+                    <Label className="flex items-center text-lg font-semibold text-foreground">
+                      Debt: ${inputs.totalDebt.toLocaleString()}
+                      <Tooltip content="Add up every debt your household would still owe if you passed away today—credit cards, auto loans, student loans, personal loans, and any other balances that do not disappear at death." />
+                    </Label>
+                  </div>
                   <Slider
                     value={[inputs.totalDebt]}
                     onValueChange={(value) => updateInput('totalDebt', value[0])}
@@ -93,34 +133,76 @@ export default function LifeInsuranceCalculator() {
                   />
                   <div className="flex justify-between text-xs text-muted-foreground mt-1">
                     <span>$0</span>
-                    <span>$5,000,000</span>
+                    <span>$5M</span>
                   </div>
                 </div>
 
-                {/* Income */}
-                <div>
-                  <Label className="flex items-center text-sm font-medium text-foreground mb-4">
-                    Annual Income
-                    <Tooltip content="Enter the total amount you earn before taxes and deductions. This figure helps estimate how much income your family would need replaced to cover everyday bills, savings goals, and future plans if you were no longer there to provide a paycheck." />
-                  </Label>
-                  <div className="relative">
-                    <span className="absolute left-4 top-3 text-muted-foreground">$</span>
-                    <Input
-                      type="number"
-                      className="glass-input pl-8"
-                      value={inputs.income}
-                      onChange={(e) => updateInput('income', parseFloat(e.target.value) || 0)}
-                      data-testid="input-income"
+                {/* I - Income */}
+                <div className="border-l-4 border-emerald-500 pl-4">
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="text-2xl font-bold text-emerald-500">I</span>
+                    <Label className="flex items-center text-lg font-semibold text-foreground">
+                      Income Replacement
+                      <Tooltip content="Enter your annual income and how many years your family would need support. We'll calculate based on either salary or living expenses—whichever provides better coverage." />
+                    </Label>
+                  </div>
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <div>
+                      <Label className="text-sm text-muted-foreground mb-2">Annual Income</Label>
+                      <Input
+                        type="number"
+                        className="glass-input"
+                        value={inputs.income}
+                        onChange={(e) => updateInput('income', parseFloat(e.target.value) || 0)}
+                        data-testid="input-income"
+                        prefix="$"
+                      />
+                    </div>
+                    <div>
+                      <Label className="text-sm text-muted-foreground mb-2">Years of Support</Label>
+                      <Select value={inputs.incomeYears.toString()} onValueChange={(value) => updateInput('incomeYears', parseFloat(value))}>
+                        <SelectTrigger className="glass-input" data-testid="select-income-years">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="10">10 years</SelectItem>
+                          <SelectItem value="15">15 years</SelectItem>
+                          <SelectItem value="20">20 years</SelectItem>
+                          <SelectItem value="25">25 years</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                  <div className="mt-4">
+                    <Label className="text-sm text-muted-foreground mb-2">
+                      Monthly Living Expenses: ${inputs.monthlyLivingExpenses?.toLocaleString() ?? 0}
+                      <span className="text-xs ml-2">(Optional - for more accurate calculation)</span>
+                    </Label>
+                    <Slider
+                      value={[inputs.monthlyLivingExpenses ?? 0]}
+                      onValueChange={(value) => updateInput('monthlyLivingExpenses', value[0])}
+                      max={15000}
+                      min={0}
+                      step={100}
+                      className="w-full"
+                      data-testid="slider-monthly-expenses"
                     />
+                    <div className="flex justify-between text-xs text-muted-foreground mt-1">
+                      <span>$0</span>
+                      <span>$15k/mo</span>
+                    </div>
                   </div>
                 </div>
 
-                {/* Mortgage */}
-                <div>
-                  <Label className="flex items-center text-sm font-medium text-foreground mb-4">
-                    Mortgage Balance: ${inputs.mortgageBalance.toLocaleString()}
-                    <Tooltip content="Include the remaining balance on your primary home’s mortgage—or any other housing loan your family would still be responsible for. Paying this off with insurance proceeds can keep your loved ones in the home without a large monthly payment." />
-                  </Label>
+                {/* M - Mortgage */}
+                <div className="border-l-4 border-amber-500 pl-4">
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="text-2xl font-bold text-amber-500">M</span>
+                    <Label className="flex items-center text-lg font-semibold text-foreground">
+                      Mortgage: ${inputs.mortgageBalance.toLocaleString()}
+                      <Tooltip content="Include the remaining balance on your primary home's mortgage. Paying this off keeps your family in the home without monthly payments." />
+                    </Label>
+                  </div>
                   <Slider
                     value={[inputs.mortgageBalance]}
                     onValueChange={(value) => updateInput('mortgageBalance', value[0])}
@@ -132,16 +214,19 @@ export default function LifeInsuranceCalculator() {
                   />
                   <div className="flex justify-between text-xs text-muted-foreground mt-1">
                     <span>$0</span>
-                    <span>$5,000,000</span>
+                    <span>$5M</span>
                   </div>
                 </div>
 
-                {/* Education */}
-                <div>
-                  <Label className="flex items-center text-sm font-medium text-foreground mb-4">
-                    Future Education Costs: ${inputs.educationCosts.toLocaleString()}
-                    <Tooltip content="Estimate the future education expenses you want to cover, such as college tuition, trade school, or private K-12 tuition. Even if you are unsure of the exact amount, entering a rough goal helps size coverage so dependents can pursue their plans without taking on heavy debt." />
-                  </Label>
+                {/* E - Education */}
+                <div className="border-l-4 border-blue-500 pl-4">
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="text-2xl font-bold text-blue-500">E</span>
+                    <Label className="flex items-center text-lg font-semibold text-foreground">
+                      Education: ${inputs.educationCosts.toLocaleString()}
+                      <Tooltip content="Estimate future education expenses like college tuition, trade school, or private K-12 tuition for your dependents." />
+                    </Label>
+                  </div>
                   <Slider
                     value={[inputs.educationCosts]}
                     onValueChange={(value) => updateInput('educationCosts', value[0])}
@@ -153,29 +238,59 @@ export default function LifeInsuranceCalculator() {
                   />
                   <div className="flex justify-between text-xs text-muted-foreground mt-1">
                     <span>$0</span>
-                    <span>$1,000,000</span>
+                    <span>$1M</span>
+                  </div>
+                  <div className="mt-4">
+                    <Label className="text-sm text-muted-foreground mb-2">
+                      Children Under 18
+                      <Tooltip content="Number of children currently under age 18. Each adds approximately $50,000 to education coverage." />
+                    </Label>
+                    <div className="flex items-center gap-4">
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        onClick={() => updateInput('childrenUnder18', Math.max(0, (inputs.childrenUnder18 ?? 0) - 1))}
+                        className="h-10 w-10"
+                      >
+                        -
+                      </Button>
+                      <div className="flex-1 text-center">
+                        <span className="text-2xl font-bold text-foreground">{inputs.childrenUnder18 ?? 0}</span>
+                        <p className="text-xs text-muted-foreground">children</p>
+                      </div>
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        onClick={() => updateInput('childrenUnder18', (inputs.childrenUnder18 ?? 0) + 1)}
+                        className="h-10 w-10"
+                      >
+                        +
+                      </Button>
+                    </div>
                   </div>
                 </div>
               </div>
 
-              {/* Additional Parameters */}
-              <div className="grid md:grid-cols-2 gap-6">
+              {/* Assets & Current Insurance */}
+              <div className="space-y-6 pt-6 border-t border-border">
                 <div>
                   <Label className="flex items-center text-sm font-medium text-foreground mb-2">
-                    Years of Income Replacement
-                    <Tooltip content="Choose the number of years your family would need your paycheck to stay on track. Many families pick enough years to reach retirement age or until kids are financially independent." />
+                    Current Liquid Assets: ${inputs.currentAssets?.toLocaleString() ?? 0}
+                    <Tooltip content="Include savings and investment accounts your family could access immediately. These offset your insurance need." />
                   </Label>
-                  <Select value={inputs.incomeYears.toString()} onValueChange={(value) => updateInput('incomeYears', parseFloat(value))}>
-                    <SelectTrigger className="glass-input" data-testid="select-income-years">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="10">10 years</SelectItem>
-                      <SelectItem value="15">15 years</SelectItem>
-                      <SelectItem value="20">20 years</SelectItem>
-                      <SelectItem value="25">25 years (until retirement)</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <Slider
+                    value={[inputs.currentAssets ?? 0]}
+                    onValueChange={(value) => updateInput('currentAssets', value[0])}
+                    max={1000000}
+                    min={0}
+                    step={5000}
+                    className="w-full"
+                    data-testid="slider-current-assets"
+                  />
+                  <div className="flex justify-between text-xs text-muted-foreground mt-1">
+                    <span>$0</span>
+                    <span>$1M</span>
+                  </div>
                 </div>
 
                 <div>
@@ -203,7 +318,7 @@ export default function LifeInsuranceCalculator() {
         </div>
 
         {/* Results */}
-        <div className="space-y-6">
+        <div className="space-y-6 md:sticky md:top-8 md:self-start">
           <GlassCard>
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-lg font-semibold text-foreground">Coverage Needed</h3>
@@ -251,14 +366,27 @@ export default function LifeInsuranceCalculator() {
             </div>
           </GlassCard>
 
+          {/* Smart Recommendations */}
+          {(() => {
+            const recommendations = generateLifeInsuranceRecommendations(inputs, results);
+            return recommendations.length > 0 ? (
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold text-foreground mb-4">Personalized Recommendations</h3>
+                {recommendations.map((rec, index) => (
+                  <RecommendationCard key={index} recommendation={rec} />
+                ))}
+              </div>
+            ) : null;
+          })()}
+
           <GlassCard>
             <h3 className="text-lg font-semibold text-foreground mb-4">
               <Calculator className="inline mr-2" size={20} />
-              DIME Breakdown
+              Enhanced DIME Breakdown
             </h3>
             <p className="text-sm text-muted-foreground mb-4">
-              The DIME acronym stands for Debt, Income, Mortgage, and Education. Adding these building blocks together creates a
-              practical coverage estimate tailored to your household’s obligations and future plans.
+              The DIME acronym stands for Debt, Income, Mortgage, and Education. We've enhanced this with your current assets,
+              children count, and living expenses for a more personalized coverage estimate.
             </p>
             <div className="space-y-3 text-sm">
               <div className="flex justify-between">
@@ -273,6 +401,14 @@ export default function LifeInsuranceCalculator() {
                   ${results.incomeReplacement.toLocaleString()}
                 </span>
               </div>
+              {results.livingExpensesComponent && results.livingExpensesComponent > inputs.income * inputs.incomeYears && (
+                <div className="flex justify-between text-xs">
+                  <span className="text-muted-foreground pl-4">↳ Based on living expenses</span>
+                  <span className="text-muted-foreground font-mono">
+                    (${inputs.monthlyLivingExpenses?.toLocaleString()}/mo × {inputs.incomeYears}yr)
+                  </span>
+                </div>
+              )}
               <div className="flex justify-between">
                 <span className="text-muted-foreground"><strong>M</strong>ortgage:</span>
                 <span className="text-foreground font-mono" data-testid="math-mortgage">
@@ -285,41 +421,38 @@ export default function LifeInsuranceCalculator() {
                   ${inputs.educationCosts.toLocaleString()}
                 </span>
               </div>
+              {results.childEducationMultiplier && results.childEducationMultiplier > 0 && (
+                <div className="flex justify-between text-xs">
+                  <span className="text-muted-foreground pl-4">↳ Child support buffer</span>
+                  <span className="text-muted-foreground font-mono">
+                    +${results.childEducationMultiplier.toLocaleString()}
+                  </span>
+                </div>
+              )}
               <div className="border-t border-border pt-2">
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">Total Need:</span>
+                  <span className="text-muted-foreground">DIME Total:</span>
                   <span className="text-primary font-mono" data-testid="math-total">
                     ${results.dimeTotal.toLocaleString()}
                   </span>
                 </div>
               </div>
-            </div>
-          </GlassCard>
-
-          <GlassCard>
-            <h3 className="text-lg font-semibold text-foreground mb-4">Recommendations</h3>
-            <div className="space-y-3 text-sm">
-              <div className="flex items-start space-x-3">
-                <Lightbulb className="text-accent mt-1" size={16} />
-                <div>
-                  <div className="font-medium text-foreground">Term vs Whole Life</div>
-                  <div className="text-xs text-muted-foreground">Term life typically offers the most coverage for the lowest cost during the years your family relies on your income.</div>
-                </div>
-              </div>
-              <div className="flex items-start space-x-3">
-                <TrendingUp className="text-accent mt-1" size={16} />
-                <div>
-                  <div className="font-medium text-foreground">Regular Reviews</div>
-                  <div className="text-xs text-muted-foreground">Revisit this calculation every year or after milestones like a home purchase, new child, or job change.</div>
-                </div>
-              </div>
-              <div className="flex items-start space-x-3">
-                <Users className="text-accent mt-1" size={16} />
-                <div>
-                  <div className="font-medium text-foreground">Professional Advice</div>
-                  <div className="text-xs text-muted-foreground">A licensed advisor can help translate these estimates into the right policy type and coverage amount.</div>
-                </div>
-              </div>
+              {inputs.currentAssets && inputs.currentAssets > 0 && (
+                <>
+                  <div className="flex justify-between text-emerald-600">
+                    <span>Less: Current Assets</span>
+                    <span className="font-mono">-${inputs.currentAssets.toLocaleString()}</span>
+                  </div>
+                  <div className="border-t border-dashed border-border pt-2">
+                    <div className="flex justify-between font-semibold">
+                      <span className="text-foreground">Adjusted Need:</span>
+                      <span className="text-primary font-mono">
+                        ${results.adjustedNeed?.toLocaleString() ?? results.dimeTotal.toLocaleString()}
+                      </span>
+                    </div>
+                  </div>
+                </>
+              )}
             </div>
           </GlassCard>
 

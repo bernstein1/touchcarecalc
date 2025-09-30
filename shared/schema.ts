@@ -32,6 +32,16 @@ export interface HSAInputs {
   targetReserve: number;
   annualIncome: number;
   filingStatus?: FilingStatus;
+  // New fields for enhanced guidance
+  spouseHasHSA?: boolean;
+  spouseHSAContribution?: number;
+  anticipatedMedicalExpenses?: number;
+  anticipatedDentalExpenses?: number;
+  anticipatedVisionExpenses?: number;
+  planDeductibleIndividual?: number;
+  planDeductibleFamily?: number;
+  monthlyContributionBudget?: number;
+  hsaMotivation?: 'affordability' | 'savings-vehicle' | 'both';
   // Legacy fields supported for backward compatibility with existing UI state
   accountType?: 'hsa' | 'fsa';
   income?: number;
@@ -52,6 +62,12 @@ export interface HSAResults {
   projectedReserve: number;
   reserveShortfall: number;
   marginalRate: number;
+  // New validation and guidance fields
+  totalAnticipatedExpenses?: number;
+  deductibleCoverageRatio?: number;
+  monthlyBudgetFeasible?: boolean;
+  spousalLimitWarning?: string;
+  warnings?: string[];
   // Legacy fields still consumed by the UI and reports
   actualContribution?: number;
   contributionLimit?: number;
@@ -69,6 +85,12 @@ export interface FSAInputs {
   expectedDependentCareExpenses: number;
   annualIncome: number;
   filingStatus?: FilingStatus;
+  // New fields for enhanced guidance
+  monthlyContributionBudget?: number;
+  payFrequency?: 'weekly' | 'biweekly' | 'semimonthly' | 'monthly';
+  includeLimitedPurposeFSA?: boolean;
+  lpfsaElection?: number;
+  lpfsaExpectedExpenses?: number;
   /** @deprecated */
   taxBracket?: number;
 }
@@ -83,6 +105,13 @@ export interface FSAResults {
   dependentCareTaxSavings: number;
   dependentCareForfeitureRisk: number;
   marginalRate: number;
+  // New pay period breakdown fields
+  perPaycheckDeduction?: number;
+  numberOfPaychecks?: number;
+  // LPFSA results
+  lpfsaTaxSavings?: number;
+  lpfsaForfeitureRisk?: number;
+  lpfsaNetBenefit?: number;
 }
 
 export interface CommuterInputs {
@@ -111,10 +140,18 @@ export interface LifeInsuranceInputs {
   educationCosts: number;
   incomeYears: number;
   currentInsurance: number;
+  // New fields for enhanced DIME calculation
+  currentAssets?: number;
+  childrenUnder18?: number;
+  monthlyLivingExpenses?: number;
 }
 
 export interface LifeInsuranceResults {
   dimeTotal: number;
   additionalNeeded: number;
   incomeReplacement: number;
+  // Enhanced calculation results
+  adjustedNeed?: number; // After subtracting current assets
+  livingExpensesComponent?: number;
+  childEducationMultiplier?: number;
 }
