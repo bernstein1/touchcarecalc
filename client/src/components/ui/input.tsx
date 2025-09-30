@@ -9,6 +9,18 @@ export interface InputProps extends React.ComponentProps<"input"> {
 
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
   ({ className, type, prefix, suffix, ...props }, ref) => {
+    // Handle number input to prevent leading zeros
+    const handleNumberInput = (e: React.FormEvent<HTMLInputElement>) => {
+      if (type === 'number') {
+        const input = e.currentTarget;
+        const value = input.value;
+        // Remove leading zeros unless the value is just "0"
+        if (value && value !== '0' && value.startsWith('0') && value[1] !== '.') {
+          input.value = value.replace(/^0+/, '');
+        }
+      }
+    };
+
     if (prefix || suffix) {
       return (
         <div className="relative flex items-center">
@@ -26,6 +38,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
               className
             )}
             ref={ref}
+            onInput={handleNumberInput}
             {...props}
           />
           {suffix && (
@@ -45,6 +58,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
           className
         )}
         ref={ref}
+        onInput={handleNumberInput}
         {...props}
       />
     )

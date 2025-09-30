@@ -73,6 +73,23 @@ export default function CommuterCalculator() {
         </div>
       </div>
 
+      <div className="rounded-lg border-2 border-primary/40 bg-primary/5 p-4 max-w-2xl mx-auto">
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-sm font-medium text-foreground">Need personalized help?</p>
+            <p className="text-xs text-muted-foreground mt-1">Visit the TouchCare Member Portal for additional questions and support</p>
+          </div>
+          <a
+            href="https://touchcare.com/ask"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-md bg-primary text-primary-foreground hover:bg-primary/90 transition-colors text-sm font-medium whitespace-nowrap"
+          >
+            Member Portal →
+          </a>
+        </div>
+      </div>
+
       <div className="grid lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2">
           <GlassCard>

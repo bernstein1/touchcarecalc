@@ -106,6 +106,23 @@ export default function HSACalculator() {
         </div>
       </div>
 
+      <div className="rounded-lg border-2 border-primary/40 bg-primary/5 p-4 max-w-2xl mx-auto">
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-sm font-medium text-foreground">Need personalized help?</p>
+            <p className="text-xs text-muted-foreground mt-1">Visit the TouchCare Member Portal for additional questions and support</p>
+          </div>
+          <a
+            href="https://touchcare.com/ask"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-md bg-primary text-primary-foreground hover:bg-primary/90 transition-colors text-sm font-medium whitespace-nowrap"
+          >
+            Member Portal →
+          </a>
+        </div>
+      </div>
+
       <div className="grid md:grid-cols-3 gap-8">
         <div className="md:col-span-2 space-y-8">
           <PreTaxExplainer variant="inline" showExamples={true} />
@@ -212,6 +229,36 @@ export default function HSACalculator() {
                     onChange={(event) => updateInput("age", Number(event.target.value) || 0)}
                   />
                 </div>
+
+                {/* Medicare Enrollment Check */}
+                <div className="rounded-lg border-2 border-border bg-background/50 p-4">
+                  <div className="flex items-center justify-between mb-2">
+                    <Label htmlFor="medicare-enrolled" className="text-sm font-medium text-foreground">
+                      Are you enrolled in Medicare?
+                    </Label>
+                    <input
+                      id="medicare-enrolled"
+                      type="checkbox"
+                      checked={inputs.enrolledInMedicare || false}
+                      onChange={(e) => updateInput("enrolledInMedicare", e.target.checked)}
+                      className="h-4 w-4"
+                    />
+                  </div>
+                  {inputs.enrolledInMedicare && (
+                    <div className="mt-3 rounded-lg bg-amber-50 border border-amber-200 p-3 space-y-2">
+                      <p className="text-sm text-amber-900 font-medium">
+                        ⚠️ You cannot contribute to an HSA for any month you are enrolled in Medicare.
+                      </p>
+                      <p className="text-xs text-amber-800">
+                        You may continue to spend existing HSA funds, including for Medicare Part B, Part D, and Medicare Advantage premiums. Medigap premiums are not qualified expenses.
+                      </p>
+                      <p className="text-xs text-amber-700 mt-2">
+                        Note: Medicare enrollment can be retroactive and may create excess contributions that need correction.
+                      </p>
+                    </div>
+                  )}
+                </div>
+
                 <div className="space-y-4">
                   <div>
                     <Label htmlFor="annual-income" className="flex items-center text-sm font-medium text-foreground mb-2">
@@ -264,11 +311,18 @@ export default function HSACalculator() {
 
           {inputs.coverage === "family" && (
             <CollapsibleSection
-              title="Spousal HSA Coordination"
+              title="Family HSA Contributions"
               subtitle="Required if your spouse also has an HSA"
               badge="Important"
               defaultOpen={true}
             >
+              <div className="rounded-lg bg-blue-50 border border-blue-200 p-4 mb-4">
+                <p className="text-sm text-blue-900 font-medium mb-2">Family HSA Contribution Rules</p>
+                <p className="text-xs text-blue-800">
+                  If either spouse has family HDHP coverage, the combined contributions to both spouses' HSAs cannot exceed the IRS family maximum of {formatCurrency(HSA_LIMITS.family)}. You may divide this limit between accounts by agreement.
+                </p>
+              </div>
+
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <Label htmlFor="spouse-has-hsa" className="text-sm font-medium text-foreground">
@@ -283,21 +337,47 @@ export default function HSACalculator() {
                   />
                 </div>
                 {inputs.spouseHasHSA && (
-                  <div>
-                    <Label htmlFor="spouse-contribution" className="text-sm font-medium text-foreground mb-2">
-                      Spouse's annual HSA contribution
-                    </Label>
-                    <Input
-                      id="spouse-contribution"
-                      type="number"
-                      min={0}
-                      value={inputs.spouseHSAContribution ?? 0}
-                      onChange={(event) => updateInput("spouseHSAContribution", Number(event.target.value) || 0)}
-                      prefix="$"
-                    />
-                    <p className="text-xs text-muted-foreground mt-2">
-                      Combined household contributions cannot exceed the family maximum of {formatCurrency(HSA_LIMITS.family)}.
-                    </p>
+                  <div className="space-y-4">
+                    <div>
+                      <Label htmlFor="spouse-contribution" className="text-sm font-medium text-foreground mb-2">
+                        Spouse's annual HSA employee contribution
+                      </Label>
+                      <Input
+                        id="spouse-contribution"
+                        type="number"
+                        min={0}
+                        value={inputs.spouseHSAContribution ?? 0}
+                        onChange={(event) => updateInput("spouseHSAContribution", Number(event.target.value) || 0)}
+                        prefix="$"
+                      />
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Amount your spouse contributes from their paycheck
+                      </p>
+                    </div>
+                    <div>
+                      <Label htmlFor="spouse-employer-contribution" className="text-sm font-medium text-foreground mb-2">
+                        Spouse's employer HSA contribution
+                      </Label>
+                      <Input
+                        id="spouse-employer-contribution"
+                        type="number"
+                        min={0}
+                        value={inputs.spouseEmployerHSAContribution ?? 0}
+                        onChange={(event) => updateInput("spouseEmployerHSAContribution", Number(event.target.value) || 0)}
+                        prefix="$"
+                      />
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Amount spouse's employer contributes to their HSA
+                      </p>
+                    </div>
+                    <div className="rounded-lg bg-amber-50 border border-amber-200 p-3">
+                      <p className="text-sm text-amber-900 font-medium">
+                        Combined family total: {formatCurrency((inputs.employeeContribution || 0) + (inputs.employerSeed || 0) + (inputs.spouseHSAContribution || 0) + (inputs.spouseEmployerHSAContribution || 0))}
+                      </p>
+                      <p className="text-xs text-amber-800 mt-1">
+                        This must not exceed {formatCurrency(HSA_LIMITS.family)} for family coverage.
+                      </p>
+                    </div>
                   </div>
                 )}
               </div>
@@ -465,8 +545,11 @@ export default function HSACalculator() {
 
             <div className="grid md:grid-cols-2 gap-6">
               <div>
-                <Label htmlFor="employer-seed" className="text-sm font-medium text-foreground mb-2">
-                  Employer contribution
+                <Label htmlFor="employer-seed" className="flex items-center text-sm font-medium text-foreground mb-2">
+                  Your employer's annual HSA contribution
+                  <Tooltip
+                    content="Money your employer contributes to your HSA. This counts toward your annual IRS contribution limit. Include all employer contributions whether they arrive upfront or through paycheck matching."
+                  />
                 </Label>
                 <Input
                   id="employer-seed"
@@ -477,13 +560,16 @@ export default function HSACalculator() {
                   prefix="$"
                 />
                 <p className="text-xs text-muted-foreground mt-2">
-                  Add any money your employer places in the HSA, whether it shows up at the start of the year or in
-                  matching deposits.
+                  This amount counts toward your annual IRS limit
                 </p>
               </div>
               <div>
-                <Label htmlFor="target-reserve" className="text-sm font-medium text-foreground mb-2">
-                  Desired HSA reserve
+                <Label htmlFor="target-reserve" className="flex items-center text-sm font-medium text-foreground mb-2">
+                  Target HSA reserve
+                  <Tooltip
+                    title="What is a target reserve?"
+                    content="Your target reserve is the HSA balance you want to maintain to cover unexpected medical expenses. Most people aim for an amount that covers their HDHP deductible so they're financially prepared if they face maximum out-of-pocket costs in a given year. This cushion gives you peace of mind and prevents the need to pay large medical bills out of regular income."
+                  />
                 </Label>
                 <Input
                   id="target-reserve"
@@ -494,7 +580,7 @@ export default function HSACalculator() {
                   prefix="$"
                 />
                 <p className="text-xs text-muted-foreground mt-2">
-                  Aim for an amount that covers your HDHP deductible or whatever balance would let you sleep at night.
+                  Recommended: Set this to your HDHP deductible amount
                 </p>
               </div>
             </div>
@@ -505,16 +591,17 @@ export default function HSACalculator() {
               <div>
                 <h3 className="text-xl font-semibold text-foreground">Compare monthly premiums</h3>
                 <p className="text-sm text-muted-foreground mt-2 leading-relaxed">
-                  Stack the HDHP premium against the copay-friendly plan you are replacing. The monthly difference becomes
-                  the cash you can redirect into the HSA for future medical bills.
+                  Enter your monthly employee premium for each health plan option. HDHPs typically cost less per month than traditional plans, and the savings can help fund your HSA.
+                </p>
+                <p className="text-xs text-muted-foreground mt-2 italic">
+                  A premium is the amount deducted from your paycheck each month to maintain your health insurance coverage through your employer.
                 </p>
               </div>
               <Tooltip
-                title="Premium comparison"
+                title="Why compare premiums?"
                 content={
                   <p>
-                    HDHP premiums are typically lower each month. Multiply that gap by twelve to see how much money you free
-                    up to send into your HSA for medical expenses.
+                    The monthly premium difference between plans represents money you can redirect to your HSA. For example, if your HDHP costs $200/month and a traditional plan costs $350/month, you save $150 monthly ($1,800 annually) that can go toward building your HSA reserve.
                   </p>
                 }
               />
@@ -523,7 +610,7 @@ export default function HSACalculator() {
             <div className="grid md:grid-cols-2 gap-6">
               <div>
                 <Label htmlFor="hdhp-premium" className="text-sm font-medium text-foreground mb-2">
-                  HDHP monthly premium
+                  Monthly employee premium for HDHP plan
                 </Label>
                 <Input
                   id="hdhp-premium"
@@ -533,10 +620,13 @@ export default function HSACalculator() {
                   onChange={(event) => updateInput("hdhpMonthlyPremium", Number(event.target.value) || 0)}
                   prefix="$"
                 />
+                <p className="text-xs text-muted-foreground mt-1">
+                  Your monthly paycheck deduction for the HDHP
+                </p>
               </div>
               <div>
                 <Label htmlFor="alt-premium" className="text-sm font-medium text-foreground mb-2">
-                  Alternative plan premium
+                  Monthly employee premium for alternative health plan
                 </Label>
                 <Input
                   id="alt-premium"
@@ -546,8 +636,8 @@ export default function HSACalculator() {
                   onChange={(event) => updateInput("altPlanMonthlyPremium", Number(event.target.value) || 0)}
                   prefix="$"
                 />
-                <p className="text-xs text-muted-foreground mt-2">
-                  Use the PPO or copay-style plan you are weighing against the HDHP.
+                <p className="text-xs text-muted-foreground mt-1">
+                  Your monthly paycheck deduction for the PPO or HMO plan
                 </p>
               </div>
             </div>
@@ -581,18 +671,17 @@ export default function HSACalculator() {
                 </p>
               </div>
               <div className="rounded-xl border border-emerald-300/40 bg-emerald-500/10 p-4">
-                <p className="text-sm text-muted-foreground">Projected HSA reserve after contributions</p>
+                <p className="text-sm text-muted-foreground">Your HSA account balance</p>
                 <p className="text-2xl font-bold text-emerald-500">{formatCurrency(reserveProgress)}</p>
                 <p className="text-xs text-muted-foreground mt-1">
-                  Employer contributions plus your pre-tax deposits available to handle medical surprises.
+                  Total money in your HSA to pay for medical bills.
                 </p>
               </div>
               <div className="rounded-xl border border-border p-4">
-                <p className="text-sm text-muted-foreground">Net cashflow advantage</p>
+                <p className="text-sm text-muted-foreground">Your total savings this year</p>
                 <p className="text-2xl font-bold text-foreground">{formatCurrency(results.netCashflowAdvantage)}</p>
                 <p className="text-xs text-muted-foreground mt-1">
-                  The amount you keep after combining premium savings, employer contributions, and tax savings, then
-                  subtracting your payroll deposits.
+                  Money you save by choosing the HDHP, including lower premiums and tax benefits.
                 </p>
               </div>
             </div>
@@ -641,43 +730,43 @@ export default function HSACalculator() {
           })()}
 
           <ShowMathSection
-            title="See how the dollars work"
-            focusLabel="Premium savings vs. deductible readiness"
-            description="Trace how lower premiums, tax savings, and employer contributions come together to keep your HDHP affordable while you build a deductible-sized buffer."
+            title="How the numbers add up"
+            focusLabel="Understanding your HSA strategy"
+            description="See how premium savings, tax benefits, and employer contributions work together to build your HSA balance."
             items={[
               {
-                label: "Annual premium gap",
+                label: "Annual premium savings",
                 value: formatCurrency(results.annualPremiumSavings),
-                helperText: "What you pocket by choosing the HDHP instead of the richer copay plan.",
+                helperText: "Yearly savings from choosing the HDHP over the alternative plan",
                 accent: "primary",
               },
               {
-                label: "Pre-tax contribution tax savings",
+                label: "Tax savings on contributions",
                 value: formatCurrency(results.taxSavings),
-                helperText: `Every dollar you defer avoids tax at ${marginalRate}% now.`,
+                helperText: `Taxes avoided on HSA contributions at your ${marginalRate}% tax rate`,
                 accent: "success",
               },
               {
-                label: "Employer dollars",
+                label: "Employer contribution",
                 value: formatCurrency(results.employerContribution),
-                helperText: "Money your employer adds to the HSA to boost your medical safety net.",
+                helperText: "Additional funds your employer adds to your HSA",
               },
               {
-                label: "Projected reserve vs. goal",
+                label: "HSA balance progress",
                 value: `${formatCurrency(results.projectedReserve)} of ${formatCurrency(inputs.targetReserve)}`,
                 helperText:
                   results.reserveShortfall > 0
-                    ? `${formatCurrency(results.reserveShortfall)} shy of your target—consider raising contributions or lowering the deductible exposure.`
-                    : "You are on pace to meet or exceed the reserve you want ready for a worst-case bill.",
+                    ? `You're ${formatCurrency(results.reserveShortfall)} short of your target reserve`
+                    : "You're on track to meet your target HSA reserve",
                 accent: results.reserveShortfall > 0 ? "warning" : "success",
               },
               {
-                label: "Net cashflow advantage",
+                label: "Net annual benefit",
                 value: formatCurrency(results.netCashflowAdvantage),
                 helperText:
                   results.netCashflowAdvantage >= 0
-                    ? "Positive numbers mean the HDHP/HSA combo leaves more money in your pocket across the year."
-                    : "A negative value means payroll contributions outweigh the premium savings—double-check affordability.",
+                    ? "Your total benefit after all contributions and savings"
+                    : "Your contributions exceed premium savings—verify this fits your budget",
                 accent: results.netCashflowAdvantage >= 0 ? "success" : "warning",
               },
             ]}

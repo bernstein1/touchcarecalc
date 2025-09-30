@@ -35,6 +35,8 @@ export interface HSAInputs {
   // New fields for enhanced guidance
   spouseHasHSA?: boolean;
   spouseHSAContribution?: number;
+  spouseEmployerHSAContribution?: number;
+  enrolledInMedicare?: boolean;
   anticipatedMedicalExpenses?: number;
   anticipatedDentalExpenses?: number;
   anticipatedVisionExpenses?: number;
