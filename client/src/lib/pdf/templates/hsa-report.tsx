@@ -25,7 +25,7 @@ export const HSAReport: React.FC<HSAReportProps> = ({ data }) => {
   const coverageText = inputs.coverage === 'family' ? 'Family' : 'Individual';
 
   return (
-    <BaseDocument title="HSA Strategy Analysis" subtitle={`${coverageText} HDHP Coverage - Tax Year 2025`} generatedAt={generatedAt}>
+    <BaseDocument title="HSA Strategy Analysis" subtitle={`${coverageText} HDHP Coverage - Tax Year 2026`} generatedAt={generatedAt}>
       <Section title="Executive Summary">
         <MetricGrid>
           <MetricCard
@@ -62,7 +62,7 @@ export const HSAReport: React.FC<HSAReportProps> = ({ data }) => {
         <ValueRow label="Participant Age" value={inputs.age} />
         <ValueRow label="Household Annual Income" value={inputs.annualIncome} currency />
         <ValueRow label="Marginal Tax Rate" value={`${results.marginalRate}%`} />
-        <ValueRow label="2025 Contribution Limit" value={results.annualContributionLimit} currency highlight />
+        <ValueRow label="2026 Contribution Limit" value={results.annualContributionLimit} currency highlight />
         <ValueRow label="Employee Contribution" value={results.employeeContribution} currency />
         <ValueRow label="Employer Contribution" value={results.employerContribution} currency />
         <ValueRow label="Target Reserve" value={inputs.targetReserve} currency />

@@ -1,21 +1,21 @@
 import { HSAInputs, HSAResults, FSAInputs, FSAResults, CommuterInputs, CommuterResults, LifeInsuranceInputs, LifeInsuranceResults } from "@shared/schema";
 import { getMarginalTaxRate } from "@/lib/tax/brackets";
 
-// 2025 limits and thresholds (IRS Revenue Procedure 2024-25 & 2024-40)
+// 2026 limits and thresholds (IRS Revenue Procedure 2025-19)
 export const HSA_LIMITS = {
-  individual: 4300,
-  family: 8550,
+  individual: 4400, // Updated for 2026 (was 4300 in 2025)
+  family: 8750, // Updated for 2026 (was 8550 in 2025)
   catchUp: 1000,
 } as const;
 
 export const FSA_LIMITS = {
-  health: 3300, // Updated for 2025 (was 3200 in 2024)
-  dependentCare: 5000,
+  health: 3400, // Updated for 2026 (was 3300 in 2025)
+  dependentCare: 7500, // Updated for 2026 (was 5000 in 2025) - Major increase!
 } as const;
 
 export const COMMUTER_LIMITS = {
-  transit: 325, // Updated for 2025 (was 315 in 2024)
-  parking: 325, // Updated for 2025 (was 315 in 2024)
+  transit: 340, // Updated for 2026 (was 325 in 2025)
+  parking: 340, // Updated for 2026 (was 325 in 2025)
 } as const;
 
 // Backward-compatible map used by portions of the UI that still reference the consolidated constants object.

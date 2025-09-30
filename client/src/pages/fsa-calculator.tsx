@@ -88,8 +88,8 @@ export default function FSACalculator() {
           </div>
         </div>
         <div className="text-right">
-          <p className="text-sm text-muted-foreground">Updated for 2025</p>
-          <p className="text-xs text-muted-foreground">IRS Notice 2024-87</p>
+          <p className="text-sm text-muted-foreground">Updated for 2026</p>
+          <p className="text-xs text-muted-foreground">IRS Notice 2025-XX</p>
         </div>
       </div>
 
@@ -162,7 +162,7 @@ export default function FSACalculator() {
               max={FSA_LIMITS.health}
               step={50}
               onChange={(value) => updateInput("healthElection", value)}
-              helperText={`The IRS cap for 2025 is ${currency(FSA_LIMITS.health)}. Elect only what you expect to use within the plan year.`}
+              helperText={`The IRS cap for 2026 is ${currency(FSA_LIMITS.health)}. Elect only what you expect to use within the plan year.`}
               focusLabel="Project annual spend"
             />
 

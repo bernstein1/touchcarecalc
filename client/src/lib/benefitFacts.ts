@@ -11,11 +11,11 @@ const formatCurrency = (amount: number) => `$${amount.toLocaleString()}`;
 export const BENEFIT_FACTS: Record<CalculatorId, BenefitFact[]> = {
   hsa: [
     {
-      label: "Individual contribution limit (2025):",
+      label: "Individual contribution limit (2026):",
       value: `${formatCurrency(CONTRIBUTION_LIMITS.HSA_INDIVIDUAL)} for self-only HDHP coverage, plus a $1,000 catch-up once you turn 55`,
     },
     {
-      label: "Family contribution limit (2025):",
+      label: "Family contribution limit (2026):",
       value: `${formatCurrency(CONTRIBUTION_LIMITS.HSA_FAMILY)} when your HDHP covers family members, plus the same $1,000 catch-up after age 55. This limit applies to the entire household.`,
     },
     {
@@ -37,8 +37,8 @@ export const BENEFIT_FACTS: Record<CalculatorId, BenefitFact[]> = {
   ],
   fsa: [
     {
-      label: "Health FSA annual limit (2025):",
-      value: `${formatCurrency(CONTRIBUTION_LIMITS.FSA)} max you can elect for health expenses in 2025`,
+      label: "Health FSA annual limit (2026):",
+      value: `${formatCurrency(CONTRIBUTION_LIMITS.FSA)} max you can elect for health expenses in 2026`,
     },
     {
       label: '"Use-it-or-lose-it" rule:',
@@ -53,17 +53,17 @@ export const BENEFIT_FACTS: Record<CalculatorId, BenefitFact[]> = {
       value: "If you have an HSA, you can pair it with an LPFSA to cover dental and vision expenses pre-tax without breaking HSA compatibility rules.",
     },
     {
-      label: "Dependent-care FSA household limit (2025):",
+      label: "Dependent-care FSA household limit (2026):",
       value: `${formatCurrency(FSA_LIMITS.dependentCare)} per household for dependent-care expenses like childcare or elder care. Reimbursed after care is provided.`,
     },
   ],
   commuter: [
     {
-      label: "Transit limit (2025):",
+      label: "Transit limit (2026):",
       value: `Set aside up to ${formatCurrency(CONTRIBUTION_LIMITS.COMMUTER_TRANSIT)} per month pre-tax for transit fares, passes, or vanpools tied to your commute`,
     },
     {
-      label: "Parking limit (2025):",
+      label: "Parking limit (2026):",
       value: `Save up to ${formatCurrency(CONTRIBUTION_LIMITS.COMMUTER_PARKING)} per month pre-tax for parking next to work or your transit station`,
     },
   ],

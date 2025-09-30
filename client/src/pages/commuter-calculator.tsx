@@ -83,7 +83,7 @@ export default function CommuterCalculator() {
               <div>
                 <Label className="flex items-center text-sm font-medium text-foreground mb-4">
                   Monthly Transit Costs: ${inputs.transitCost}
-                  <Tooltip content="Eligible expenses are the rides the IRS says count for this benefit—monthly passes, pay-per-ride fares, or employer vanpools you use to get to work. You can move up to $325 per month in 2025 from your paycheck before taxes for these costs; anything over that comes out after tax." />
+                  <Tooltip content="Eligible expenses are the rides the IRS says count for this benefit—monthly passes, pay-per-ride fares, or employer vanpools you use to get to work. You can move up to $340 per month in 2026 from your paycheck before taxes for these costs; anything over that comes out after tax." />
                 </Label>
                 <Slider
                   value={[inputs.transitCost]}
@@ -99,7 +99,7 @@ export default function CommuterCalculator() {
                   <span>$500</span>
                 </div>
                 <div className="mt-2 text-xs text-muted-foreground">
-                  2025 monthly limit (the most you can set aside before taxes): $325
+                  2026 monthly limit (the most you can set aside before taxes): $340
                 </div>
               </div>
 
@@ -107,7 +107,7 @@ export default function CommuterCalculator() {
               <div>
                 <Label className="flex items-center text-sm font-medium text-foreground mb-4">
                   Monthly Parking Costs: ${inputs.parkingCost}
-                  <Tooltip content="Eligible parking means spaces tied to getting to work, like a garage at your office or lot at the train station. In 2025 you can shield up to $325 per month from taxes for this parking; paying more than that means the extra is taxed like normal pay." />
+                  <Tooltip content="Eligible parking means spaces tied to getting to work, like a garage at your office or lot at the train station. In 2026 you can shield up to $340 per month from taxes for this parking; paying more than that means the extra is taxed like normal pay." />
                 </Label>
                 <Slider
                   value={[inputs.parkingCost]}
@@ -123,7 +123,7 @@ export default function CommuterCalculator() {
                   <span>$500</span>
                 </div>
                 <div className="mt-2 text-xs text-muted-foreground">
-                  2025 monthly limit (tax-free cap): $325
+                  2026 monthly limit (tax-free cap): $340
                 </div>
               </div>
 
@@ -253,7 +253,7 @@ export default function CommuterCalculator() {
             <h3 className="text-lg font-semibold text-foreground mb-4">TouchCare Transit Guidance</h3>
             <div className="space-y-3 text-sm text-muted-foreground">
               <p>
-                A monthly limit is the most you can move from your paycheck before taxes. For 2025 that limit is $325 for transit and another $325 for parking. Money above those caps still pays for your commute, it just isn't tax-free.
+                A monthly limit is the most you can move from your paycheck before taxes. For 2026 that limit is $340 for transit and another $340 for parking. Money above those caps still pays for your commute, it just isn't tax-free.
               </p>
               <p>
                 Eligible expenses are the commute costs tied directly to getting to work, like transit passes, vanpools, or parking next to your job or station. Substantiation simply means showing proof—usually uploading a receipt or pass—so keep those records handy and send them in within your plan’s deadline.

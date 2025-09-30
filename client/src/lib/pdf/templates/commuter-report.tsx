@@ -18,7 +18,7 @@ export const CommuterReport: React.FC<CommuterReportProps> = ({ data }) => {
   return (
     <BaseDocument
       title="Commuter Benefits Analysis Report"
-      subtitle="Pre-Tax Transportation Savings - Tax Year 2025"
+      subtitle="Pre-Tax Transportation Savings - Tax Year 2026"
       generatedAt={generatedAt}
     >
       {/* Executive Summary */}
@@ -64,11 +64,11 @@ export const CommuterReport: React.FC<CommuterReportProps> = ({ data }) => {
 
       <Divider />
 
-      {/* 2025 Benefit Limits and Calculations */}
-      <Section title="How the 2025 Limits Work">
+      {/* 2026 Benefit Limits and Calculations */}
+      <Section title="How the 2026 Limits Work">
         <Text style={{ fontSize: 10, marginBottom: 10, color: '#374151' }}>
-          A monthly limit is the most you can move from your paycheck before taxes. For 2025 the IRS lets you set aside up to
-          {` ${formatCurrency(325)}`} for transit and another {` ${formatCurrency(325)}`} for parking each month.
+          A monthly limit is the most you can move from your paycheck before taxes. For 2026 the IRS lets you set aside up to
+          {` ${formatCurrency(340)}`} for transit and another {` ${formatCurrency(340)}`} for parking each month.
         </Text>
 
         <View style={{ marginBottom: 15 }}>
@@ -76,10 +76,10 @@ export const CommuterReport: React.FC<CommuterReportProps> = ({ data }) => {
             Transit rides that count (bus, train, subway, ferry, vanpool)
           </Text>
           <ValueRow label="Your Monthly Transit Cost" value={inputs.transitCost} currency />
-          <ValueRow label="2025 monthly limit" value={325} currency />
+          <ValueRow label="2026 monthly limit" value={340} currency />
           <ValueRow
             label="Amount you can set aside before taxes"
-            value={Math.min(inputs.transitCost, 325)}
+            value={Math.min(inputs.transitCost, 340)}
             currency
             primary
           />
@@ -97,10 +97,10 @@ export const CommuterReport: React.FC<CommuterReportProps> = ({ data }) => {
             Parking that counts (garage or lot tied to your commute)
           </Text>
           <ValueRow label="Your Monthly Parking Cost" value={inputs.parkingCost} currency />
-          <ValueRow label="2025 monthly limit" value={325} currency />
+          <ValueRow label="2026 monthly limit" value={340} currency />
           <ValueRow
             label="Amount you can set aside before taxes"
-            value={Math.min(inputs.parkingCost, 325)}
+            value={Math.min(inputs.parkingCost, 340)}
             currency
             primary
           />
@@ -175,7 +175,7 @@ export const CommuterReport: React.FC<CommuterReportProps> = ({ data }) => {
         </Text>
 
         <Text style={{ fontSize: 9, marginBottom: 5, color: '#374151' }}>
-          1. Confirm your monthly transit and parking costs. If they are above {formatCurrency(325)}, you will still get the
+          1. Confirm your monthly transit and parking costs. If they are above {formatCurrency(340)}, you will still get the
           maximum tax-free amount and pay the rest with normal taxed pay.
         </Text>
 
@@ -204,7 +204,7 @@ export const CommuterReport: React.FC<CommuterReportProps> = ({ data }) => {
         </Note>
 
         <Text style={{ fontSize: 8, marginTop: 8, color: '#6b7280' }}>
-          The savings in this report use the 2025 IRS limits and the tax rate you entered. Your results can change if your pay or
+          The savings in this report use the 2026 IRS limits and the tax rate you entered. Your results can change if your pay or
           state rules are different. Check with your HR team or a tax professional for the exact steps to join and stay compliant.
         </Text>
       </Section>

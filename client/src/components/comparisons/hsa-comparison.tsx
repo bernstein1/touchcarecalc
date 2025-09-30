@@ -263,7 +263,7 @@ export default function HSAComparison({ scenarios, onUpdateScenario, onRemoveSce
                       />
                     </div>
                     <div className="rounded-lg bg-primary/5 border border-dashed border-primary/40 p-3 text-xs text-muted-foreground">
-                      <p>2025 limit: {currency(contributionLimit)}</p>
+                      <p>2026 limit: {currency(contributionLimit)}</p>
                       <p>{scenario.data.age >= 55 ? "Includes the $1,000 catch-up for age 55+" : "Add $1,000 more once you turn 55"}</p>
                     </div>
                   </div>

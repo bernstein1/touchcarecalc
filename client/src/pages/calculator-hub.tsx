@@ -58,7 +58,7 @@ export default function CalculatorHub() {
       {/* Hero Section - Simplified */}
       <div className="text-center max-w-3xl mx-auto">
         <h1 className="text-5xl font-bold text-foreground mb-4" data-testid="text-main-title">
-          2025 Benefits Calculators
+          2026 Benefits Calculators
         </h1>
         <p className="text-xl text-muted-foreground" data-testid="text-main-description">
           Plan your pre-tax benefits and insurance coverage in minutes
@@ -130,7 +130,7 @@ export default function CalculatorHub() {
               <h3 className="text-lg font-semibold text-foreground">How These Calculators Help</h3>
             </div>
             <p className="text-sm text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-              Pre-tax benefits reduce your taxable income, saving you money on every paycheck. Use these tools to find the right contribution amounts, avoid over-election penalties, and maximize your tax savings for 2025.
+              Pre-tax benefits reduce your taxable income, saving you money on every paycheck. Use these tools to find the right contribution amounts, avoid over-election penalties, and maximize your tax savings for 2026.
             </p>
           </div>
         </GlassCard>

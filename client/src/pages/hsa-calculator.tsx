@@ -101,8 +101,8 @@ export default function HSACalculator() {
           </div>
         </div>
         <div className="text-right">
-          <p className="text-sm text-muted-foreground">Updated for 2025</p>
-          <p className="text-xs text-muted-foreground">IRS Publication 969</p>
+          <p className="text-sm text-muted-foreground">Updated for 2026</p>
+          <p className="text-xs text-muted-foreground">IRS Rev. Proc. 2025-19</p>
         </div>
       </div>
 
@@ -253,7 +253,7 @@ export default function HSACalculator() {
 
             <div className="rounded-xl border border-dashed border-primary/40 bg-primary/5 p-4 text-sm">
               <p className="font-medium text-primary">
-                2025 contribution room: {formatCurrency(contributionLimit)}
+                2026 contribution room: {formatCurrency(contributionLimit)}
               </p>
               <p className="text-muted-foreground mt-1">
                 This includes the base limit of {formatCurrency(inputs.coverage === "family" ? HSA_LIMITS.family : HSA_LIMITS.individual)}
@@ -552,6 +552,18 @@ export default function HSACalculator() {
               </div>
             </div>
           </GlassCard>
+
+          <GlassCard className="space-y-4">
+            <div className="flex items-center gap-3 text-primary">
+              <Calculator className="h-5 w-5" />
+              <h3 className="text-lg font-semibold text-foreground">Ready for claim season</h3>
+            </div>
+            <p className="text-sm text-muted-foreground leading-relaxed">
+              Remember: HDHPs rarely include copays for office visits or prescriptions. Expect to pay the negotiated rate
+              until you hit the deductible, then lean on your HSA balance. Revisit this plan after open enrollment or if
+              your medical usage changes during the year.
+            </p>
+          </GlassCard>
         </div>
 
         <div className="space-y-8 md:sticky md:top-8 md:self-start">
@@ -670,18 +682,6 @@ export default function HSACalculator() {
               },
             ]}
           />
-
-          <GlassCard className="space-y-4">
-            <div className="flex items-center gap-3 text-primary">
-              <Calculator className="h-5 w-5" />
-              <h3 className="text-lg font-semibold text-foreground">Ready for claim season</h3>
-            </div>
-            <p className="text-sm text-muted-foreground leading-relaxed">
-              Remember: HDHPs rarely include copays for office visits or prescriptions. Expect to pay the negotiated rate
-              until you hit the deductible, then lean on your HSA balance. Revisit this plan after open enrollment or if
-              your medical usage changes during the year.
-            </p>
-          </GlassCard>
         </div>
       </div>
     </div>

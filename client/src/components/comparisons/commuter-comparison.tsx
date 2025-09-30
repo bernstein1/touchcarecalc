@@ -238,7 +238,7 @@ export default function CommuterComparison({ scenarios, onUpdateScenario, onRemo
               <div>
                 <Label className="flex items-center text-sm font-medium text-foreground mb-3">
                   Monthly Transit Cost
-                  <Tooltip content="Eligible expenses are the bus, train, subway, ferry, or employer vanpool rides you take to get to work. In 2025 you can move up to $325 per month from your paycheck before taxes for these rides; extra costs are paid with normal taxed pay." />
+                  <Tooltip content="Eligible expenses are the bus, train, subway, ferry, or employer vanpool rides you take to get to work. In 2026 you can move up to $340 per month from your paycheck before taxes for these rides; extra costs are paid with normal taxed pay." />
                 </Label>
                 <div className="space-y-3">
                   <div className="relative">
@@ -274,7 +274,7 @@ export default function CommuterComparison({ scenarios, onUpdateScenario, onRemo
               <div>
                 <Label className="flex items-center text-sm font-medium text-foreground mb-3">
                   Monthly Parking Cost
-                  <Tooltip content="Eligible parking means spots connected to your commute, like the lot at your office or the garage by the train station. You can set aside up to $325 per month before taxes in 2025; parking beyond that amount is treated like regular pay." />
+                  <Tooltip content="Eligible parking means spots connected to your commute, like the lot at your office or the garage by the train station. You can set aside up to $340 per month before taxes in 2026; parking beyond that amount is treated like regular pay." />
                 </Label>
                 <div className="space-y-3">
                   <div className="relative">

@@ -23,7 +23,7 @@ export const FSAReport: React.FC<FSAReportProps> = ({ data }) => {
     | undefined;
 
   return (
-    <BaseDocument title="FSA Election Analysis" subtitle="Health & Dependent Care FSAs - Tax Year 2025" generatedAt={generatedAt}>
+    <BaseDocument title="FSA Election Analysis" subtitle="Health & Dependent Care FSAs - Tax Year 2026" generatedAt={generatedAt}>
       <Section title="Executive Summary">
         <Text style={{ fontSize: 10, marginBottom: 10, color: '#374151' }}>
           This report breaks down your Flexible Spending Account choices in everyday language. Use it to confirm how much you elected, what you plan to spend, and how the use-it-or-lose-it rule could affect you.
