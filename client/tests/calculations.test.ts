@@ -31,7 +31,7 @@ describe("calculator math", () => {
     expect(result.annualPremiumSavings).toBeCloseTo((500 - 300) * 12);
   });
 
-  it("caps commuter transit at $315/mo", () => {
+  it("caps commuter transit at $340/mo (2026 limit)", () => {
     const result = calculateCommuter({ transitCost: 500, parkingCost: 250, annualIncome: 90000, filingStatus: "single" });
     expect(result.annualTransit).toBe(COMMUTER_LIMITS.transit * 12);
     expect(result.totalSavings).toBeCloseTo(
@@ -57,8 +57,9 @@ describe("calculator math", () => {
     expect(result.forfeitureRisk).toBeGreaterThanOrEqual(0);
     expect(result.marginalRate).toBeGreaterThan(0);
     expect(result.taxSavings).toBeCloseTo(FSA_LIMITS.health * (result.marginalRate / 100), 2);
-    expect(result.dependentCareTaxSavings).toBeCloseTo(FSA_LIMITS.dependentCare * (result.marginalRate / 100), 2);
-    expect(result.dependentCareForfeitureRisk).toBeCloseTo(FSA_LIMITS.dependentCare - 4000, 2);
+    // Dependent care election is 6000, which is under the 2026 limit of 7500, so tax savings should be based on 6000
+    expect(result.dependentCareTaxSavings).toBeCloseTo(6000 * (result.marginalRate / 100), 2);
+    expect(result.dependentCareForfeitureRisk).toBeCloseTo(6000 - 4000, 2);
   });
 
   it("computes DIME coverage", () => {
