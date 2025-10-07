@@ -30,7 +30,7 @@ export const ComparisonReport: React.FC<ComparisonReportProps> = ({ data }) => {
 
   const getCalculatorDescription = (type: string) => {
     switch (type) {
-      case 'hsa': return 'Compare HDHP premium offsets, employer contributions, and deductible reserves';
+      case 'hsa': return 'Compare HDHP / CDHP premium offsets, employer contributions, and deductible reserves';
       case 'fsa': return 'Compare election sizing, grace-period timing, and forfeiture exposure';
       case 'commuter': return 'Compare pre-tax transportation benefit scenarios';
       case 'life-insurance': return 'Compare life insurance coverage need scenarios';

@@ -493,6 +493,9 @@ export default function FSACalculator() {
                     without losing HSA eligibility. This strategic pairing gives you the best of both worlds: HSA long-term
                     savings for medical, and LPFSA front-loaded funds for predictable dental and vision bills.
                   </p>
+                  <p className="text-xs text-muted-foreground mt-3 leading-relaxed">
+                    Limited Purpose FSAs are not available through every organization. Employees should review their benefits guide, platform, or enrollment solution to confirm whether their company offers an LPFSA.
+                  </p>
                 </div>
                 <Tooltip
                   title="LPFSA + HSA Compatibility"
@@ -509,7 +512,7 @@ export default function FSACalculator() {
                 <div>
                   <p className="text-sm font-medium text-foreground">Include Limited Purpose FSA</p>
                   <p className="text-xs text-muted-foreground">
-                    Only available if you are enrolled in an HDHP with an HSA
+                    Only available if you are enrolled in an HDHP / CDHP with an HSA
                   </p>
                 </div>
                 <Switch

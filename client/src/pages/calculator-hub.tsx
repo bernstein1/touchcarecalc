@@ -19,7 +19,7 @@ export default function CalculatorHub() {
       id: "hsa",
       title: "HSA Strategy Planner",
       description:
-        "Show how HDHP premiums, employer HSA deposits, and your own savings affect yearly costs.",
+        "Show how HDHP / CDHP premiums, employer HSA deposits, and your own savings affect yearly costs.",
       icon: HeartPulse,
       route: "/hsa",
       analyticsId: "calculator-hsa-entry",

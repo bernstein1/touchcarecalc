@@ -86,6 +86,8 @@ export default function HSAComparison({ scenarios, onUpdateScenario, onRemoveSce
 
   const summary = scenarios.map((scenario) => {
     const results = scenarioResults[scenario.id];
+    const totalSavings =
+      (results?.annualPremiumSavings ?? 0) + (results?.taxSavings ?? 0);
     return {
       id: scenario.id,
       name: scenario.name,
@@ -95,6 +97,7 @@ export default function HSAComparison({ scenarios, onUpdateScenario, onRemoveSce
       reserveGap: results?.reserveShortfall ?? 0,
       netAdvantage: results?.netCashflowAdvantage ?? 0,
       employeeContribution: results?.employeeContribution ?? 0,
+      totalSavings,
     };
   });
 
@@ -103,6 +106,7 @@ export default function HSAComparison({ scenarios, onUpdateScenario, onRemoveSce
   const bestReserve = Math.max(...summary.map((item) => item.projectedReserve));
   const lowestGap = Math.min(...summary.map((item) => item.reserveGap));
   const bestAdvantage = Math.max(...summary.map((item) => item.netAdvantage));
+  const bestTotalSavings = Math.max(...summary.map((item) => item.totalSavings));
 
   return (
     <div className="space-y-8">
@@ -122,7 +126,7 @@ export default function HSAComparison({ scenarios, onUpdateScenario, onRemoveSce
             </thead>
             <tbody>
               <tr className="border-b border-border">
-                <td className="p-3 font-medium text-foreground">Yearly premium savings versus the other plan</td>
+                <td className="p-3 font-medium text-foreground">Annual premium savings redirected (HDHP / CDHP)</td>
                 {summary.map((scenario) => (
                   <td key={`premium-${scenario.id}`} className="p-3 text-center">
                     <div className="flex items-center justify-center">
@@ -165,6 +169,17 @@ export default function HSAComparison({ scenarios, onUpdateScenario, onRemoveSce
                   </td>
                 ))}
               </tr>
+              <tr className="border-b border-border">
+                <td className="p-3 font-medium text-foreground">Your total savings this year (HDHP / CDHP)</td>
+                {summary.map((scenario) => (
+                  <td key={`totals-${scenario.id}`} className="p-3 text-center">
+                    <div className="flex items-center justify-center">
+                      <span className="text-lg font-semibold text-emerald-600">{currency(scenario.totalSavings)}</span>
+                      {getIndicator(scenario.totalSavings, bestTotalSavings)}
+                    </div>
+                  </td>
+                ))}
+              </tr>
               <tr>
                 <td className="p-3 font-medium text-foreground">Money left after savings and deposits</td>
                 {summary.map((scenario) => (
@@ -186,13 +201,17 @@ export default function HSAComparison({ scenarios, onUpdateScenario, onRemoveSce
           const results = scenarioResults[scenario.id];
           const contributionLimit = getContributionLimit(scenario.data);
           const coverageLabel = scenario.data.coverage === "family" ? "Family" : "Individual";
+          const isFamily = scenario.data.coverage === "family";
+          const scenarioLimitDisplay = currency(contributionLimit);
+          const familyLimitDisplay = currency(HSA_LIMITS.family);
+          const familyLimitWithCatchUpDisplay = currency(HSA_LIMITS.family + HSA_LIMITS.catchUp);
 
           return (
             <GlassCard key={scenario.id} className="space-y-6" analyticsId={`hsa-scenario-${scenario.id}`}>
               <div className="flex items-start justify-between border-b border-border pb-2">
                 <div>
                   <h4 className="text-lg font-semibold text-foreground">{scenario.name}</h4>
-                  <p className="text-xs text-muted-foreground">{coverageLabel} HDHP scenario overview</p>
+                  <p className="text-xs text-muted-foreground">{coverageLabel} HDHP / CDHP scenario overview</p>
                 </div>
                 <Button
                   variant="ghost"
@@ -210,11 +229,11 @@ export default function HSAComparison({ scenarios, onUpdateScenario, onRemoveSce
                   <div className="flex items-center justify-between">
                     <Label className="text-sm font-medium text-foreground">Coverage & age</Label>
                     <Tooltip
-                      title="HDHP compatibility"
+                      title="HDHP / CDHP compatibility"
                       content={
                         <p>
                           Your coverage level and age decide how much the IRS lets you put in an HSA. Confirm the medical plan
-                          counts as an HDHP before relying on these results.
+                          counts as an HDHP / CDHP before relying on these results.
                         </p>
                       }
                     />
@@ -262,9 +281,20 @@ export default function HSAComparison({ scenarios, onUpdateScenario, onRemoveSce
                         onChange={(event) => updateScenario(scenario.id, { age: Number(event.target.value) || 0 })}
                       />
                     </div>
-                    <div className="rounded-lg bg-primary/5 border border-dashed border-primary/40 p-3 text-xs text-muted-foreground">
-                      <p>2026 limit: {currency(contributionLimit)}</p>
-                      <p>{scenario.data.age >= 55 ? "Includes the $1,000 catch-up for age 55+" : "Add $1,000 more once you turn 55"}</p>
+                    <div className="rounded-lg bg-primary/5 border border-dashed border-primary/40 p-3 text-xs text-muted-foreground leading-relaxed">
+                      <p className="font-semibold text-primary">Your 2026 IRS limit: {scenarioLimitDisplay}</p>
+                      <p className="mt-1">
+                        The {familyLimitDisplay} family limit applies only to family HDHP / CDHP coverage. Age 55+ catch-up raises that cap to {familyLimitWithCatchUpDisplay} and adds the same $1,000 to individual limits.
+                      </p>
+                      {isFamily ? (
+                        <p className="mt-2">
+                          Remember to include both your payroll deposits and employer contributions when tracking this family limit.
+                        </p>
+                      ) : (
+                        <p className="mt-2 text-amber-600 font-semibold">
+                          If an individual is not on a family plan, they cannot contribute this amount.
+                        </p>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -276,7 +306,7 @@ export default function HSAComparison({ scenarios, onUpdateScenario, onRemoveSce
                       title="Premium offsets"
                       content={
                         <p>
-                          Track how much cheaper the HDHP is each month. Redirect that savings to your HSA so the deductible is
+                          Track how much cheaper the HDHP / CDHP is each month. Redirect that savings to your HSA so the deductible is
                           covered before any claims arrive.
                         </p>
                       }
@@ -284,7 +314,7 @@ export default function HSAComparison({ scenarios, onUpdateScenario, onRemoveSce
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <Label className="text-xs uppercase text-muted-foreground">HDHP monthly premium</Label>
+                      <Label className="text-xs uppercase text-muted-foreground">HDHP / CDHP monthly premium</Label>
                       <Input
                         type="number"
                         min={0}
@@ -303,7 +333,7 @@ export default function HSAComparison({ scenarios, onUpdateScenario, onRemoveSce
                     </div>
                   </div>
                   <div className="rounded-lg bg-secondary/10 border border-dashed border-secondary/40 p-3 text-xs text-muted-foreground">
-                    <p>Annual premium savings: {currency(results?.annualPremiumSavings ?? 0)}</p>
+                    <p>Annual premium savings redirected (HDHP / CDHP): {currency(results?.annualPremiumSavings ?? 0)}</p>
                     <p>Money left after inflows and deposits: {currency(results?.netCashflowAdvantage ?? 0)}</p>
                   </div>
                 </div>
@@ -402,7 +432,7 @@ export default function HSAComparison({ scenarios, onUpdateScenario, onRemoveSce
                   </div>
                   <div className="rounded-xl border border-dashed border-border/60 bg-muted/40 p-4 text-xs text-muted-foreground">
                     <p>Tax savings: {currency(results?.taxSavings ?? 0)}</p>
-                    <p>Estimated after-tax cost of the HDHP: {currency(results?.effectiveCost ?? 0)}</p>
+                    <p>Estimated after-tax cost of the HDHP / CDHP: {currency(results?.effectiveCost ?? 0)}</p>
                   </div>
                 </div>
               </div>

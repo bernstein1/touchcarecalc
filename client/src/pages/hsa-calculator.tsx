@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
-import { ArrowLeft, Calculator, Download, PiggyBank } from "lucide-react";
+import { ArrowLeft, Calculator, Download, PiggyBank, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Progress } from "@/components/ui/progress";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import GlassCard from "@/components/glass-card";
@@ -75,7 +76,24 @@ export default function HSACalculator() {
   };
 
   const premiumDifference = results.annualPremiumSavings;
+  const totalSavingsThisYear = results.annualPremiumSavings + results.taxSavings;
   const reserveProgress = results.projectedReserve;
+  const targetReserveAmount = inputs.targetReserve ?? 0;
+  const reserveProgressPercent = targetReserveAmount > 0 ? Math.min(100, (reserveProgress / targetReserveAmount) * 100) : undefined;
+  const reserveShortfall = targetReserveAmount > 0 ? Math.max(targetReserveAmount - reserveProgress, 0) : 0;
+  const reserveProgressLabel = targetReserveAmount > 0
+    ? `${formatCurrency(Math.min(reserveProgress, targetReserveAmount))} of ${formatCurrency(targetReserveAmount)}`
+    : formatCurrency(reserveProgress);
+  const familyEligible = inputs.coverage === "family";
+  const familyLimitWarning = !familyEligible
+    ? "If an individual is not on a family plan, they cannot contribute this amount."
+    : undefined;
+  const familyLimitDisplay = formatCurrency(HSA_LIMITS.family);
+  const familyLimitWithCatchUpDisplay = formatCurrency(HSA_LIMITS.family + HSA_LIMITS.catchUp);
+  const individualLimitDisplay = formatCurrency(HSA_LIMITS.individual);
+  const sliderHelperText = inputs.coverage === "family"
+    ? `Pre-tax payroll dollars you plan to contribute into your HSA. The 2026 family HDHP / CDHP limit is ${familyLimitDisplay} (or ${familyLimitWithCatchUpDisplay} if you're 55 or older).`
+    : `Pre-tax payroll dollars you plan to contribute into your HSA. The 2026 individual limit is ${individualLimitDisplay}. Only family HDHP / CDHP coverage qualifies for the ${familyLimitDisplay} family limit (or ${familyLimitWithCatchUpDisplay} with the age 55+ catch-up).`;
 
   return (
     <div className="space-y-8" data-analytics-id="page-hsa-calculator">
@@ -94,8 +112,8 @@ export default function HSACalculator() {
               HSA Strategy Planner
             </h2>
             <p className="text-muted-foreground max-w-xl">
-              Use this guide to see how a high-deductible health plan (HDHP) works with a health savings account (HSA).
-              HDHPs usually skip copays, so you pay the early bills out of pocket. We will show how premiums, payroll
+              Use this guide to see how a high-deductible or consumer driven health plan (HDHP / CDHP) works with a health savings account (HSA).
+              HDHP / CDHP plans usually skip copays, so you pay the early bills out of pocket. We will show how premiums, payroll
               deposits, and any employer help can build an HSA cushion before those bills arrive.
             </p>
           </div>
@@ -143,7 +161,7 @@ export default function HSACalculator() {
                 </div>
                 <div className="flex items-start gap-2">
                   <span className="text-primary font-bold">🏥</span>
-                  <p><strong className="text-foreground">HDHP/CDHP requirement:</strong> You must be enrolled in a qualified high-deductible or consumer driven health plan to contribute to an HSA, and you cannot fund it if you also participate in a general-purpose medical FSA.</p>
+                  <p><strong className="text-foreground">HDHP / CDHP requirement:</strong> You must be enrolled in a qualified high-deductible or consumer driven health plan to contribute to an HSA, and you cannot fund it if you also participate in a general-purpose medical FSA.</p>
                 </div>
               </div>
             </GlassCard>
@@ -152,13 +170,13 @@ export default function HSACalculator() {
           <GlassCard className="space-y-6">
             <div className="flex items-start justify-between gap-4">
               <div>
-                <h3 className="text-xl font-semibold text-foreground">Confirm HDHP eligibility</h3>
+                <h3 className="text-xl font-semibold text-foreground">Confirm HDHP / CDHP eligibility</h3>
                 <p className="text-sm text-muted-foreground mt-2 leading-relaxed space-y-2">
                   <span className="block">
-                    If you intend to contribute to an HSA account, make sure the health insurance plan you choose is a qualified High Deductible Health Plan or Consumer Driven Health Plan (HDHP/CDHP) — only these plans allow you to participate in an HSA funding arrangement.
+                    If you intend to contribute to an HSA account, make sure the health insurance plan you choose is a qualified High Deductible Health Plan or Consumer Driven Health Plan (HDHP / CDHP) — only these plans allow you to participate in an HSA funding arrangement.
                   </span>
                   <span className="block">
-                    HDHP or CDHP health plans typically trade predictable copays for lower premiums and higher out-of-pocket costs, so check that the coverage works for your household and that your HSA balance (or budget) can handle unexpected expenses. If you have questions about how HDHP or CDHP plans work, please contact TouchCare for additional assistance.
+                    HDHP / CDHP health plans typically trade predictable copays for lower premiums and higher out-of-pocket costs, so check that the coverage works for your household and that your HSA balance (or budget) can handle unexpected expenses. If you have questions about how HDHP / CDHP plans work, please contact TouchCare for additional assistance.
                   </span>
                 </p>
               </div>
@@ -195,7 +213,7 @@ export default function HSACalculator() {
                     <Label htmlFor="coverage-individual" className="cursor-pointer">
                       <div className="text-center">
                         <div className="text-primary text-xl mb-2">👤</div>
-                        <div className="font-medium text-foreground">Individual (Self-Only) HDHP/CDHP Coverage</div>
+                        <div className="font-medium text-foreground">Individual (Self-Only) HDHP / CDHP Coverage</div>
                         <div className="text-xs text-muted-foreground">Applies when you’re the only person covered under the plan.</div>
                       </div>
                     </Label>
@@ -211,7 +229,7 @@ export default function HSACalculator() {
                     <Label htmlFor="coverage-family" className="cursor-pointer">
                       <div className="text-center">
                         <div className="text-primary text-xl mb-2">👨‍👩‍👧‍👦</div>
-                        <div className="font-medium text-foreground">Family HDHP/CDHP Coverage</div>
+                        <div className="font-medium text-foreground">Family HDHP / CDHP Coverage</div>
                         <div className="text-xs text-muted-foreground">Applies when your plan also covers a spouse and/or dependents.</div>
                       </div>
                     </Label>
@@ -308,11 +326,20 @@ export default function HSACalculator() {
 
             <div className="rounded-xl border border-dashed border-primary/40 bg-primary/5 p-4 text-sm">
               <p className="font-medium text-primary">
-                2026 family HSA Contribution Limit: $9,750
+                2026 family HSA contribution limit: {familyLimitDisplay}
               </p>
-              <p className="text-muted-foreground mt-1">
-                This amount includes the 2026 IRS family limit of $8,750, plus an extra $1,000 catch-up amount for anyone 55 or older.
+              <p className="text-muted-foreground mt-1 leading-relaxed">
+                Only households enrolled in family HDHP / CDHP coverage can contribute this full amount. If you are 55 or older, the IRS catch-up raises the ceiling to {familyLimitWithCatchUpDisplay}.
               </p>
+              {familyLimitWarning ? (
+                <p className="text-xs font-semibold text-amber-600 mt-2">
+                  {familyLimitWarning}
+                </p>
+              ) : (
+                <p className="text-xs text-muted-foreground mt-2">
+                  Remember: both your own and employer contributions count toward this family limit, with an extra {formatCurrency(HSA_LIMITS.catchUp)} catch-up once you turn 55.
+                </p>
+              )}
             </div>
           </GlassCard>
 
@@ -326,7 +353,7 @@ export default function HSACalculator() {
               <div className="rounded-lg bg-blue-50 border border-blue-200 p-4 mb-4">
                 <p className="text-sm text-blue-900 font-medium mb-2">Family HSA Contribution Rules</p>
                 <p className="text-xs text-blue-800">
-                  If both spouses have HDHP coverage and each opens an HSA, the total amount you can contribute together can’t be more than the IRS family limit of {formatCurrency(HSA_LIMITS.family)}.
+                  If both spouses have HDHP / CDHP coverage and each opens an HSA, the total amount you can contribute together can’t be more than the IRS family limit of {formatCurrency(HSA_LIMITS.family)}.
                 </p>
                 <p className="text-xs text-blue-800 mt-2">
                   This limit includes all contributions — both your own and any employer contributions from either spouse’s employer. Together, you may choose how to split the total between your accounts.
@@ -546,9 +573,19 @@ export default function HSACalculator() {
               max={contributionLimit}
               step={100}
               onChange={(value) => updateInput("employeeContribution", value)}
-              helperText={`Pre-tax payroll dollars you plan to contribute into your HSA. You can contribute up to $8,750, or $9,750 if you’re 55+.`}
+              helperText={sliderHelperText}
               focusLabel="Target deductible coverage"
             />
+
+            {familyLimitWarning ? (
+              <div className="flex items-start gap-3 rounded-xl border border-amber-300/60 bg-amber-50 p-4 text-xs text-amber-900" role="alert">
+                <AlertTriangle className="h-4 w-4 mt-0.5 flex-shrink-0" />
+                <div>
+                  <p className="font-semibold">Family limit reminder</p>
+                  <p>{familyLimitWarning}</p>
+                </div>
+              </div>
+            ) : null}
 
             <div className="grid md:grid-cols-2 gap-6">
               <div>
@@ -575,7 +612,7 @@ export default function HSACalculator() {
                     HSA Savings Goal
                   <Tooltip
                     title="What is a target reserve?"
-                    content="Your target reserve is the HSA balance you want to maintain to cover unexpected medical expenses. Most people aim for an amount that covers their HDHP deductible so they're financially prepared if they face maximum out-of-pocket costs in a given year. This cushion gives you peace of mind and prevents the need to pay large medical bills out of regular income."
+                    content="Your target reserve is the HSA balance you want to maintain to cover unexpected medical expenses. Most people aim for an amount that covers their HDHP / CDHP deductible so they're financially prepared if they face maximum out-of-pocket costs in a given year. This cushion gives you peace of mind and prevents the need to pay large medical bills out of regular income."
                   />
                 </Label>
                 <Input
@@ -587,7 +624,7 @@ export default function HSACalculator() {
                   prefix="$"
                 />
                 <p className="text-xs text-muted-foreground mt-2">
-                  Recommended: Set this to your HDHP deductible amount
+                  Recommended: Set this to your HDHP / CDHP deductible amount
                 </p>
               </div>
             </div>
@@ -605,7 +642,7 @@ export default function HSACalculator() {
                 title="Why compare premiums?"
                 content={
                   <p>
-                    The monthly premium difference between plans represents money you can redirect to your HSA. For example, if your HDHP costs $200/month and a traditional plan costs $350/month, you save $150 monthly ($1,800 annually) that can go toward building your HSA reserve.
+                    The monthly premium difference between plans represents money you can redirect to your HSA. For example, if your HDHP / CDHP costs $200/month and a traditional plan costs $350/month, you save $150 monthly ($1,800 annually) that can go toward building your HSA reserve.
                   </p>
                 }
               />
@@ -614,7 +651,7 @@ export default function HSACalculator() {
             <div className="grid md:grid-cols-2 gap-6">
               <div>
                 <Label htmlFor="hdhp-premium" className="text-sm font-medium text-foreground mb-2">
-                  Monthly employee premium for HDHP plan
+                  Monthly employee premium for HDHP / CDHP plan
                 </Label>
                 <Input
                   id="hdhp-premium"
@@ -625,7 +662,7 @@ export default function HSACalculator() {
                   prefix="$"
                 />
                 <p className="text-xs text-muted-foreground mt-1">
-                  Your monthly paycheck deduction for the HDHP
+                  Your monthly paycheck deduction for the HDHP / CDHP plan
                 </p>
               </div>
               <div>
@@ -671,24 +708,35 @@ export default function HSACalculator() {
             </div>
             <div className="space-y-4">
               <div className="rounded-xl border border-primary/30 bg-primary/5 p-4">
-                <p className="text-sm text-muted-foreground">Annual premium savings redirected</p>
+                <p className="text-sm text-muted-foreground">Annual premium savings redirected (HDHP / CDHP)</p>
                 <p className="text-2xl font-bold text-primary">{formatCurrency(premiumDifference)}</p>
-                <p className="text-xs text-muted-foreground mt-1">
-                  Total yearly difference between your HDHP premium and the alternative plan premium.
+                <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
+                  Total yearly difference between your HDHP / CDHP premium and the alternative plan premium that you can move into your HSA.
                 </p>
               </div>
               <div className="rounded-xl border border-emerald-300/40 bg-emerald-500/10 p-4">
-                <p className="text-sm text-muted-foreground">Your HSA account balance</p>
-                <p className="text-2xl font-bold text-emerald-500">{formatCurrency(reserveProgress)}</p>
-                <p className="text-xs text-muted-foreground mt-1">
-                  Total money in your HSA to pay for medical bills.
-                </p>
+                <p className="text-sm text-muted-foreground">HSA balance progress</p>
+                <p className="text-2xl font-bold text-emerald-600">{reserveProgressLabel}</p>
+                {reserveProgressPercent !== undefined ? (
+                  <>
+                    <Progress value={reserveProgressPercent} className="mt-3 h-2" />
+                    <p className="text-xs text-muted-foreground mt-2">
+                      {reserveShortfall > 0
+                        ? `You're ${formatCurrency(reserveShortfall)} short of your target savings goal.`
+                        : "You've reached your target savings goal."}
+                    </p>
+                  </>
+                ) : (
+                  <p className="text-xs text-muted-foreground mt-2">
+                    Set a target savings goal to track progress toward your cushion.
+                  </p>
+                )}
               </div>
               <div className="rounded-xl border border-border p-4">
-                <p className="text-sm text-muted-foreground">Your total savings this year</p>
-                <p className="text-2xl font-bold text-foreground">{formatCurrency(results.netCashflowAdvantage)}</p>
-                <p className="text-xs text-muted-foreground mt-1">
-                  Money you save by choosing the HDHP, including lower premiums and tax benefits.
+                <p className="text-sm text-muted-foreground">Your total savings this year (HDHP / CDHP)</p>
+                <p className="text-2xl font-bold text-foreground">{formatCurrency(totalSavingsThisYear)}</p>
+                <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
+                  Premium savings plus tax savings you can redirect toward your HSA or other goals.
                 </p>
               </div>
             </div>
@@ -742,9 +790,9 @@ export default function HSACalculator() {
             description="See how premium savings, tax benefits, and employer contributions work together to build your HSA balance."
             items={[
               {
-                label: "Annual premium savings",
+                label: "Annual premium savings redirected (HDHP / CDHP)",
                 value: formatCurrency(results.annualPremiumSavings),
-                helperText: "Yearly savings from choosing the HDHP over the alternative plan",
+                helperText: "Yearly savings from choosing the HDHP / CDHP over the alternative plan",
                 accent: "primary",
               },
               {
@@ -763,18 +811,15 @@ export default function HSACalculator() {
                 value: `${formatCurrency(results.projectedReserve)} of ${formatCurrency(inputs.targetReserve)}`,
                 helperText:
                   results.reserveShortfall > 0
-                    ? `You're ${formatCurrency(results.reserveShortfall)} short of your target reserve`
-                    : "You're on track to meet your target HSA reserve",
+                    ? `You're ${formatCurrency(results.reserveShortfall)} short of your target savings goal`
+                    : "You're on track to meet your target savings goal",
                 accent: results.reserveShortfall > 0 ? "warning" : "success",
               },
               {
-                label: "Net annual benefit",
-                value: formatCurrency(results.netCashflowAdvantage),
-                helperText:
-                  results.netCashflowAdvantage >= 0
-                    ? "Your total benefit after all contributions and savings"
-                    : "Your contributions exceed premium savings—verify this fits your budget",
-                accent: results.netCashflowAdvantage >= 0 ? "success" : "warning",
+                label: "Your total savings this year (HDHP / CDHP)",
+                value: formatCurrency(totalSavingsThisYear),
+                helperText: "Premium savings plus tax savings available to fund your HSA.",
+                accent: "success",
               },
             ]}
           />

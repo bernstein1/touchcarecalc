@@ -39,7 +39,7 @@ const calculatorTypes = [
     id: 'hsa' as const,
     name: 'Health Savings Account (HSA)',
     icon: HeartPulse,
-    description: 'Compare high-deductible health plan (HDHP) premiums and HSA contributions in plain dollars'
+    description: 'Compare high-deductible or consumer driven health plan (HDHP / CDHP) premiums and HSA contributions in plain dollars'
   },
   {
     id: 'fsa' as const,

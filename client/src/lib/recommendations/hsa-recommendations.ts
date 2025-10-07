@@ -55,7 +55,7 @@ export function generateHSARecommendations(inputs: HSAInputs, results: HSAResult
         message: `Your HSA balance will only cover ${Math.round(coverageRatio)}% of your deductible. Without additional savings, a major medical event could strain your finances significantly.`,
         actions: [
           `Critical: Increase contribution by $${(relevantDeductible - results.projectedReserve).toLocaleString()} to protect against high medical costs`,
-          "Consider if the HDHP is the right plan choice given your financial situation",
+          "Consider if the HDHP / CDHP is the right plan choice given your financial situation",
           "Ensure you have emergency savings outside HSA for medical costs"
         ]
       });
@@ -123,7 +123,7 @@ export function generateHSARecommendations(inputs: HSAInputs, results: HSAResult
       recommendations.push({
         level: "optimal",
         title: "Premium Savings Exceed Contribution",
-        message: `Your HDHP saves you $${Math.round(results.annualPremiumSavings).toLocaleString()} vs. the alternative plan—more than your $${results.employeeContribution.toLocaleString()} HSA contribution. The HDHP strategy is cash-flow positive even before tax savings.`,
+        message: `Your HDHP / CDHP plan saves you $${Math.round(results.annualPremiumSavings).toLocaleString()} vs. the alternative plan—more than your $${results.employeeContribution.toLocaleString()} HSA contribution. The HDHP / CDHP strategy is cash-flow positive even before tax savings.`,
         actions: [
           "Redirect premium savings into HSA to build your reserve faster",
           "You're in an excellent position with this plan choice"
@@ -147,7 +147,7 @@ export function generateHSARecommendations(inputs: HSAInputs, results: HSAResult
     recommendations.push({
       level: "good",
       title: "Premium Savings Help Offset Contribution",
-      message: `By enrolling in an HDHP/CDHP plan, you save $${Math.round(results.annualPremiumSavings).toLocaleString()} in annual premiums (what you pay for your insurance plan). This savings is enough to cover about ${coveragePercent}% of your HSA contribution goal${deductibleSentence}.`
+      message: `By enrolling in an HDHP / CDHP plan, you save $${Math.round(results.annualPremiumSavings).toLocaleString()} in annual premiums (what you pay for your insurance plan). This savings is enough to cover about ${coveragePercent}% of your HSA contribution goal${deductibleSentence}.`
     });
     }
   }
@@ -161,7 +161,7 @@ export function generateHSARecommendations(inputs: HSAInputs, results: HSAResult
       title: "Room for Tax-Advantaged Growth",
       message: `You're only using ${Math.round(utilizationRate)}% of your HSA contribution limit. In your ${results.marginalRate}% tax bracket, you could save an additional $${Math.round((results.annualContributionLimit - results.totalContribution) * (results.marginalRate / 100)).toLocaleString()} by maximizing contributions.`,
       actions: [
-        "Consider increasing contribution toward the $8,750 IRS limit (+ $1,000 if over 55)",
+        "Consider increasing contribution toward the $8,750 family limit (+ $1,000 catch-up if over 55)",
         "HSA is one of the most tax-advantaged accounts available (triple tax benefit)"
       ]
     });

@@ -36,11 +36,11 @@ const comparisonData: ComparisonRow[] = [
     feature: "Required health plan",
     hsa: {
       available: true,
-      detail: "Must be enrolled in a qualified high-deductible health plan (HDHP)",
+      detail: "Must be enrolled in a qualified high-deductible or consumer driven health plan (HDHP / CDHP)",
     },
     fsa: {
       available: true,
-      detail: "Works with any health plan—no HDHP required",
+      detail: "Works with any health plan—no HDHP / CDHP required",
     },
   },
   {
@@ -69,7 +69,7 @@ const comparisonData: ComparisonRow[] = [
     feature: "Can pair with Limited Purpose FSA (dental/vision only)",
     hsa: {
       available: true,
-      detail: "LPFSA is HSA-compatible for dental and vision expenses",
+      detail: "LPFSA is HSA-compatible for dental and vision expenses; check your benefits guide to confirm it's offered",
     },
     fsa: {
       available: false,
@@ -102,7 +102,7 @@ const comparisonData: ComparisonRow[] = [
     feature: "Best for...",
     hsa: {
       available: true,
-      detail: "People on HDHPs who want long-term savings or can afford upfront medical costs",
+      detail: "People on HDHP / CDHP plans who want long-term savings or can afford upfront medical costs",
     },
     fsa: {
       available: true,
@@ -183,9 +183,12 @@ export default function FSAvsHSAComparison({ variant = "inline" }: FSAvsHSACompa
           Strategic pairing: HSA + Limited Purpose FSA (LPFSA)
         </h4>
         <p className="text-sm text-muted-foreground leading-relaxed">
-          If you have an HDHP and HSA, you can also enroll in a <em>Limited Purpose FSA</em> to cover dental and vision
+          If you have an HDHP / CDHP and HSA, you can also enroll in a <em>Limited Purpose FSA</em> to cover dental and vision
           expenses pre-tax without losing HSA eligibility. This combo gives you the best of both worlds: HSA long-term
           savings for medical expenses, and LPFSA front-loaded funds for predictable dental and vision bills.
+        </p>
+        <p className="text-xs text-muted-foreground leading-relaxed">
+          Limited Purpose FSAs are not available through every organization. Employees should review their benefits guide, platform, or enrollment solution to confirm whether their company offers an LPFSA.
         </p>
       </div>
     </div>

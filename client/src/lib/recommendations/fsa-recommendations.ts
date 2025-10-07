@@ -105,7 +105,7 @@ export function generateFSARecommendations(inputs: FSAInputs, results: FSAResult
     recommendations.push({
       level: "good",
       title: "Consider Limited Purpose FSA",
-      message: "If you have an HSA, you can pair it with a Limited Purpose FSA (LPFSA) for dental and vision expenses. This gives you front-loaded funds for predictable expenses while keeping HSA eligibility.",
+      message: "If you have an HSA, you can pair it with a Limited Purpose FSA (LPFSA) for dental and vision expenses. Limited Purpose FSAs are not available through every organization—review your benefits guide, platform, or enrollment solution to confirm whether your company offers an LPFSA. This combo gives you front-loaded funds for predictable expenses while keeping HSA eligibility.",
       actions: [
         "LPFSA covers dental cleanings, fillings, orthodontics, glasses, contacts",
         "Strategy: Use LPFSA for planned dental/vision, save HSA for medical emergencies",
