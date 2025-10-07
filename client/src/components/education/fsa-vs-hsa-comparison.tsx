@@ -7,16 +7,16 @@ import {
 } from "@/components/ui/accordion";
 import GlassCard from "@/components/glass-card";
 
+interface ComparisonAvailability {
+  available: boolean;
+  detail: string;
+  status?: "conditional";
+}
+
 interface ComparisonRow {
   feature: string;
-  hsa: {
-    available: boolean;
-    detail: string;
-  };
-  fsa: {
-    available: boolean;
-    detail: string;
-  };
+  hsa: ComparisonAvailability;
+  fsa: ComparisonAvailability;
 }
 
 const comparisonData: ComparisonRow[] = [
@@ -28,6 +28,7 @@ const comparisonData: ComparisonRow[] = [
     },
     fsa: {
       available: false,
+      status: "conditional",
       detail: "Use-it-or-lose-it rule applies (unless plan offers carryover up to $640 or grace period)",
     },
   },
@@ -119,8 +120,7 @@ export default function FSAvsHSAComparison({ variant = "inline" }: FSAvsHSACompa
     <div className="space-y-6">
       <div className="text-sm text-muted-foreground leading-relaxed">
         <p className="mb-3">
-          Both FSAs and HSAs let you pay for medical expenses with pre-tax dollars, but they work very differently.
-          Understanding these differences helps you choose the right account—or use both strategically.
+          Both FSAs and HSAs allow you to pay for qualified medical, dental and vision expenses using pre-tax dollars, but they work very differently. Understanding these differences helps you choose the right account - or (if available) use both types of accounts, strategically.
         </p>
       </div>
 
@@ -137,7 +137,7 @@ export default function FSAvsHSAComparison({ variant = "inline" }: FSAvsHSACompa
               </th>
               <th className="text-center p-3 font-medium text-foreground w-[120px]">
                 <div className="flex flex-col items-center">
-                  <span className="text-secondary font-semibold">FSA</span>
+                  <span className="text-foreground font-semibold">FSA</span>
                   <span className="text-xs text-muted-foreground font-normal">(Flexible Spending Account)</span>
                 </div>
               </th>
@@ -149,7 +149,9 @@ export default function FSAvsHSAComparison({ variant = "inline" }: FSAvsHSACompa
                 <td className="p-3 font-medium text-foreground">{row.feature}</td>
                 <td className="p-3 text-center">
                   <div className="flex flex-col items-center gap-2">
-                    {row.hsa.available ? (
+                    {row.hsa.status === "conditional" ? (
+                      <span className="inline-flex items-center gap-1 rounded-full bg-amber-100 px-2 py-1 text-xs font-medium text-amber-900">Conditional</span>
+                    ) : row.hsa.available ? (
                       <Check className="text-green-500" size={20} />
                     ) : (
                       <X className="text-red-500" size={20} />
@@ -159,7 +161,9 @@ export default function FSAvsHSAComparison({ variant = "inline" }: FSAvsHSACompa
                 </td>
                 <td className="p-3 text-center">
                   <div className="flex flex-col items-center gap-2">
-                    {row.fsa.available ? (
+                    {row.fsa.status === "conditional" ? (
+                      <span className="inline-flex items-center gap-1 rounded-full bg-amber-100 px-2 py-1 text-xs font-medium text-amber-900">Conditional</span>
+                    ) : row.fsa.available ? (
                       <Check className="text-green-500" size={20} />
                     ) : (
                       <X className="text-red-500" size={20} />

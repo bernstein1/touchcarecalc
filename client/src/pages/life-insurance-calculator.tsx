@@ -71,10 +71,10 @@ export default function LifeInsuranceCalculator() {
       </div>
 
       <div className="rounded-lg border-2 border-primary/40 bg-primary/5 p-4 max-w-2xl mx-auto">
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-sm font-medium text-foreground">Need personalized help?</p>
-            <p className="text-xs text-muted-foreground mt-1">Visit the TouchCare Member Portal for additional questions and support</p>
+        <div className="flex items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <img src="/unnamed.png" alt="TouchCare" className="h-10 w-10 rounded-full object-cover" />
+            <p className="text-sm font-medium text-foreground max-w-xs">Connect with a TouchCare Specialist for additional questions or support</p>
           </div>
           <a
             href="https://touchcare.com/ask"
@@ -82,7 +82,7 @@ export default function LifeInsuranceCalculator() {
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 px-4 py-2 rounded-md bg-primary text-primary-foreground hover:bg-primary/90 transition-colors text-sm font-medium whitespace-nowrap"
           >
-            Member Portal →
+            <span>TouchCare Member Portal</span>
           </a>
         </div>
       </div>

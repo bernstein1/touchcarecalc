@@ -130,11 +130,25 @@ export function generateHSARecommendations(inputs: HSAInputs, results: HSAResult
         ]
       });
     } else {
-      recommendations.push({
-        level: "good",
-        title: "Premium Savings Help Offset Contribution",
-        message: `Your HDHP saves $${Math.round(results.annualPremiumSavings).toLocaleString()} in premiums, covering ${Math.round((results.annualPremiumSavings / results.employeeContribution) * 100)}% of your HSA contribution.`
-      });
+    const coveragePercent = results.employeeContribution > 0
+      ? Math.round((results.annualPremiumSavings / results.employeeContribution) * 100)
+      : 0;
+    const relevantDeductible = inputs.coverage === 'family'
+      ? inputs.planDeductibleFamily ?? 0
+      : inputs.planDeductibleIndividual ?? 0;
+    const deductibleCoveragePercent = relevantDeductible > 0
+      ? Math.round((results.projectedReserve / relevantDeductible) * 100)
+      : undefined;
+
+    const deductibleSentence = deductibleCoveragePercent !== undefined
+      ? `, and builds a reserve covering roughly ${deductibleCoveragePercent}% of your deductible`
+      : '';
+
+    recommendations.push({
+      level: "good",
+      title: "Premium Savings Help Offset Contribution",
+      message: `By enrolling in an HDHP/CDHP plan, you save $${Math.round(results.annualPremiumSavings).toLocaleString()} in annual premiums (what you pay for your insurance plan). This savings is enough to cover about ${coveragePercent}% of your HSA contribution goal${deductibleSentence}.`
+    });
     }
   }
 
@@ -147,7 +161,7 @@ export function generateHSARecommendations(inputs: HSAInputs, results: HSAResult
       title: "Room for Tax-Advantaged Growth",
       message: `You're only using ${Math.round(utilizationRate)}% of your HSA contribution limit. In your ${results.marginalRate}% tax bracket, you could save an additional $${Math.round((results.annualContributionLimit - results.totalContribution) * (results.marginalRate / 100)).toLocaleString()} by maximizing contributions.`,
       actions: [
-        `Consider increasing contribution toward the $${results.annualContributionLimit.toLocaleString()} limit`,
+        "Consider increasing contribution toward the $8,750 IRS limit (+ $1,000 if over 55)",
         "HSA is one of the most tax-advantaged accounts available (triple tax benefit)"
       ]
     });

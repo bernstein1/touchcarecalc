@@ -85,6 +85,11 @@ export interface FSAInputs {
   includeDependentCare: boolean;
   dependentCareElection: number;
   expectedDependentCareExpenses: number;
+  dentalOrthodonticExpenses?: number;
+  visionExpenses?: number;
+  priorYearQualifiedMedicalExpenses?: number;
+  plannedMedicalProcedures?: number;
+  otherQualifiedExpenses?: number;
   annualIncome: number;
   filingStatus?: FilingStatus;
   // New fields for enhanced guidance

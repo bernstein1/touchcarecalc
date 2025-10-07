@@ -107,10 +107,10 @@ export default function HSACalculator() {
       </div>
 
       <div className="rounded-lg border-2 border-primary/40 bg-primary/5 p-4 max-w-2xl mx-auto">
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-sm font-medium text-foreground">Need personalized help?</p>
-            <p className="text-xs text-muted-foreground mt-1">Visit the TouchCare Member Portal for additional questions and support</p>
+        <div className="flex items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <img src="/unnamed.png" alt="TouchCare" className="h-10 w-10 rounded-full object-cover" />
+            <p className="text-sm font-medium text-foreground max-w-xs">Connect with a TouchCare Specialist for additional questions or support</p>
           </div>
           <a
             href="https://touchcare.com/ask"
@@ -118,7 +118,7 @@ export default function HSACalculator() {
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 px-4 py-2 rounded-md bg-primary text-primary-foreground hover:bg-primary/90 transition-colors text-sm font-medium whitespace-nowrap"
           >
-            Member Portal →
+            <span>TouchCare Member Portal</span>
           </a>
         </div>
       </div>
@@ -139,11 +139,11 @@ export default function HSACalculator() {
                 </div>
                 <div className="flex items-start gap-2">
                   <span className="text-primary font-bold">⏱</span>
-                  <p><strong className="text-foreground">Funds availability:</strong> Money you contribute becomes available once it's distributed to your HSA account. Check with your provider for timing.</p>
+                  <p><strong className="text-foreground">Funds availability:</strong> Money you contribute into your HSA becomes available once it is distributed to your account. Check with your HSA administrator for timing.</p>
                 </div>
                 <div className="flex items-start gap-2">
                   <span className="text-primary font-bold">🏥</span>
-                  <p><strong className="text-foreground">HDHP requirement:</strong> HSAs are only compatible with qualified high-deductible health plans. You cannot contribute to an HSA while also enrolled in a general-purpose medical FSA.</p>
+                  <p><strong className="text-foreground">HDHP/CDHP requirement:</strong> You must be enrolled in a qualified high-deductible or consumer driven health plan to contribute to an HSA, and you cannot fund it if you also participate in a general-purpose medical FSA.</p>
                 </div>
               </div>
             </GlassCard>
@@ -153,10 +153,13 @@ export default function HSACalculator() {
             <div className="flex items-start justify-between gap-4">
               <div>
                 <h3 className="text-xl font-semibold text-foreground">Confirm HDHP eligibility</h3>
-                <p className="text-sm text-muted-foreground mt-2 leading-relaxed">
-                  Make sure the plan you are choosing counts as an HDHP so you can fund an HSA. These plans trade
-                  predictable copays for lower premiums, so double-check that the coverage fits your household and that
-                  your HSA can handle unexpected bills.
+                <p className="text-sm text-muted-foreground mt-2 leading-relaxed space-y-2">
+                  <span className="block">
+                    If you intend to contribute to an HSA account, make sure the health insurance plan you choose is a qualified High Deductible Health Plan or Consumer Driven Health Plan (HDHP/CDHP) — only these plans allow you to participate in an HSA funding arrangement.
+                  </span>
+                  <span className="block">
+                    HDHP or CDHP health plans typically trade predictable copays for lower premiums and higher out-of-pocket costs, so check that the coverage works for your household and that your HSA balance (or budget) can handle unexpected expenses. If you have questions about how HDHP or CDHP plans work, please contact TouchCare for additional assistance.
+                  </span>
                 </p>
               </div>
               <Tooltip
@@ -192,8 +195,8 @@ export default function HSACalculator() {
                     <Label htmlFor="coverage-individual" className="cursor-pointer">
                       <div className="text-center">
                         <div className="text-primary text-xl mb-2">👤</div>
-                        <div className="font-medium text-foreground">Individual</div>
-                        <div className="text-xs text-muted-foreground">Self-only HDHP coverage</div>
+                        <div className="font-medium text-foreground">Individual (Self-Only) HDHP/CDHP Coverage</div>
+                        <div className="text-xs text-muted-foreground">Applies when you’re the only person covered under the plan.</div>
                       </div>
                     </Label>
                   </div>
@@ -208,8 +211,8 @@ export default function HSACalculator() {
                     <Label htmlFor="coverage-family" className="cursor-pointer">
                       <div className="text-center">
                         <div className="text-primary text-xl mb-2">👨‍👩‍👧‍👦</div>
-                        <div className="font-medium text-foreground">Family</div>
-                        <div className="text-xs text-muted-foreground">Includes spouse and/or dependents</div>
+                        <div className="font-medium text-foreground">Family HDHP/CDHP Coverage</div>
+                        <div className="text-xs text-muted-foreground">Applies when your plan also covers a spouse and/or dependents.</div>
                       </div>
                     </Label>
                   </div>
@@ -247,13 +250,13 @@ export default function HSACalculator() {
                   {inputs.enrolledInMedicare && (
                     <div className="mt-3 rounded-lg bg-amber-50 border border-amber-200 p-3 space-y-2">
                       <p className="text-sm text-amber-900 font-medium">
-                        ⚠️ You cannot contribute to an HSA for any month you are enrolled in Medicare.
+                        ⚠️ Once a Medicare plan is active, you can no longer contribute to an HSA account.
                       </p>
                       <p className="text-xs text-amber-800">
-                        You may continue to spend existing HSA funds, including for Medicare Part B, Part D, and Medicare Advantage premiums. Medigap premiums are not qualified expenses.
+                        You can still use what’s already in your account for most Medicare or out-of-pocket, qualified healthcare costs — like Parts B and D or Medicare Advantage premiums — but HSA funds cannot be used to pay for Medigap plans.
                       </p>
                       <p className="text-xs text-amber-700 mt-2">
-                        Note: Medicare enrollment can be retroactive and may create excess contributions that need correction.
+                        Note: Medicare coverage can start retroactively, so check your dates carefully to avoid contributions that will need to be redacted. If you do make an error by continuing to contribute to your HSA, your HSA administrator can help make corrections.
                       </p>
                     </div>
                   )}
@@ -274,7 +277,7 @@ export default function HSACalculator() {
                     />
                   </div>
                   <div>
-                    <Label className="flex items-center text-sm font-medium text-foreground mb-2">Filing status</Label>
+                    <Label className="flex items-center text-sm font-medium text-foreground mb-2">Tax filing status</Label>
                     <Select
                       value={inputs.filingStatus ?? "single"}
                       onValueChange={(value: FilingStatus) => updateInput("filingStatus", value)}
@@ -291,20 +294,24 @@ export default function HSACalculator() {
                       </SelectContent>
                     </Select>
                   </div>
-                  <p className="text-xs text-muted-foreground">
-                    Estimated marginal tax rate: <span className="font-semibold text-foreground">{marginalRate}%</span>
-                  </p>
+                  <div className="text-xs text-muted-foreground space-y-1">
+                    <p>
+                      Estimated tax bracket: <span className="font-semibold text-foreground">{marginalRate}%</span>
+                    </p>
+                    <p>
+                      This means you may pay about {marginalRate}¢ in federal income tax for every additional $1 you earn.
+                    </p>
+                  </div>
                 </div>
               </div>
             </div>
 
             <div className="rounded-xl border border-dashed border-primary/40 bg-primary/5 p-4 text-sm">
               <p className="font-medium text-primary">
-                2026 contribution room: {formatCurrency(contributionLimit)}
+                2026 family HSA Contribution Limit: $9,750
               </p>
               <p className="text-muted-foreground mt-1">
-                This includes the base limit of {formatCurrency(inputs.coverage === "family" ? HSA_LIMITS.family : HSA_LIMITS.individual)}
-                and {inputs.age >= 55 ? "a $1,000 catch-up contribution available after age 55." : "an extra $1,000 catch-up contribution once you reach age 55."}
+                This amount includes the 2026 IRS family limit of $8,750, plus an extra $1,000 catch-up amount for anyone 55 or older.
               </p>
             </div>
           </GlassCard>
@@ -319,7 +326,10 @@ export default function HSACalculator() {
               <div className="rounded-lg bg-blue-50 border border-blue-200 p-4 mb-4">
                 <p className="text-sm text-blue-900 font-medium mb-2">Family HSA Contribution Rules</p>
                 <p className="text-xs text-blue-800">
-                  If either spouse has family HDHP coverage, the combined contributions to both spouses' HSAs cannot exceed the IRS family maximum of {formatCurrency(HSA_LIMITS.family)}. You may divide this limit between accounts by agreement.
+                  If both spouses have HDHP coverage and each opens an HSA, the total amount you can contribute together can’t be more than the IRS family limit of {formatCurrency(HSA_LIMITS.family)}.
+                </p>
+                <p className="text-xs text-blue-800 mt-2">
+                  This limit includes all contributions — both your own and any employer contributions from either spouse’s employer. Together, you may choose how to split the total between your accounts.
                 </p>
               </div>
 
@@ -471,7 +481,7 @@ export default function HSACalculator() {
               <div className="grid md:grid-cols-2 gap-4">
                 <div>
                   <Label htmlFor="plan-deductible" className="text-sm font-medium text-foreground mb-2">
-                    {inputs.coverage === "family" ? "Family plan deductible" : "Individual plan deductible"}
+                    Health Insurance Plan Deductible
                   </Label>
                   <Input
                     id="plan-deductible"
@@ -486,7 +496,7 @@ export default function HSACalculator() {
                     prefix="$"
                   />
                   <p className="text-xs text-muted-foreground mt-2">
-                    Your HDHP deductible sets the ceiling for out-of-pocket costs before insurance kicks in.
+                    Individual or family deductible, based on who is covered under your plan.
                   </p>
                 </div>
                 <div>
@@ -514,8 +524,7 @@ export default function HSACalculator() {
               <div>
                 <h3 className="text-xl font-semibold text-foreground">Plan your HSA deposits</h3>
                 <p className="text-sm text-muted-foreground mt-2 leading-relaxed">
-                  Decide how much to send from your paycheck and how much your employer adds. Together these deposits
-                  should build a cushion that can handle the plan deductible without wrecking your monthly budget.
+                  Decide how much you’ll contribute from each paycheck and include how much your employer will add. Together, these deposits should create a cushion to cover your plan’s deductible without straining your monthly budget.
                 </p>
               </div>
               <Tooltip
@@ -537,9 +546,7 @@ export default function HSACalculator() {
               max={contributionLimit}
               step={100}
               onChange={(value) => updateInput("employeeContribution", value)}
-              helperText={`Pre-tax payroll dollars you will direct into the HSA. Limited to ${formatCurrency(
-                contributionLimit
-              )} based on your eligibility.`}
+              helperText={`Pre-tax payroll dollars you plan to contribute into your HSA. You can contribute up to $8,750, or $9,750 if you’re 55+.`}
               focusLabel="Target deductible coverage"
             />
 
@@ -560,12 +567,12 @@ export default function HSACalculator() {
                   prefix="$"
                 />
                 <p className="text-xs text-muted-foreground mt-2">
-                  This amount counts toward your annual IRS limit
+                  Employer contributions count toward the annual IRS HSA limits
                 </p>
               </div>
               <div>
-                <Label htmlFor="target-reserve" className="flex items-center text-sm font-medium text-foreground mb-2">
-                  Target HSA reserve
+                  <Label htmlFor="target-reserve" className="flex items-center text-sm font-medium text-foreground mb-2">
+                    HSA Savings Goal
                   <Tooltip
                     title="What is a target reserve?"
                     content="Your target reserve is the HSA balance you want to maintain to cover unexpected medical expenses. Most people aim for an amount that covers their HDHP deductible so they're financially prepared if they face maximum out-of-pocket costs in a given year. This cushion gives you peace of mind and prevents the need to pay large medical bills out of regular income."
@@ -591,10 +598,7 @@ export default function HSACalculator() {
               <div>
                 <h3 className="text-xl font-semibold text-foreground">Compare monthly premiums</h3>
                 <p className="text-sm text-muted-foreground mt-2 leading-relaxed">
-                  Enter your monthly employee premium for each health plan option. HDHPs typically cost less per month than traditional plans, and the savings can help fund your HSA.
-                </p>
-                <p className="text-xs text-muted-foreground mt-2 italic">
-                  A premium is the amount deducted from your paycheck each month to maintain your health insurance coverage through your employer.
+                  Enter the monthly amount you would pay for each health plan. Because HDHP / CDHP plans often cost less per month, you can use the money you save on premiums to grow your HSA balance.
                 </p>
               </div>
               <Tooltip
@@ -648,10 +652,13 @@ export default function HSACalculator() {
               <Calculator className="h-5 w-5" />
               <h3 className="text-lg font-semibold text-foreground">Ready for claim season</h3>
             </div>
-            <p className="text-sm text-muted-foreground leading-relaxed">
-              Remember: HDHPs rarely include copays for office visits or prescriptions. Expect to pay the negotiated rate
-              until you hit the deductible, then lean on your HSA balance. Revisit this plan after open enrollment or if
-              your medical usage changes during the year.
+            <p className="text-sm text-muted-foreground leading-relaxed space-y-2">
+              <span className="block">
+                Tip: Most HDHP / CDHP plans don’t have copays for doctor visits or prescriptions. When you see in-network providers, you’ll pay the discounted price your insurance company has contracted with them until you reach your deductible.
+              </span>
+              <span className="block">
+                Your HSA funds can help cover those costs. Revisit your plan during open enrollment or if your medical needs shift during the year.
+              </span>
             </p>
           </GlassCard>
         </div>

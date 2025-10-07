@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { ArrowLeft, ClipboardList, Download, Wallet } from "lucide-react";
+import { ArrowLeft, ClipboardList, Download, Wallet, Calculator } from "lucide-react";
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -28,6 +28,11 @@ const DEFAULT_INPUTS: FSAInputs = {
   includeDependentCare: true,
   dependentCareElection: 4000,
   expectedDependentCareExpenses: 3600,
+  dentalOrthodonticExpenses: 0,
+  visionExpenses: 0,
+  priorYearQualifiedMedicalExpenses: 0,
+  plannedMedicalProcedures: 0,
+  otherQualifiedExpenses: 0,
   annualIncome: 85000,
   filingStatus: "single",
   monthlyContributionBudget: 0,
@@ -60,6 +65,36 @@ export default function FSACalculator() {
   const carryoverCeiling = useMemo(() => Math.min(inputs.planCarryover, inputs.healthElection), [inputs.planCarryover, inputs.healthElection]);
   const marginalRate = results.marginalRate ?? getMarginalTaxRate(inputs.annualIncome, inputs.filingStatus);
 
+  const projectedQualifiedExpenses = useMemo(() => {
+    return (
+      (inputs.dentalOrthodonticExpenses ?? 0) +
+      (inputs.visionExpenses ?? 0) +
+      (inputs.priorYearQualifiedMedicalExpenses ?? 0) +
+      (inputs.plannedMedicalProcedures ?? 0) +
+      (inputs.otherQualifiedExpenses ?? 0)
+    );
+  }, [
+    inputs.dentalOrthodonticExpenses,
+    inputs.visionExpenses,
+    inputs.priorYearQualifiedMedicalExpenses,
+    inputs.plannedMedicalProcedures,
+    inputs.otherQualifiedExpenses,
+  ]);
+
+  const recommendedHealthElection = useMemo(() => {
+    return Math.min(projectedQualifiedExpenses, FSA_LIMITS.health);
+  }, [projectedQualifiedExpenses]);
+
+  useEffect(() => {
+    setInputs(prev => {
+      const current = prev.expectedEligibleExpenses ?? 0;
+      if (Math.round(current) === Math.round(projectedQualifiedExpenses)) {
+        return prev;
+      }
+      return { ...prev, expectedEligibleExpenses: projectedQualifiedExpenses };
+    });
+  }, [projectedQualifiedExpenses]);
+
   const updateInput = <K extends keyof FSAInputs>(key: K, value: FSAInputs[K]) => {
     setInputs(prev => ({ ...prev, [key]: value }));
   };
@@ -81,9 +116,7 @@ export default function FSACalculator() {
               FSA Election Forecaster
             </h2>
             <p className="text-muted-foreground max-w-xl">
-              A Flexible Spending Account lets you choose an annual election, get the full balance on day one, and pay
-              back the money through paychecks. This planner explains how the use-it-or-lose-it rule, carryovers, and
-              grace periods work so you only set aside what you can spend.
+              A Flexible Spending Account (FSA) is a tax-free account that lets you set aside money from your paycheck to pay for eligible healthcare expenses. You choose how much to contribute each year (up to the IRS limit), and your full elected amount is available on day one of your FSA plan year — you simply repay it through pre-tax payroll deductions over time. This calculator helps you understand how FSA rules work and shows how much you’ll contribute each pay period based on your annual election.
             </p>
           </div>
         </div>
@@ -94,10 +127,10 @@ export default function FSACalculator() {
       </div>
 
       <div className="rounded-lg border-2 border-primary/40 bg-primary/5 p-4 max-w-2xl mx-auto">
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-sm font-medium text-foreground">Need personalized help?</p>
-            <p className="text-xs text-muted-foreground mt-1">Visit the TouchCare Member Portal for additional questions and support</p>
+        <div className="flex items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <img src="/unnamed.png" alt="TouchCare" className="h-10 w-10 rounded-full object-cover" />
+            <p className="text-sm font-medium text-foreground max-w-xs">Connect with a TouchCare Specialist for additional questions or support</p>
           </div>
           <a
             href="https://touchcare.com/ask"
@@ -105,31 +138,132 @@ export default function FSACalculator() {
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 px-4 py-2 rounded-md bg-primary text-primary-foreground hover:bg-primary/90 transition-colors text-sm font-medium whitespace-nowrap"
           >
-            Member Portal →
+            <span>TouchCare Member Portal</span>
           </a>
         </div>
       </div>
 
       <div className="grid md:grid-cols-3 gap-8">
         <div className="md:col-span-2 space-y-8">
-          <CollapsibleSection
-            title="Additional Guidance"
-            defaultOpen={false}
-          >
-            <GlassCard className="space-y-4">
-              <div className="flex items-center gap-3 text-primary">
-                <ClipboardList className="h-5 w-5" />
-                <h3 className="text-lg font-semibold text-foreground">Coordinate with your health plan</h3>
+          <GlassCard className="space-y-6">
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <h3 className="text-xl font-semibold text-foreground">Estimate your qualified expenses</h3>
+                <p className="text-sm text-muted-foreground mt-2 leading-relaxed">
+                  List the healthcare costs you expect to pay out of pocket this year. We’ll total them up so you can size your FSA election with confidence.
+                </p>
               </div>
-              <p className="text-sm text-muted-foreground leading-relaxed">
-                Check how your health plan handles deductibles and copays before locking in an election. Track
-                reimbursements during the year so money does not sit unused, and ask HR if carryover or grace rules change
-                before you re-enroll.
-              </p>
-            </GlassCard>
-          </CollapsibleSection>
+              <Calculator className="text-primary" />
+            </div>
 
-          <FSAvsHSAComparison variant="inline" />
+            <div className="grid md:grid-cols-2 gap-6">
+              <div>
+                <Label htmlFor="dental-orthodontic" className="text-sm font-medium text-foreground mb-2">
+                  Dental, orthodontic, or oral surgery expenses
+                </Label>
+                <Input
+                  id="dental-orthodontic"
+                  type="number"
+                  min={0}
+                  value={inputs.dentalOrthodonticExpenses ?? 0}
+                  onChange={(event) => updateInput("dentalOrthodonticExpenses", Number(event.target.value) || 0)}
+                  prefix="$"
+                />
+                <p className="text-xs text-muted-foreground mt-2">
+                  Include braces, periodontal work, crowns, implants, and other non-cosmetic dental care for you or your dependents.
+                </p>
+              </div>
+              <div>
+                <Label htmlFor="vision-expenses" className="text-sm font-medium text-foreground mb-2">
+                  Vision costs (glasses, contacts, exams)
+                </Label>
+                <Input
+                  id="vision-expenses"
+                  type="number"
+                  min={0}
+                  value={inputs.visionExpenses ?? 0}
+                  onChange={(event) => updateInput("visionExpenses", Number(event.target.value) || 0)}
+                  prefix="$"
+                />
+                <p className="text-xs text-muted-foreground mt-2">
+                  Add what you expect to spend on frames, lenses, contacts, LASIK, or routine eye exams.
+                </p>
+              </div>
+              <div>
+                <Label htmlFor="prior-year-expenses" className="text-sm font-medium text-foreground mb-2">
+                  Qualified medical expenses paid in 2025
+                </Label>
+                <Input
+                  id="prior-year-expenses"
+                  type="number"
+                  min={0}
+                  value={inputs.priorYearQualifiedMedicalExpenses ?? 0}
+                  onChange={(event) => updateInput("priorYearQualifiedMedicalExpenses", Number(event.target.value) || 0)}
+                  prefix="$"
+                />
+                <p className="text-xs text-muted-foreground mt-2">
+                  Use last year’s receipts as a baseline—urgent care visits, therapy sessions, prescriptions, or lab work.
+                </p>
+              </div>
+              <div>
+                <Label htmlFor="planned-procedures" className="text-sm font-medium text-foreground mb-2">
+                  Planned 2026 medical procedures or therapies
+                </Label>
+                <Input
+                  id="planned-procedures"
+                  type="number"
+                  min={0}
+                  value={inputs.plannedMedicalProcedures ?? 0}
+                  onChange={(event) => updateInput("plannedMedicalProcedures", Number(event.target.value) || 0)}
+                  prefix="$"
+                />
+                <p className="text-xs text-muted-foreground mt-2">
+                  Think ahead to surgeries, physical therapy, fertility treatments, or ongoing prescriptions you expect this year.
+                </p>
+              </div>
+              <div className="md:col-span-2">
+                <Label htmlFor="other-qualified-expenses" className="text-sm font-medium text-foreground mb-2">
+                  Other qualified healthcare expenses
+                </Label>
+                <Input
+                  id="other-qualified-expenses"
+                  type="number"
+                  min={0}
+                  value={inputs.otherQualifiedExpenses ?? 0}
+                  onChange={(event) => updateInput("otherQualifiedExpenses", Number(event.target.value) || 0)}
+                  prefix="$"
+                />
+                <p className="text-xs text-muted-foreground mt-2">
+                  Include additional eligible costs—hearing aids, over-the-counter items, chiropractic visits, or medical travel.
+                </p>
+              </div>
+            </div>
+
+            <div className="rounded-xl border border-primary/30 bg-primary/5 p-4 space-y-3">
+              <div className="flex items-center justify-between">
+                <p className="text-sm text-muted-foreground">Projected qualified expenses</p>
+                <p className="text-2xl font-bold text-foreground">{currency(projectedQualifiedExpenses)}</p>
+              </div>
+              <div className="flex items-center justify-between">
+                <p className="text-xs text-muted-foreground">Suggested election (capped at IRS limit)</p>
+                <p className="text-sm font-semibold text-primary">{currency(recommendedHealthElection)}</p>
+              </div>
+              <div className="flex items-center gap-2">
+                <Button
+                  type="button"
+                  variant="secondary"
+                  onClick={() => updateInput("healthElection", recommendedHealthElection)}
+                  disabled={projectedQualifiedExpenses === 0}
+                  className="whitespace-nowrap"
+                >
+                  Apply suggested election
+                </Button>
+                <p className="text-xs text-muted-foreground">
+                  We’ll still show your totals below so you can fine-tune the number.
+                </p>
+              </div>
+            </div>
+          </GlassCard>
 
           <GlassCard className="space-y-6">
             <div className="flex items-start justify-between gap-4">
@@ -327,7 +461,7 @@ export default function FSACalculator() {
                 </div>
                 <div>
                   <Label htmlFor="dependent-care-expenses" className="text-sm font-medium text-foreground mb-2">
-                    Expected dependent-care expenses
+                    Estimated qualified childcare expenses in 2026
                   </Label>
                   <Input
                     id="dependent-care-expenses"
@@ -338,7 +472,7 @@ export default function FSACalculator() {
                     prefix="$"
                   />
                   <p className="text-xs text-muted-foreground mt-2">
-                    Include daycare, preschool, day camps, after-school programs, or qualified elder care costs for this year.
+                    Include daycare, preschool, day camps, after-school programs, or qualified elder care costs you expect to pay in 2026.
                   </p>
                 </div>
               </div>
@@ -435,6 +569,24 @@ export default function FSACalculator() {
               )}
             </GlassCard>
           </CollapsibleSection>
+
+          <CollapsibleSection
+            title="Additional Guidance"
+            defaultOpen={false}
+          >
+            <GlassCard className="space-y-4">
+              <div className="flex items-center gap-3 text-primary">
+                <ClipboardList className="h-5 w-5" />
+                <h3 className="text-lg font-semibold text-foreground">Coordinate with your health, dental and vision plans</h3>
+              </div>
+              <p className="text-sm text-muted-foreground leading-relaxed space-y-2">
+                <span className="block">Before setting your FSA election, check how your health, dental and vision plans apply deductibles and copays to avoid over- or underfunding your FSA account.</span>
+                <span className="block">Throughout the year, track your reimbursements so your funds don’t go unused, and confirm with HR whether carryover or grace period rules have changed before you re-enroll.</span>
+              </p>
+            </GlassCard>
+          </CollapsibleSection>
+
+          <FSAvsHSAComparison variant="inline" />
         </div>
 
         <div className="space-y-8 md:sticky md:top-8 md:self-start">
