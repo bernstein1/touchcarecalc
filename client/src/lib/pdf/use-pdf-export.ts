@@ -1,10 +1,9 @@
 import { useState } from 'react';
-import { generateAndDownloadPDF, getFilenameSuffix, PDFReportData, ComparisonReportData, formatCurrency } from './pdf-utils';
+import { generateAndDownloadPDF, getFilenameSuffix, PDFReportData, formatCurrency } from './pdf-utils';
 import { HSAReport } from './templates/hsa-report';
 import { FSAReport } from './templates/fsa-report';
 import { CommuterReport } from './templates/commuter-report';
 import { LifeInsuranceReport } from './templates/life-insurance-report';
-import { ComparisonReport } from './templates/comparison-report';
 import {
   HSAInputs,
   HSAResults,
@@ -142,27 +141,6 @@ export const usePDFExport = () => {
     }
   };
 
-  const exportComparisonReport = async (data: Omit<ComparisonReportData, 'generatedAt'>) => {
-    setIsGenerating(true);
-    setError(null);
-    
-    try {
-      const reportData: ComparisonReportData = {
-        ...data,
-        generatedAt: new Date()
-      };
-      
-      const filename = `Comparison_Report_${data.calculatorType}_${getFilenameSuffix()}.pdf`;
-      const reportElement = ComparisonReport({ data: reportData }) as React.ReactElement;
-      await generateAndDownloadPDF(reportElement, filename);
-    } catch (err) {
-      setError('Failed to generate Comparison report. Please try again.');
-      console.error('Comparison PDF export error:', err);
-    } finally {
-      setIsGenerating(false);
-    }
-  };
-
   const exportReport = async (
     type: 'hsa' | 'fsa' | 'commuter' | 'life-insurance',
     inputs: CalculatorInputs,
@@ -193,7 +171,6 @@ export const usePDFExport = () => {
     exportFSAReport,
     exportCommuterReport,
     exportLifeInsuranceReport,
-    exportComparisonReport,
     exportReport
   };
 };

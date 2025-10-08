@@ -11,7 +11,7 @@ import {
   LifeInsuranceResults
 } from '@shared/schema';
 
-export type ReportType = 'hsa' | 'fsa' | 'commuter' | 'life-insurance' | 'comparison';
+export type ReportType = 'hsa' | 'fsa' | 'commuter' | 'life-insurance';
 
 export interface PDFReportData {
   type: ReportType;
@@ -20,18 +20,6 @@ export interface PDFReportData {
   inputs: any;
   results: any;
   additionalData?: any;
-}
-
-export interface ComparisonReportData {
-  type: 'comparison';
-  title: string;
-  generatedAt: Date;
-  calculatorType: 'hsa' | 'fsa' | 'commuter' | 'life-insurance';
-  scenarios: Array<{
-    name: string;
-    inputs: any;
-    results: any;
-  }>;
 }
 
 export const generateAndDownloadPDF = async (

@@ -6,7 +6,6 @@ A marketing-ready web experience for TouchCare clients and prospects to explore 
 
 - 2025 IRS limits baked into every calculator with centralized constants.
 - Guided UX with TouchCare branding, education tooltips, and PDF exports per scenario.
-- Comparison tool to evaluate multiple benefit strategies side-by-side.
 - Serverless API routes (`/api/calculations`) powered by the same Drizzle schemas, deployable on Vercel.
 - Fully typed TypeScript codebase shared between client, shared logic, and API handlers.
 

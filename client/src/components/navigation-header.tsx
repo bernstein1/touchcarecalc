@@ -1,4 +1,4 @@
-import { Printer, Home, GitCompare } from "lucide-react";
+import { Printer, Home } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useLocation } from "wouter";
 import TouchCareLogo from "@/components/touchcare-logo";
@@ -6,7 +6,6 @@ import TouchCareLogo from "@/components/touchcare-logo";
 export default function NavigationHeader() {
   const [location, navigate] = useLocation();
   const isHub = location === "/";
-  const isComparison = location === "/comparison";
 
   const handlePrint = () => {
     window.print();
@@ -33,16 +32,6 @@ export default function NavigationHeader() {
               Dashboard
             </Button>
           )}
-          <Button
-            variant="ghost"
-            className={`px-3 ${isComparison ? "bg-[var(--surface-subtle)] text-primary" : "text-primary"}`}
-            onClick={() => navigate("/comparison")}
-            data-testid="button-comparison"
-            aria-current={isComparison ? "page" : undefined}
-          >
-            <GitCompare className="mr-2" size={16} />
-            Compare
-          </Button>
           <Button
             variant="outline"
             className="px-3"
