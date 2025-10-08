@@ -264,14 +264,14 @@ export default function FSACalculator() {
 
             <div className="rounded-xl border border-primary/30 bg-primary/5 p-4 space-y-3">
               <div className="flex items-center justify-between">
-                <p className="text-sm text-muted-foreground">Projected qualified expenses</p>
-                <p className="text-2xl font-bold text-foreground">{currency(projectedQualifiedExpenses)}</p>
+                <p className="text-sm font-medium text-primary">Suggested election (capped at IRS limit)</p>
+                <p className="text-3xl font-bold text-primary">{currency(recommendedHealthElection)}</p>
               </div>
               <div className="flex items-center justify-between">
-                <p className="text-xs text-muted-foreground">Suggested election (capped at IRS limit)</p>
-                <p className="text-sm font-semibold text-primary">{currency(recommendedHealthElection)}</p>
+                <p className="text-xs text-muted-foreground">Projected qualified expenses</p>
+                <p className="text-lg font-semibold text-foreground">{currency(projectedQualifiedExpenses)}</p>
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 flex-wrap">
                 <Button
                   type="button"
                   variant="secondary"
