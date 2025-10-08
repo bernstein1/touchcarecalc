@@ -18,15 +18,15 @@ export const LifeInsuranceReport: React.FC<LifeInsuranceReportProps> = ({ data }
   return (
     <BaseDocument
       title="Life Insurance Needs Analysis Report"
-      subtitle="Plain-Language DIME Assessment"
+      subtitle="Life Insurance Needs Assessment"
       generatedAt={generatedAt}
     >
       {/* Executive Summary */}
       <Section title="Executive Summary">
         <Text style={{ fontSize: 10, marginBottom: 10, color: '#374151' }}>
           This report estimates how much life insurance could help your family stay financially secure if you were no longer
-          here. It applies the DIME method—adding together Debt, Income replacement, Mortgage payoff, and Education goals—to
-          translate insurance jargon into everyday numbers.
+          here. It walks through major goals—paying off debt, replacing income, clearing your mortgage, and covering education—
+          to translate insurance jargon into everyday numbers.
         </Text>
         <MetricGrid>
           <MetricCard
@@ -59,15 +59,15 @@ export const LifeInsuranceReport: React.FC<LifeInsuranceReportProps> = ({ data }
       <Divider />
 
       {/* DIME Methodology Breakdown */}
-      <Section title="DIME Methodology Calculation">
+      <Section title="Coverage Calculation Breakdown">
         <Text style={{ fontSize: 10, marginBottom: 10, color: '#374151' }}>
-          The DIME method is a straightforward way to estimate coverage: pay off debts, replace lost paychecks, remove housing
-          costs, and fund future schooling. The following pages walk through each piece in plain language.
+          We estimate coverage by lining up major financial goals in plain language—pay off debts, replace lost income, remove housing costs,
+          and fund future schooling. The pages below walk through each section.
         </Text>
         
         <View style={{ marginBottom: 15 }}>
           <Text style={{ fontSize: 12, fontWeight: 'bold', marginBottom: 8, color: '#2563eb' }}>
-            D - Debt Coverage
+            Debt Coverage
           </Text>
           <ValueRow label="Total Outstanding Debt" value={inputs.totalDebt} currency />
           <Text style={{ fontSize: 9, marginBottom: 8, color: '#6b7280' }}>
@@ -77,7 +77,7 @@ export const LifeInsuranceReport: React.FC<LifeInsuranceReportProps> = ({ data }
 
         <View style={{ marginBottom: 15 }}>
           <Text style={{ fontSize: 12, fontWeight: 'bold', marginBottom: 8, color: '#2563eb' }}>
-            I - Income Replacement
+            Income Replacement
           </Text>
           <ValueRow label="Annual Income" value={inputs.income} currency />
           <ValueRow label="Years of Coverage" value={`${inputs.incomeYears} years`} />
@@ -89,7 +89,7 @@ export const LifeInsuranceReport: React.FC<LifeInsuranceReportProps> = ({ data }
 
         <View style={{ marginBottom: 15 }}>
           <Text style={{ fontSize: 12, fontWeight: 'bold', marginBottom: 8, color: '#2563eb' }}>
-            M - Mortgage Payoff
+            Mortgage Payoff
           </Text>
           <ValueRow label="Outstanding Mortgage Balance" value={inputs.mortgageBalance} currency />
           <Text style={{ fontSize: 9, marginBottom: 8, color: '#6b7280' }}>
@@ -99,7 +99,7 @@ export const LifeInsuranceReport: React.FC<LifeInsuranceReportProps> = ({ data }
 
         <View style={{ marginBottom: 15 }}>
           <Text style={{ fontSize: 12, fontWeight: 'bold', marginBottom: 8, color: '#2563eb' }}>
-            E - Education Fund
+            Education Fund
           </Text>
           <ValueRow label="Future Education Costs" value={inputs.educationCosts} currency />
           <Text style={{ fontSize: 9, marginBottom: 8, color: '#6b7280' }}>
@@ -109,14 +109,14 @@ export const LifeInsuranceReport: React.FC<LifeInsuranceReportProps> = ({ data }
 
         <View style={{ padding: 10, backgroundColor: '#f3f4f6', marginVertical: 10 }}>
           <ValueRow 
-            label="Total DIME Calculation" 
+            label="Total coverage target" 
             value={results.dimeTotal} 
             currency 
             highlight 
             primary 
           />
           <Text style={{ fontSize: 8, color: '#6b7280', marginTop: 5 }}>
-            Sum of Debt + Income + Mortgage + Education. This is the total amount of protection the DIME method suggests.
+            Sum of Debt + Income replacement + Mortgage + Education. This is the total amount of protection the calculator suggests.
           </Text>
         </View>
       </Section>
@@ -125,7 +125,7 @@ export const LifeInsuranceReport: React.FC<LifeInsuranceReportProps> = ({ data }
 
       {/* Coverage Analysis */}
       <Section title="Coverage Gap Analysis">
-        <ValueRow label="Recommended Coverage (DIME)" value={results.dimeTotal} currency />
+        <ValueRow label="Recommended Coverage Target" value={results.dimeTotal} currency />
         <ValueRow label="Current Life Insurance" value={inputs.currentInsurance} currency />
         <ValueRow 
           label={results.additionalNeeded > 0 ? "Additional Coverage Needed" : "Coverage Surplus"} 
@@ -139,7 +139,7 @@ export const LifeInsuranceReport: React.FC<LifeInsuranceReportProps> = ({ data }
           {results.additionalNeeded > 0 ? (
             `You currently have a coverage gap of ${formatCurrency(results.additionalNeeded)}. Adding this amount of coverage would let your family pay debts, replace income, and pursue future goals without financial strain.`
           ) : results.additionalNeeded < 0 ? (
-            `You have a coverage surplus of ${formatCurrency(Math.abs(results.additionalNeeded))}. Your existing policies already exceed what the DIME method suggests, so you could review whether the extra protection still fits your goals.`
+            `You have a coverage surplus of ${formatCurrency(Math.abs(results.additionalNeeded))}. Your existing policies already exceed what the calculator suggests, so you could review whether the extra protection still fits your goals.`
           ) : (
             "Your current coverage matches the DIME estimate. Continue reviewing it each year or after major life changes."
           )}

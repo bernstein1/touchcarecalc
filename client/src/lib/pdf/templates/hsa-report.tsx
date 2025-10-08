@@ -41,7 +41,7 @@ export const HSAReport: React.FC<HSAReportProps> = ({ data }) => {
       <Section title="Executive Summary">
         <MetricGrid>
           <MetricCard
-            title="Premium Savings Redirected (HDHP / CDHP)"
+            title="Annual premium savings redirected (HDHP / CDHP)"
             value={results.annualPremiumSavings}
             currency
             description="Money saved on premiums by choosing the HDHP / CDHP plan"
@@ -53,7 +53,7 @@ export const HSAReport: React.FC<HSAReportProps> = ({ data }) => {
             description="Taxes avoided because HSA deposits come out before tax"
           />
           <MetricCard
-            title="Your Total Savings This Year (HDHP / CDHP)"
+            title="Your total savings this year (HDHP / CDHP)"
             value={totalSavingsThisYear}
             currency
             description="Premium savings plus tax savings available to fund your HSA"
@@ -95,9 +95,9 @@ export const HSAReport: React.FC<HSAReportProps> = ({ data }) => {
         </Text>
         <ValueRow label="HDHP / CDHP Monthly Premium" value={inputs.hdhpMonthlyPremium} currency />
         <ValueRow label="Alternative Plan Premium" value={inputs.altPlanMonthlyPremium} currency />
-        <ValueRow label="Annual Premium Savings Redirected (HDHP / CDHP)" value={results.annualPremiumSavings} currency primary />
+        <ValueRow label="Annual premium savings redirected (HDHP / CDHP)" value={results.annualPremiumSavings} currency primary />
         <ValueRow label="Tax Savings" value={results.taxSavings} currency />
-        <ValueRow label="Your Total Savings This Year (HDHP / CDHP)" value={totalSavingsThisYear} currency />
+        <ValueRow label="Your total savings this year (HDHP / CDHP)" value={totalSavingsThisYear} currency />
         <ValueRow label="Employer Contribution" value={results.employerContribution} currency />
         <ValueRow label="Net Cashflow Advantage" value={results.netCashflowAdvantage} currency highlight />
       </Section>
