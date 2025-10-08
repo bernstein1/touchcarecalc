@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
 import { ArrowLeft, ClipboardList, Download, Wallet, Calculator } from "lucide-react";
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
@@ -19,6 +19,8 @@ import PreTaxExplainer from "@/components/education/pre-tax-explainer";
 import CollapsibleSection from "@/components/ui/collapsible-section";
 import RecommendationCard from "@/components/recommendations/recommendation-card";
 import { generateFSARecommendations } from "@/lib/recommendations/fsa-recommendations";
+import { usePrintContext } from "@/context/print-context";
+import FSAPrintSummary from "@/components/print/fsa-print-summary";
 
 const DEFAULT_INPUTS: FSAInputs = {
   healthElection: 2600,
@@ -54,6 +56,7 @@ const currency = (value: number) => `$${Math.round(value).toLocaleString()}`;
 export default function FSACalculator() {
   const [, navigate] = useLocation();
   const { exportFSAReport, isGenerating, error } = usePDFExport();
+  const { setPrintHandler } = usePrintContext();
 
   const [inputs, setInputs] = useState<FSAInputs>(DEFAULT_INPUTS);
   const [results, setResults] = useState<FSAResults>(() => calculateFSA(DEFAULT_INPUTS));
@@ -64,6 +67,16 @@ export default function FSACalculator() {
 
   const carryoverCeiling = useMemo(() => Math.min(inputs.planCarryover, inputs.healthElection), [inputs.planCarryover, inputs.healthElection]);
   const marginalRate = results.marginalRate ?? getMarginalTaxRate(inputs.annualIncome, inputs.filingStatus);
+  const recommendations = useMemo(() => generateFSARecommendations(inputs, results), [inputs, results]);
+  const forfeitureRiskAmount = results.forfeitureRisk ?? 0;
+  const forfeitureLabel =
+    forfeitureRiskAmount > 0
+      ? "FSA money you might lose if you don’t spend it on qualified expenses before the end of the FSA plan year or the forfeiture deadline."
+      : "Money you might lose if you do not spend it by the deadline";
+  const forfeitureDescription =
+    forfeitureRiskAmount > 0
+      ? "Submit qualified expenses before the plan year ends or the forfeiture deadline so these FSA dollars don’t expire."
+      : undefined;
 
   const projectedQualifiedExpenses = useMemo(() => {
     return (
@@ -99,9 +112,19 @@ export default function FSACalculator() {
     setInputs(prev => ({ ...prev, [key]: value }));
   };
 
+  const handlePrintSummary = useCallback(() => {
+    window.print();
+  }, []);
+
+  useEffect(() => {
+    setPrintHandler(handlePrintSummary);
+    return () => setPrintHandler(null);
+  }, [handlePrintSummary, setPrintHandler]);
+
   return (
-    <div className="space-y-8" data-analytics-id="page-fsa-calculator">
-      <div className="flex items-center justify-between mb-8">
+    <Fragment>
+      <div className="space-y-8 print-hidden" data-analytics-id="page-fsa-calculator">
+        <div className="flex items-center justify-between mb-8">
         <div className="flex items-center space-x-4">
           <Button
             variant="ghost"
@@ -191,7 +214,7 @@ export default function FSACalculator() {
               </div>
               <div>
                 <Label htmlFor="prior-year-expenses" className="text-sm font-medium text-foreground mb-2">
-                  Qualified medical expenses paid in 2025
+                  Out of Pocket Costs for Qualified medical expenses paid in 2025
                 </Label>
                 <Input
                   id="prior-year-expenses"
@@ -207,7 +230,7 @@ export default function FSACalculator() {
               </div>
               <div>
                 <Label htmlFor="planned-procedures" className="text-sm font-medium text-foreground mb-2">
-                  Planned 2026 medical procedures or therapies
+                  Planned out of pocket cost for 2026 medical procedures or therapies
                 </Label>
                 <Input
                   id="planned-procedures"
@@ -269,19 +292,26 @@ export default function FSACalculator() {
             <div className="flex items-start justify-between gap-4">
               <div>
                 <h3 className="text-xl font-semibold text-foreground">Plan your yearly election</h3>
-                <p className="text-sm text-muted-foreground mt-2 leading-relaxed">
-                  Decide how much money to promise to the health FSA for the year. You can swipe the card or request a
-                  reimbursement for the full election even if only a few paychecks have been taken so far. Match that
-                  upfront access with real appointments such as braces, prescriptions, or therapy visits.
-                </p>
+                <div className="space-y-2 text-sm text-muted-foreground mt-2 leading-relaxed">
+                  <p>
+                    Decide how much money to contribute to your health FSA for the year. You can swipe your FSA card or request reimbursement through your FSA administrator as you accrue qualified expenses by submitting itemized receipts.
+                  </p>
+                  <p>
+                    Money you select at the beginning of the year is “front loaded”—meaning all of your elected funds are available on the first day your FSA account is active.
+                  </p>
+                  <p>
+                    This is especially useful if you expect large upfront costs such as braces, therapy sessions, or prescriptions.
+                  </p>
+                  <p>
+                    You can even shop for qualified expenses through sites such as Amazon using your FSA card.
+                  </p>
+                </div>
               </div>
               <Tooltip
                 title="Explain the election"
                 content={
                   <p>
-                    Your election is the total dollars you promise to spend through the health FSA. The plan front-loads
-                    that money, so you can use all of it at once and repay it over the rest of the year. Keep that loan in
-                    mind when you size the election.
+                    Your election is the total dollars you commit to contribute to the health FSA. Because funds are front loaded, the full election is available on day one and you repay it through equal payroll deductions for the rest of the year.
                   </p>
                 }
               />
@@ -488,11 +518,20 @@ export default function FSACalculator() {
             <GlassCard className="space-y-6">
               <div className="flex items-start justify-between gap-4">
                 <div>
-                  <p className="text-sm text-muted-foreground mt-2 leading-relaxed">
-                    If you have an HSA, you can also use a Limited Purpose FSA to cover dental and vision expenses pre-tax
-                    without losing HSA eligibility. This strategic pairing gives you the best of both worlds: HSA long-term
-                    savings for medical, and LPFSA front-loaded funds for predictable dental and vision bills.
-                  </p>
+                  <div className="space-y-2 text-sm text-muted-foreground leading-relaxed mt-2">
+                    <p>
+                      If you have an HSA, you can also use a Limited Purpose FSA (LPFSA) to cover dental and vision expenses pre-tax without losing HSA eligibility.
+                    </p>
+                    <p>
+                      HSA funds can also be used for qualified dental and vision expenses.
+                    </p>
+                    <p>
+                      An LPFSA supplements your HSA by providing additional funds that can be used for qualified dental and vision expenses when HSA dollars run out.
+                    </p>
+                    <p>
+                      Example: Families with kids who need braces, contacts, or similar predictable dental and vision costs.
+                    </p>
+                  </div>
                   <p className="text-xs text-muted-foreground mt-3 leading-relaxed">
                     Limited Purpose FSAs are not available through every organization. Employees should review their benefits guide, platform, or enrollment solution to confirm whether their company offers an LPFSA.
                   </p>
@@ -614,11 +653,11 @@ export default function FSACalculator() {
                 </p>
               </div>
               <div className="rounded-xl border border-amber-300/40 bg-amber-500/10 p-4">
-                <p className="text-sm text-muted-foreground">Potential forfeiture risk</p>
-                <p className="text-2xl font-bold text-amber-500">{currency(results.forfeitureRisk)}</p>
-                <p className="text-xs text-muted-foreground mt-1">
-                  Money you might lose back to the plan if you do not spend it by the deadline.
-                </p>
+                <p className="text-sm text-muted-foreground">{forfeitureLabel}</p>
+                <p className="text-2xl font-bold text-amber-500">{currency(forfeitureRiskAmount)}</p>
+                {forfeitureDescription ? (
+                  <p className="text-xs text-muted-foreground mt-1">{forfeitureDescription}</p>
+                ) : null}
               </div>
               {inputs.includeDependentCare ? (
                 <div className="rounded-xl border border-border p-4">
@@ -674,17 +713,14 @@ export default function FSACalculator() {
           )}
 
           {/* Smart Recommendations */}
-          {(() => {
-            const recommendations = generateFSARecommendations(inputs, results);
-            return recommendations.length > 0 ? (
-              <div className="space-y-4">
-                <h3 className="text-lg font-semibold text-foreground">Personalized Recommendations</h3>
-                {recommendations.map((rec, index) => (
-                  <RecommendationCard key={index} recommendation={rec} />
-                ))}
-              </div>
-            ) : null;
-          })()}
+          {recommendations.length > 0 ? (
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold text-foreground">Personalized Recommendations</h3>
+              {recommendations.map((rec, index) => (
+                <RecommendationCard key={index} recommendation={rec} />
+              ))}
+            </div>
+          ) : null}
 
           <ShowMathSection
             title="Show the math"
@@ -735,5 +771,7 @@ export default function FSACalculator() {
         </div>
       </div>
     </div>
+    <FSAPrintSummary inputs={inputs} results={results} recommendations={recommendations} />
+  </Fragment>
   );
 }

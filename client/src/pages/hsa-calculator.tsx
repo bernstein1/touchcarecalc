@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
 import { ArrowLeft, Calculator, Download, PiggyBank, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -19,6 +19,8 @@ import PreTaxExplainer from "@/components/education/pre-tax-explainer";
 import CollapsibleSection from "@/components/ui/collapsible-section";
 import RecommendationCard from "@/components/recommendations/recommendation-card";
 import { generateHSARecommendations } from "@/lib/recommendations/hsa-recommendations";
+import { usePrintContext } from "@/context/print-context";
+import HSAPrintSummary from "@/components/print/hsa-print-summary";
 
 const DEFAULT_INPUTS: HSAInputs = {
   accountType: "hsa",
@@ -60,6 +62,7 @@ const getContributionLimit = (inputs: HSAInputs) => {
 export default function HSACalculator() {
   const [, navigate] = useLocation();
   const { exportHSAReport, isGenerating, error } = usePDFExport();
+  const { setPrintHandler } = usePrintContext();
 
   const [inputs, setInputs] = useState<HSAInputs>(DEFAULT_INPUTS);
   const [results, setResults] = useState<HSAResults>(() => calculateHSA(DEFAULT_INPUTS));
@@ -70,6 +73,7 @@ export default function HSACalculator() {
 
   const contributionLimit = useMemo(() => getContributionLimit(inputs), [inputs]);
   const marginalRate = results.marginalRate ?? getMarginalTaxRate(inputs.annualIncome, inputs.filingStatus);
+  const recommendations = useMemo(() => generateHSARecommendations(inputs, results), [inputs, results]);
 
   const updateInput = <K extends keyof HSAInputs>(key: K, value: HSAInputs[K]) => {
     setInputs(prev => ({ ...prev, [key]: value }));
@@ -95,9 +99,19 @@ export default function HSACalculator() {
     ? `Pre-tax payroll dollars you plan to contribute into your HSA. The 2026 family HDHP / CDHP limit is ${familyLimitDisplay} (or ${familyLimitWithCatchUpDisplay} if you're 55 or older).`
     : `Pre-tax payroll dollars you plan to contribute into your HSA. The 2026 individual limit is ${individualLimitDisplay}. Only family HDHP / CDHP coverage qualifies for the ${familyLimitDisplay} family limit (or ${familyLimitWithCatchUpDisplay} with the age 55+ catch-up).`;
 
+  const handlePrintSummary = useCallback(() => {
+    window.print();
+  }, []);
+
+  useEffect(() => {
+    setPrintHandler(handlePrintSummary);
+    return () => setPrintHandler(null);
+  }, [handlePrintSummary, setPrintHandler]);
+
   return (
-    <div className="space-y-8" data-analytics-id="page-hsa-calculator">
-      <div className="flex items-center justify-between mb-8">
+    <Fragment>
+      <div className="space-y-8 print-hidden" data-analytics-id="page-hsa-calculator">
+        <div className="flex items-center justify-between mb-8">
         <div className="flex items-center space-x-4">
           <Button
             variant="ghost"
@@ -772,17 +786,14 @@ export default function HSACalculator() {
           )}
 
           {/* Smart Recommendations */}
-          {(() => {
-            const recommendations = generateHSARecommendations(inputs, results);
-            return recommendations.length > 0 ? (
-              <div className="space-y-4">
-                <h3 className="text-lg font-semibold text-foreground">Personalized Recommendations</h3>
-                {recommendations.map((rec, index) => (
-                  <RecommendationCard key={index} recommendation={rec} />
-                ))}
-              </div>
-            ) : null;
-          })()}
+          {recommendations.length > 0 ? (
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold text-foreground">Personalized Recommendations</h3>
+              {recommendations.map((rec, index) => (
+                <RecommendationCard key={index} recommendation={rec} />
+              ))}
+            </div>
+          ) : null}
 
           <ShowMathSection
             title="How the numbers add up"
@@ -826,5 +837,7 @@ export default function HSACalculator() {
         </div>
       </div>
     </div>
+    <HSAPrintSummary inputs={inputs} results={results} recommendations={recommendations} />
+    </Fragment>
   );
 }

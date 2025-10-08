@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
 import { ArrowLeft, Calculator, Lightbulb, TrendingUp, Users, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,10 +14,13 @@ import { usePDFExport } from "@/lib/pdf/use-pdf-export";
 import RecommendationCard from "@/components/recommendations/recommendation-card";
 import { generateLifeInsuranceRecommendations } from "@/lib/recommendations/life-recommendations";
 import CollapsibleSection from "@/components/ui/collapsible-section";
+import { usePrintContext } from "@/context/print-context";
+import LifePrintSummary from "@/components/print/life-print-summary";
 
 export default function LifeInsuranceCalculator() {
   const [, navigate] = useLocation();
   const { exportLifeInsuranceReport, isGenerating, error } = usePDFExport();
+  const { setPrintHandler } = usePrintContext();
   
   const [inputs, setInputs] = useState<LifeInsuranceInputs>({
     totalDebt: 250000,
@@ -42,13 +45,25 @@ export default function LifeInsuranceCalculator() {
     setResults(calculatedResults);
   }, [inputs]);
 
+  const recommendations = useMemo(() => generateLifeInsuranceRecommendations(inputs, results), [inputs, results]);
+
   const updateInput = (key: keyof LifeInsuranceInputs, value: number) => {
     setInputs(prev => ({ ...prev, [key]: value }));
   };
 
+  const handlePrintSummary = useCallback(() => {
+    window.print();
+  }, []);
+
+  useEffect(() => {
+    setPrintHandler(handlePrintSummary);
+    return () => setPrintHandler(null);
+  }, [handlePrintSummary, setPrintHandler]);
+
   return (
-    <div className="space-y-8">
-      <div className="flex items-center justify-between mb-8">
+    <Fragment>
+      <div className="space-y-8 print-hidden">
+        <div className="flex items-center justify-between mb-8">
         <div className="flex items-center space-x-4">
           <Button
             variant="ghost"
@@ -384,17 +399,14 @@ export default function LifeInsuranceCalculator() {
           </GlassCard>
 
           {/* Smart Recommendations */}
-          {(() => {
-            const recommendations = generateLifeInsuranceRecommendations(inputs, results);
-            return recommendations.length > 0 ? (
-              <div className="space-y-4">
-                <h3 className="text-lg font-semibold text-foreground mb-4">Personalized Recommendations</h3>
-                {recommendations.map((rec, index) => (
-                  <RecommendationCard key={index} recommendation={rec} />
-                ))}
-              </div>
-            ) : null;
-          })()}
+          {recommendations.length > 0 ? (
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold text-foreground mb-4">Personalized Recommendations</h3>
+              {recommendations.map((rec, index) => (
+                <RecommendationCard key={index} recommendation={rec} />
+              ))}
+            </div>
+          ) : null}
 
           <GlassCard>
             <h3 className="text-lg font-semibold text-foreground mb-4">
@@ -490,5 +502,7 @@ export default function LifeInsuranceCalculator() {
         </div>
       </div>
     </div>
+    <LifePrintSummary inputs={inputs} results={results} />
+  </Fragment>
   );
 }

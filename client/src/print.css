@@ -1,0 +1,82 @@
+.print-summary {
+  padding: 2.5rem 2rem;
+  background-color: #ffffff;
+  color: #111827;
+  font-family: "Inter", "Helvetica Neue", Arial, sans-serif;
+  display: none;
+}
+
+.print-summary h1 {
+  font-size: 1.75rem;
+  font-weight: 700;
+  margin-bottom: 0.75rem;
+}
+
+.print-summary h2 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-top: 1.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.print-summary p,
+.print-summary li,
+.print-summary dd {
+  font-size: 0.95rem;
+  line-height: 1.55;
+}
+
+.print-summary dl {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 0.5rem 1.5rem;
+}
+
+.print-summary dt {
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.print-summary dd {
+  margin: 0;
+  color: #374151;
+}
+
+.print-summary__divider {
+  border-top: 1px solid #d1d5db;
+  margin: 1.5rem 0;
+}
+
+.print-summary__list {
+  padding-left: 1rem;
+  margin: 0.5rem 0 0;
+}
+
+.print-summary__list li {
+  list-style-type: disc;
+}
+
+@media print {
+  @page {
+    size: Letter;
+    margin: 18mm 15mm;
+  }
+
+  body {
+    background: #ffffff !important;
+    color: #111827 !important;
+  }
+
+  .print-summary {
+    display: block !important;
+    page-break-inside: avoid;
+  }
+
+  .print-summary + .print-summary {
+    page-break-before: always;
+  }
+
+  .print-hidden {
+    display: none !important;
+  }
+}

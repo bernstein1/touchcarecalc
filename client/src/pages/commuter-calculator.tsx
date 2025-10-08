@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { Fragment, useCallback, useEffect, useState } from "react";
 import { ArrowLeft, Calculator, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,6 +12,8 @@ import { calculateCommuter } from "@/lib/calculations";
 import { getMarginalTaxRate, describeFilingStatus } from "@/lib/tax/brackets";
 import { CommuterInputs, CommuterResults, FilingStatus } from "@shared/schema";
 import { usePDFExport } from "@/lib/pdf/use-pdf-export";
+import { usePrintContext } from "@/context/print-context";
+import CommuterPrintSummary from "@/components/print/commuter-print-summary";
 
 const FILING_STATUS_OPTIONS: { value: FilingStatus; label: string }[] = [
   { value: "single", label: describeFilingStatus("single") },
@@ -23,6 +25,7 @@ const FILING_STATUS_OPTIONS: { value: FilingStatus; label: string }[] = [
 export default function CommuterCalculator() {
   const [, navigate] = useLocation();
   const { exportCommuterReport, isGenerating, error } = usePDFExport();
+  const { setPrintHandler } = usePrintContext();
   
   const [inputs, setInputs] = useState<CommuterInputs>({
     transitCost: 200,
@@ -52,9 +55,19 @@ export default function CommuterCalculator() {
 
   const marginalRate = results.marginalRate ?? getMarginalTaxRate(inputs.annualIncome, inputs.filingStatus);
 
+  const handlePrintSummary = useCallback(() => {
+    window.print();
+  }, []);
+
+  useEffect(() => {
+    setPrintHandler(handlePrintSummary);
+    return () => setPrintHandler(null);
+  }, [handlePrintSummary, setPrintHandler]);
+
   return (
-    <div className="space-y-8">
-      <div className="flex items-center justify-between mb-8">
+    <Fragment>
+      <div className="space-y-8 print-hidden">
+        <div className="flex items-center justify-between mb-8">
         <div className="flex items-center space-x-4">
           <Button
             variant="ghost"
@@ -291,5 +304,7 @@ export default function CommuterCalculator() {
         </div>
       </div>
     </div>
+    <CommuterPrintSummary inputs={inputs} results={results} />
+  </Fragment>
   );
 }
