@@ -131,7 +131,8 @@ export const FSAReport: React.FC<FSAReportProps> = ({ data }) => {
         </Text>
         <Text style={{ fontSize: 9, marginBottom: 4, color: '#374151' }}>• If expected expenses are lower than your election, lower the election or schedule eligible purchases before deadlines.</Text>
         <Text style={{ fontSize: 9, marginBottom: 4, color: '#374151' }}>• Submit claims during the year so reimbursements keep pace with spending and you are not rushing at year-end.</Text>
-        <Text style={{ fontSize: 9, color: '#374151' }}>• Coordinate with your spouse's benefits—only one person can have a full health FSA if the other contributes to a health savings account.</Text>
+        <Text style={{ fontSize: 9, marginBottom: 4, color: '#374151' }}>• Coordinate with your spouse's benefits—only one person can have a full health FSA if the other contributes to an HSA alongside HDHP / CDHP coverage.</Text>
+        <Text style={{ fontSize: 9, color: '#374151' }}>• Considering dental or vision costs? Confirm whether your employer offers a Limited Purpose FSA (LPFSA) that can pair with an HSA and HDHP / CDHP coverage for those expenses.</Text>
       </Section>
     </BaseDocument>
   );

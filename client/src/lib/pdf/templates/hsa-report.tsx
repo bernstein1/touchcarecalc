@@ -27,6 +27,14 @@ export const HSAReport: React.FC<HSAReportProps> = ({ data }) => {
   const totalSavingsThisYear = results.annualPremiumSavings + results.taxSavings;
   const familyLimitDisplay = formatCurrency(HSA_LIMITS.family);
   const familyLimitWithCatchUpDisplay = formatCurrency(HSA_LIMITS.family + HSA_LIMITS.catchUp);
+  const projectedReserve = results.projectedReserve ?? 0;
+  const targetSavingsGoal = inputs.targetReserve ?? 0;
+  const reserveProgressLabel =
+    targetSavingsGoal > 0
+      ? `${formatCurrency(Math.min(projectedReserve, targetSavingsGoal))} of ${formatCurrency(targetSavingsGoal)}`
+      : formatCurrency(projectedReserve);
+  const reserveShortfall =
+    targetSavingsGoal > 0 ? Math.max(targetSavingsGoal - projectedReserve, 0) : 0;
 
   return (
     <BaseDocument title="HSA Strategy Analysis" subtitle={`${coverageText} HDHP / CDHP Coverage - Tax Year 2026`} generatedAt={generatedAt}>
@@ -69,7 +77,8 @@ export const HSAReport: React.FC<HSAReportProps> = ({ data }) => {
         <ValueRow label="2026 Contribution Limit" value={results.annualContributionLimit} currency highlight />
         <ValueRow label="Employee Contribution" value={results.employeeContribution} currency />
         <ValueRow label="Employer Contribution" value={results.employerContribution} currency />
-        <ValueRow label="Target Reserve" value={inputs.targetReserve} currency />
+        <ValueRow label="Target savings goal" value={inputs.targetReserve} currency />
+        <ValueRow label="HSA balance progress" value={reserveProgressLabel} />
         <Note>
           {inputs.coverage === 'family'
             ? `The ${familyLimitDisplay} family limit applies to family HDHP / CDHP coverage and reaches ${familyLimitWithCatchUpDisplay} with the age 55+ catch-up.`
@@ -117,12 +126,13 @@ export const HSAReport: React.FC<HSAReportProps> = ({ data }) => {
       <Divider />
 
       <Section title="HSA Reserve Outlook">
-        <ValueRow label="Projected Reserve" value={results.projectedReserve} currency primary />
-        <ValueRow label="Target Reserve" value={inputs.targetReserve} currency />
-        <ValueRow label="Reserve Shortfall" value={results.reserveShortfall} currency highlight />
+        <ValueRow label="Projected HSA balance" value={projectedReserve} currency primary />
+        <ValueRow label="Target savings goal" value={targetSavingsGoal} currency />
+        <ValueRow label="Shortfall to target savings goal" value={reserveShortfall} currency highlight />
+        <ValueRow label="Balance progress" value={reserveProgressLabel} />
         <Note>
-          HDHP / CDHP plans depend on a stocked HSA to offset surprise bills. Direct premium savings into the account until the reserve
-          matches your deductible, then invest extra dollars for future medical needs.
+          HDHP / CDHP plans depend on a stocked HSA to offset surprise bills. Direct premium savings into the account until your balance
+          reaches the target savings goal (often the HDHP / CDHP deductible), then invest extra dollars for future medical needs.
         </Note>
       </Section>
 

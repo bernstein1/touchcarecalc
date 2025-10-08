@@ -528,7 +528,7 @@ export default function HSACalculator() {
                 </div>
                 <div>
                   <Label htmlFor="monthly-budget" className="text-sm font-medium text-foreground mb-2">
-                    Monthly contribution budget (optional)
+                    Monthly HSA contribution budget (optional)
                   </Label>
                   <Input
                     id="monthly-budget"
@@ -539,7 +539,7 @@ export default function HSACalculator() {
                     prefix="$"
                   />
                   <p className="text-xs text-muted-foreground mt-2">
-                    How much can you comfortably contribute per month without straining your budget?
+                    How much can you comfortably contribute per month to your HSA without straining your budget?
                   </p>
                 </div>
               </div>
